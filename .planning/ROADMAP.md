@@ -7,7 +7,7 @@ A strangler fig migration of get-shit-done-cc (v1.20.5) from rigid workflow scri
 ## Phases
 
 - [x] **Phase 1: Characterization Tests and Safe Deletion** - Establish behavioral baseline tests, then incrementally delete ~55 dead files ✓ 2026-02-22
-- [ ] **Phase 2: Deterministic Tooling Foundation** - Build the mechanical operations layer (file management, SHA checks, prerequisites, model resolution, todo CRUD)
+- [x] **Phase 2: Deterministic Tooling Foundation** - Build the mechanical operations layer (file management, SHA checks, prerequisites, model resolution, todo CRUD) (completed 2026-02-22)
 - [ ] **Phase 3: Knowledge Document System** - Create AGENTS.md index and domain-specific reference docs that agents reason over
 - [ ] **Phase 4: Command Handlers and Project Lifecycle** - Wire up all slash commands as thin triggers that load knowledge docs and spawn agents
 - [ ] **Phase 5: Agent Spawning and Handoff Protocols** - Modify agents for single-commit scope with self-contained context propagation
@@ -117,7 +117,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Characterization Tests and Safe Deletion | 2/3 | In progress | - |
-| 2. Deterministic Tooling Foundation | 0/2 | Not started | - |
+| 2. Deterministic Tooling Foundation | 2/2 | Complete   | 2026-02-22 |
 | 3. Knowledge Document System | 0/TBD | Not started | - |
 | 4. Command Handlers and Project Lifecycle | 0/TBD | Not started | - |
 | 5. Agent Spawning and Handoff Protocols | 0/TBD | Not started | - |
