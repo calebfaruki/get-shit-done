@@ -5,14 +5,14 @@
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
-const { loadConfig, resolveModelInternal, findPhaseInternal, getRoadmapPhaseInternal, pathExistsInternal, generateSlugInternal, getMilestoneInfo, normalizePhaseName, output, error } = require('./core.cjs');
+const { getDefaultConfig, resolveModelInternal, findPhaseInternal, getRoadmapPhaseInternal, pathExistsInternal, generateSlugInternal, getMilestoneInfo, normalizePhaseName, output, error } = require('./core.cjs');
 
 function cmdInitExecutePhase(cwd, phase, raw) {
   if (!phase) {
     error('phase required for init execute-phase');
   }
 
-  const config = loadConfig(cwd);
+  const config = getDefaultConfig();
   const phaseInfo = findPhaseInternal(cwd, phase);
   const milestone = getMilestoneInfo(cwd);
 
@@ -62,11 +62,9 @@ function cmdInitExecutePhase(cwd, phase, raw) {
     // File existence
     state_exists: pathExistsInternal(cwd, '.planning/STATE.md'),
     roadmap_exists: pathExistsInternal(cwd, '.planning/ROADMAP.md'),
-    config_exists: pathExistsInternal(cwd, '.planning/config.json'),
     // File paths
     state_path: '.planning/STATE.md',
     roadmap_path: '.planning/ROADMAP.md',
-    config_path: '.planning/config.json',
   };
 
   output(result, raw);
@@ -77,7 +75,7 @@ function cmdInitPlanPhase(cwd, phase, raw) {
     error('phase required for init plan-phase');
   }
 
-  const config = loadConfig(cwd);
+  const config = getDefaultConfig();
   const phaseInfo = findPhaseInternal(cwd, phase);
 
   const result = {
@@ -144,7 +142,7 @@ function cmdInitPlanPhase(cwd, phase, raw) {
 }
 
 function cmdInitNewProject(cwd, raw) {
-  const config = loadConfig(cwd);
+  const config = getDefaultConfig();
 
   // Detect Brave Search API key availability
   const homedir = require('os').homedir();
@@ -203,7 +201,7 @@ function cmdInitNewProject(cwd, raw) {
 }
 
 function cmdInitNewMilestone(cwd, raw) {
-  const config = loadConfig(cwd);
+  const config = getDefaultConfig();
   const milestone = getMilestoneInfo(cwd);
 
   const result = {
@@ -235,7 +233,7 @@ function cmdInitNewMilestone(cwd, raw) {
 }
 
 function cmdInitQuick(cwd, description, raw) {
-  const config = loadConfig(cwd);
+  const config = getDefaultConfig();
   const now = new Date();
   const slug = description ? generateSlugInternal(description)?.substring(0, 40) : null;
 
@@ -285,7 +283,7 @@ function cmdInitQuick(cwd, description, raw) {
 }
 
 function cmdInitResume(cwd, raw) {
-  const config = loadConfig(cwd);
+  const config = getDefaultConfig();
 
   // Check for interrupted agent
   let interruptedAgentId = null;
@@ -321,7 +319,7 @@ function cmdInitVerifyWork(cwd, phase, raw) {
     error('phase required for init verify-work');
   }
 
-  const config = loadConfig(cwd);
+  const config = getDefaultConfig();
   const phaseInfo = findPhaseInternal(cwd, phase);
 
   const result = {
@@ -346,7 +344,7 @@ function cmdInitVerifyWork(cwd, phase, raw) {
 }
 
 function cmdInitPhaseOp(cwd, phase, raw) {
-  const config = loadConfig(cwd);
+  const config = getDefaultConfig();
   let phaseInfo = findPhaseInternal(cwd, phase);
 
   // Fallback to ROADMAP.md if no directory exists (e.g., Plans: TBD)
@@ -427,7 +425,7 @@ function cmdInitPhaseOp(cwd, phase, raw) {
 }
 
 function cmdInitTodos(cwd, area, raw) {
-  const config = loadConfig(cwd);
+  const config = getDefaultConfig();
   const now = new Date();
 
   // List todos (reuse existing logic)
@@ -486,7 +484,7 @@ function cmdInitTodos(cwd, area, raw) {
 }
 
 function cmdInitMilestoneOp(cwd, raw) {
-  const config = loadConfig(cwd);
+  const config = getDefaultConfig();
   const milestone = getMilestoneInfo(cwd);
 
   // Count phases
@@ -547,7 +545,7 @@ function cmdInitMilestoneOp(cwd, raw) {
 }
 
 function cmdInitMapCodebase(cwd, raw) {
-  const config = loadConfig(cwd);
+  const config = getDefaultConfig();
 
   // Check for existing codebase maps
   const codebaseDir = path.join(cwd, '.planning', 'codebase');
@@ -581,7 +579,7 @@ function cmdInitMapCodebase(cwd, raw) {
 }
 
 function cmdInitProgress(cwd, raw) {
-  const config = loadConfig(cwd);
+  const config = getDefaultConfig();
   const milestone = getMilestoneInfo(cwd);
 
   // Analyze phases
@@ -672,7 +670,6 @@ function cmdInitProgress(cwd, raw) {
     state_path: '.planning/STATE.md',
     roadmap_path: '.planning/ROADMAP.md',
     project_path: '.planning/PROJECT.md',
-    config_path: '.planning/config.json',
   };
 
   output(result, raw);

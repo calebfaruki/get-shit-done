@@ -128,7 +128,6 @@ const state = require('./lib/state.cjs');
 const phase = require('./lib/phase.cjs');
 const roadmap = require('./lib/roadmap.cjs');
 const verify = require('./lib/verify.cjs');
-const config = require('./lib/config.cjs');
 const template = require('./lib/template.cjs');
 const milestone = require('./lib/milestone.cjs');
 const commands = require('./lib/commands.cjs');
@@ -325,21 +324,6 @@ async function main() {
 
     case 'verify-path-exists': {
       commands.cmdVerifyPathExists(cwd, args[1], raw);
-      break;
-    }
-
-    case 'config-ensure-section': {
-      config.cmdConfigEnsureSection(cwd, raw);
-      break;
-    }
-
-    case 'config-set': {
-      config.cmdConfigSet(cwd, args[1], args[2], raw);
-      break;
-    }
-
-    case 'config-get': {
-      config.cmdConfigGet(cwd, args[1], raw);
       break;
     }
 

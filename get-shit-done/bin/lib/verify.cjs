@@ -518,7 +518,6 @@ function cmdValidateHealth(cwd, options, raw) {
   const projectPath = path.join(planningDir, 'PROJECT.md');
   const roadmapPath = path.join(planningDir, 'ROADMAP.md');
   const statePath = path.join(planningDir, 'STATE.md');
-  const configPath = path.join(planningDir, 'config.json');
   const phasesDir = path.join(planningDir, 'phases');
 
   const errors = [];
@@ -597,36 +596,17 @@ function cmdValidateHealth(cwd, options, raw) {
     }
   }
 
-  // ─── Check 5: config.json valid JSON + valid schema ───────────────────────
-  if (!fs.existsSync(configPath)) {
-    addIssue('warning', 'W003', 'config.json not found', 'Run /gsd:health --repair to create with defaults', true);
-    repairs.push('createConfig');
-  } else {
-    try {
-      const raw = fs.readFileSync(configPath, 'utf-8');
-      const parsed = JSON.parse(raw);
-      // Validate known fields
-      const validProfiles = ['quality', 'balanced', 'budget'];
-      if (parsed.model_profile && !validProfiles.includes(parsed.model_profile)) {
-        addIssue('warning', 'W004', `config.json: invalid model_profile "${parsed.model_profile}"`, `Valid values: ${validProfiles.join(', ')}`);
-      }
-    } catch (err) {
-      addIssue('error', 'E005', `config.json: JSON parse error - ${err.message}`, 'Run /gsd:health --repair to reset to defaults', true);
-      repairs.push('resetConfig');
-    }
-  }
-
-  // ─── Check 6: Phase directory naming (NN-name format) ─────────────────────
+  // ─── Check 5: Phase directory naming (NN-name format) ─────────────────────
   try {
     const entries = fs.readdirSync(phasesDir, { withFileTypes: true });
     for (const e of entries) {
       if (e.isDirectory() && !e.name.match(/^\d{2}(?:\.\d+)?-[\w-]+$/)) {
-        addIssue('warning', 'W005', `Phase directory "${e.name}" doesn't follow NN-name format`, 'Rename to match pattern (e.g., 01-setup)');
+        addIssue('warning', 'W003', `Phase directory "${e.name}" doesn't follow NN-name format`, 'Rename to match pattern (e.g., 01-setup)');
       }
     }
   } catch {}
 
-  // ─── Check 7: Orphaned plans (PLAN without SUMMARY) ───────────────────────
+  // ─── Check 6: Orphaned plans (PLAN without SUMMARY) ───────────────────────
   try {
     const entries = fs.readdirSync(phasesDir, { withFileTypes: true });
     for (const e of entries) {
@@ -645,7 +625,7 @@ function cmdValidateHealth(cwd, options, raw) {
     }
   } catch {}
 
-  // ─── Check 8: Run existing consistency checks ─────────────────────────────
+  // ─── Check 7: Run existing consistency checks ─────────────────────────────
   // Inline subset of cmdValidateConsistency
   if (fs.existsSync(roadmapPath)) {
     const roadmapContent = fs.readFileSync(roadmapPath, 'utf-8');
@@ -671,7 +651,7 @@ function cmdValidateHealth(cwd, options, raw) {
     for (const p of roadmapPhases) {
       const padded = String(parseInt(p, 10)).padStart(2, '0');
       if (!diskPhases.has(p) && !diskPhases.has(padded)) {
-        addIssue('warning', 'W006', `Phase ${p} in ROADMAP.md but no directory on disk`, 'Create phase directory or remove from roadmap');
+        addIssue('warning', 'W004', `Phase ${p} in ROADMAP.md but no directory on disk`, 'Create phase directory or remove from roadmap');
       }
     }
 
@@ -679,7 +659,7 @@ function cmdValidateHealth(cwd, options, raw) {
     for (const p of diskPhases) {
       const unpadded = String(parseInt(p, 10));
       if (!roadmapPhases.has(p) && !roadmapPhases.has(unpadded)) {
-        addIssue('warning', 'W007', `Phase ${p} exists on disk but not in ROADMAP.md`, 'Add to roadmap or remove directory');
+        addIssue('warning', 'W005', `Phase ${p} exists on disk but not in ROADMAP.md`, 'Add to roadmap or remove directory');
       }
     }
   }
@@ -690,22 +670,6 @@ function cmdValidateHealth(cwd, options, raw) {
     for (const repair of repairs) {
       try {
         switch (repair) {
-          case 'createConfig':
-          case 'resetConfig': {
-            const defaults = {
-              model_profile: 'balanced',
-              commit_docs: true,
-              search_gitignored: false,
-              branching_strategy: 'none',
-              research: true,
-              plan_checker: true,
-              verifier: true,
-              parallelization: true,
-            };
-            fs.writeFileSync(configPath, JSON.stringify(defaults, null, 2), 'utf-8');
-            repairActions.push({ action: repair, success: true, path: 'config.json' });
-            break;
-          }
           case 'regenerateState': {
             // Create timestamped backup before overwriting
             if (fs.existsSync(statePath)) {

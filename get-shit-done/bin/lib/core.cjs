@@ -57,9 +57,8 @@ function safeReadFile(filePath) {
   }
 }
 
-function loadConfig(cwd) {
-  const configPath = path.join(cwd, '.planning', 'config.json');
-  const defaults = {
+function getDefaultConfig() {
+  return {
     model_profile: 'balanced',
     commit_docs: true,
     search_gitignored: false,
@@ -72,42 +71,6 @@ function loadConfig(cwd) {
     parallelization: true,
     brave_search: false,
   };
-
-  try {
-    const raw = fs.readFileSync(configPath, 'utf-8');
-    const parsed = JSON.parse(raw);
-
-    const get = (key, nested) => {
-      if (parsed[key] !== undefined) return parsed[key];
-      if (nested && parsed[nested.section] && parsed[nested.section][nested.field] !== undefined) {
-        return parsed[nested.section][nested.field];
-      }
-      return undefined;
-    };
-
-    const parallelization = (() => {
-      const val = get('parallelization');
-      if (typeof val === 'boolean') return val;
-      if (typeof val === 'object' && val !== null && 'enabled' in val) return val.enabled;
-      return defaults.parallelization;
-    })();
-
-    return {
-      model_profile: get('model_profile') ?? defaults.model_profile,
-      commit_docs: get('commit_docs', { section: 'planning', field: 'commit_docs' }) ?? defaults.commit_docs,
-      search_gitignored: get('search_gitignored', { section: 'planning', field: 'search_gitignored' }) ?? defaults.search_gitignored,
-      branching_strategy: get('branching_strategy', { section: 'git', field: 'branching_strategy' }) ?? defaults.branching_strategy,
-      phase_branch_template: get('phase_branch_template', { section: 'git', field: 'phase_branch_template' }) ?? defaults.phase_branch_template,
-      milestone_branch_template: get('milestone_branch_template', { section: 'git', field: 'milestone_branch_template' }) ?? defaults.milestone_branch_template,
-      research: get('research', { section: 'workflow', field: 'research' }) ?? defaults.research,
-      plan_checker: get('plan_checker', { section: 'workflow', field: 'plan_check' }) ?? defaults.plan_checker,
-      verifier: get('verifier', { section: 'workflow', field: 'verifier' }) ?? defaults.verifier,
-      parallelization,
-      brave_search: get('brave_search') ?? defaults.brave_search,
-    };
-  } catch {
-    return defaults;
-  }
 }
 
 // ─── Git utilities ────────────────────────────────────────────────────────────
@@ -310,16 +273,8 @@ function getRoadmapPhaseInternal(cwd, phaseNum) {
 }
 
 function resolveModelInternal(cwd, agentType) {
-  const config = loadConfig(cwd);
-
-  // Check per-agent override first
-  const override = config.model_overrides?.[agentType];
-  if (override) {
-    return override === 'opus' ? 'inherit' : override;
-  }
-
-  // Fall back to profile lookup
-  const profile = config.model_profile || 'balanced';
+  const config = getDefaultConfig();
+  const profile = config.model_profile;
   const agentModels = MODEL_PROFILES[agentType];
   if (!agentModels) return 'sonnet';
   const resolved = agentModels[profile] || agentModels['balanced'] || 'sonnet';
@@ -362,7 +317,7 @@ module.exports = {
   output,
   error,
   safeReadFile,
-  loadConfig,
+  getDefaultConfig,
   isGitIgnored,
   execGit,
   normalizePhaseName,

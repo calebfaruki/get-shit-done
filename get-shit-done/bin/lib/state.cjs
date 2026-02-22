@@ -4,10 +4,10 @@
 
 const fs = require('fs');
 const path = require('path');
-const { loadConfig, output, error } = require('./core.cjs');
+const { getDefaultConfig, output, error } = require('./core.cjs');
 
 function cmdStateLoad(cwd, raw) {
-  const config = loadConfig(cwd);
+  const config = getDefaultConfig();
   const planningDir = path.join(cwd, '.planning');
 
   let stateRaw = '';
@@ -15,7 +15,6 @@ function cmdStateLoad(cwd, raw) {
     stateRaw = fs.readFileSync(path.join(planningDir, 'STATE.md'), 'utf-8');
   } catch {}
 
-  const configExists = fs.existsSync(path.join(planningDir, 'config.json'));
   const roadmapExists = fs.existsSync(path.join(planningDir, 'ROADMAP.md'));
   const stateExists = stateRaw.length > 0;
 
@@ -24,7 +23,6 @@ function cmdStateLoad(cwd, raw) {
     state_raw: stateRaw,
     state_exists: stateExists,
     roadmap_exists: roadmapExists,
-    config_exists: configExists,
   };
 
   // For --raw, output a condensed key=value format
@@ -40,7 +38,6 @@ function cmdStateLoad(cwd, raw) {
       `research=${c.research}`,
       `plan_checker=${c.plan_checker}`,
       `verifier=${c.verifier}`,
-      `config_exists=${configExists}`,
       `roadmap_exists=${roadmapExists}`,
       `state_exists=${stateExists}`,
     ];

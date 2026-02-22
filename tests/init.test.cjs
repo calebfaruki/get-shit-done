@@ -30,7 +30,6 @@ describe('init commands', () => {
     const output = JSON.parse(result.output);
     assert.strictEqual(output.state_path, '.planning/STATE.md');
     assert.strictEqual(output.roadmap_path, '.planning/ROADMAP.md');
-    assert.strictEqual(output.config_path, '.planning/config.json');
   });
 
   test('init plan-phase returns file paths', () => {
@@ -62,7 +61,6 @@ describe('init commands', () => {
     assert.strictEqual(output.state_path, '.planning/STATE.md');
     assert.strictEqual(output.roadmap_path, '.planning/ROADMAP.md');
     assert.strictEqual(output.project_path, '.planning/PROJECT.md');
-    assert.strictEqual(output.config_path, '.planning/config.json');
   });
 
   test('init phase-op returns core and optional phase file paths', () => {
