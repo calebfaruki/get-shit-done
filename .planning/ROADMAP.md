@@ -79,8 +79,8 @@ Plans:
   9. Human drives all phase transitions; no auto-advance exists
 **Plans**: 5 plans
 Plans:
-- [ ] 04-01-PLAN.md — Infrastructure: .gitignore, bare-namespace /map and /todo commands
-- [ ] 04-02-PLAN.md — Project intake: /new-project and /discuss-project with scope validation
+- [x] 04-01-PLAN.md — Infrastructure: .gitignore, bare-namespace /map and /todo commands ✓ 2026-02-22
+- [x] 04-02-PLAN.md — Project intake: /new-project and /discuss-project with scope validation ✓ 2026-02-22
 - [ ] 04-03-PLAN.md — Project lifecycle: /research-project, /plan-project, /verify-project
 - [ ] 04-04-PLAN.md — Phase commands: /discuss-phase, /research-phase, /plan-phase
 - [ ] 04-05-PLAN.md — Execution: /execute-phase with PROJECT-SUMMARY.md tracking, gsd:* cleanup
@@ -129,7 +129,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 1. Characterization Tests and Safe Deletion | 3/3 | Complete | 2026-02-22 |
 | 2. Deterministic Tooling Foundation | 2/2 | Complete | 2026-02-22 |
 | 3. Knowledge Document System | 3/3 | Complete | 2026-02-22 |
-| 4. Command Handlers and Project Lifecycle | 1/5 | In Progress|  |
+| 4. Command Handlers and Project Lifecycle | 2/5 | In Progress|  |
 | 5. Agent Spawning and Handoff Protocols | 0/TBD | Not started | - |
 | 6. Verification and Git Staging | 0/TBD | Not started | - |
 | 7. Integration Testing and Migration Cleanup | 0/TBD | Not started | - |

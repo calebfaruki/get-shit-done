@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-22)
 ## Current Position
 
 Phase: 4 of 7 (Command Handlers and Project Lifecycle)
-Plan: 1 of 3 in current phase (04-01 completed)
+Plan: 4 of 5 in current phase (04-01, 04-02, 04-03, 04-04 completed)
 Status: In progress
-Last activity: 2026-02-22 -- Completed 04-01-PLAN.md
+Last activity: 2026-02-22 -- Completed 04-04-PLAN.md
 
-Progress: [#####.....] 50%
+Progress: [#######...] 70%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
-- Average duration: 4.3 minutes
-- Total execution time: 0.52 hours
+- Total plans completed: 10
+- Average duration: 4.0 minutes
+- Total execution time: 0.72 hours
 
 **By Phase:**
 
@@ -29,18 +29,22 @@ Progress: [#####.....] 50%
 |-------|-------|-------|----------|
 | 01 | 3 | 13min | 4min |
 | 02 | 1 | 2min | 2min |
-| 03 | 2 | 6min | 3min |
-| 04 | 1 | 10min | 10min |
+| 03 | 3 | 9min | 3min |
+| 04 | 4 | 24min | 6min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (2min), 03-01 (5min), 03-02 (3min), 03-03 (3min), 04-01 (10min)
-- Trend: Increasing
+- Last 5 plans: 03-03 (3min), 04-01 (10min), 04-02 (2min), 04-03 (3min), 04-04 (9min)
+- Trend: Variable
 
 *Updated after each plan completion*
 | Phase 03 P01 | 5 | 2 tasks | 2 files |
 | Phase 03 P02 | 3 | 2 tasks | 2 files |
 | Phase 03 P03 | 3 | 2 tasks | 1 files |
 | Phase 04 P01 | 10 | 2 tasks | 7 files |
+| Phase 04 P02 | 2 | 2 tasks | 4 files |
+| Phase 04 P03 | 3 | 2 tasks | 6 files |
+| Phase 04 P04 | 9 | 2 tasks | 9 files |
+| Phase 04 P05 | 3 min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -70,6 +74,26 @@ Recent decisions affecting current work:
 - [Phase 04]: Anchor codebase maps to git commit SHA for staleness detection
 - [Phase 04]: Output single CODEBASE.md instead of multiple files in codebase/ directory
 - [Phase 04]: Make /todo view-only (no mutations, no state updates)
+- [Phase 04-02]: Efficient sharpener style for intake (1-2 rounds max, propose criteria quickly)
+- [Phase 04-02]: Todo matching uses area tag matching (not semantic/AI judgment)
+- [Phase 04-04]: Phase workflows read PROJECT-PLAN.md directly instead of ROADMAP.md for phase validation
+- [Phase 04-04]: All phase artifacts go to .planning/project/ with PHASE-N-* flat naming
+- [Phase 04-04]: Three-category CONTEXT.md format (Locked Decisions, Discretion Areas, Deferred Ideas)
+- [Phase 04-04]: XML-tagged RESEARCH.md sections for structured output per SPEC
+- [Phase 04-04]: YAML+XML PHASE-N-PLAN.md format with no wave/depends_on/parallelization (single-commit scope)
+- [Phase 04-04]: Research handled separately via /research-phase command, not integrated into plan-phase
+- [Phase 04-04]: Removed plan-checker and revision loop - not needed for single-commit scope
+- [Phase 04-04]: Never auto-advance - user explicitly drives all phase transitions per SPEC
+- [Phase 04-02]: No archive before project wipe (rm -rf after confirmation)
+- [Phase 04-02]: PROJECT.md uses plain markdown with no frontmatter per SPEC
+- [Phase 04-02]: Soft prerequisite checks (warn and offer help, not hard error)
+- [Phase 04-03]: PROJECT-PLAN.md is sole planning artifact (no ROADMAP, STATE, MILESTONES, REQUIREMENTS)
+- [Phase 04-03]: Research produces single PROJECT-RESEARCH.md (no multi-file output, no synthesizer)
+- [Phase 04-03]: Verification is report-only (no automated fix loops, human decides next steps)
+- [Phase 04-03]: Re-running commands overwrites previous output (no archiving)
+- [Phase 04-05]: Executor leaves all changes unstaged — verifier stages on pass
+- [Phase 04-05]: PROJECT-SUMMARY.md uses plain markdown phase blocks, overwrites on re-run
+- [Phase 04-05]: Complete migration to bare namespace (no gsd:* commands remain)
 
 ### Pending Todos
 
@@ -82,5 +106,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: Completed 04-01-PLAN.md (Foundation Infrastructure)
-Resume file: .planning/phases/04-command-handlers-and-project-lifecycle/04-01-SUMMARY.md
+Stopped at: Completed 04-04-PLAN.md (Phase-Level Commands)
+Resume file: .planning/phases/04-command-handlers-and-project-lifecycle/04-04-SUMMARY.md

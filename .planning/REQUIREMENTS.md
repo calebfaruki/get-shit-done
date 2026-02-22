@@ -32,19 +32,19 @@
 
 ### Commands — Project Level
 
-- [ ] **CMD-01**: `/new-project` — conversational intake, scope validation, acceptance criteria sharpening; writes PROJECT.md
-- [ ] **CMD-02**: `/research-project` — strategic research via subagent, single-file output
-- [ ] **CMD-03**: `/discuss-project` — deeper exploration of existing PROJECT.md in main context
-- [ ] **CMD-04**: `/plan-project` — break project into phases, produce PROJECT-PLAN.md via subagent
-- [ ] **CMD-05**: `/verify-project` — check result against project-level acceptance criteria via subagent
+- [x] **CMD-01**: `/new-project` — conversational intake, scope validation, acceptance criteria sharpening; writes PROJECT.md ✓ 2026-02-22
+- [x] **CMD-02**: `/research-project` — strategic research via subagent, single-file output
+- [x] **CMD-03**: `/discuss-project` — deeper exploration of existing PROJECT.md in main context ✓ 2026-02-22
+- [x] **CMD-04**: `/plan-project` — break project into phases, produce PROJECT-PLAN.md via subagent
+- [x] **CMD-05**: `/verify-project` — check result against project-level acceptance criteria via subagent
 
 ### Commands — Phase Level
 
-- [ ] **CMD-06**: `/execute-phase N` — no per-step commits, no STATE.md updates, no auto-advance, no continuation agents
+- [x] **CMD-06**: `/execute-phase N` — no per-step commits, no STATE.md updates, no auto-advance, no continuation agents
 - [ ] **CMD-07**: `/verify-phase N` — report-only verification, stages files on pass via explicit `git add <file>`, reports diagnostics on fail
-- [ ] **CMD-08**: `/plan-phase N` — single-commit scope, one plan per phase
-- [ ] **CMD-09**: `/research-phase N` — tactical research with XML-tagged sections for planner consumption
-- [ ] **CMD-10**: `/discuss-phase N` — clarify decisions before planning, no roadmap/state dependencies
+- [x] **CMD-08**: `/plan-phase N` — single-commit scope, one plan per phase
+- [x] **CMD-09**: `/research-phase N` — tactical research with XML-tagged sections for planner consumption
+- [x] **CMD-10**: `/discuss-phase N` — clarify decisions before planning, no roadmap/state dependencies
 
 ### Commands — Utility
 
@@ -63,23 +63,23 @@
 
 ### State Management
 
-- [ ] **STATE-01**: Ephemeral project directory (`.planning/project/`) wiped on new project with archive-before-wipe safety
-- [ ] **STATE-02**: PROJECT-PLAN.md replaces ROADMAP.md, STATE.md, MILESTONES.md
-- [ ] **STATE-03**: PROJECT-SUMMARY.md: executor appends phase blocks, overwrites on re-run
+- [x] **STATE-01**: Ephemeral project directory (`.planning/project/`) wiped on new project with archive-before-wipe safety ✓ 2026-02-22
+- [x] **STATE-02**: PROJECT-PLAN.md replaces ROADMAP.md, STATE.md, MILESTONES.md
+- [x] **STATE-03**: PROJECT-SUMMARY.md: executor appends phase blocks, overwrites on re-run
 - [x] **STATE-04**: No config.json — workflow configuration removed — config.cjs deleted, all code paths removed, hardcoded defaults in core.cjs ✓ 2026-02-22
 - [x] **STATE-05**: Files on disk are the state; no cross-session resume/pause mechanism
 
 ### Scope Validation
 
-- [ ] **SCOPE-01**: Verifiability assessment during `/new-project` (greenfield/mechanical/brownfield heuristics)
-- [ ] **SCOPE-02**: Scope warnings for brownfield requests that lack verifiable acceptance criteria
-- [ ] **SCOPE-03**: Must-have / nice-to-have split enforced; nice-to-haves parked as todos
+- [x] **SCOPE-01**: Verifiability assessment during `/new-project` (greenfield/mechanical/brownfield heuristics) ✓ 2026-02-22
+- [x] **SCOPE-02**: Scope warnings for brownfield requests that lack verifiable acceptance criteria ✓ 2026-02-22
+- [x] **SCOPE-03**: Must-have / nice-to-have split enforced; nice-to-haves parked as todos ✓ 2026-02-22
 
 ### Safety
 
 - [ ] **SAFE-01**: Working tree safety: pipeline manages `.planning/` files only; never commits, resets, checks out, stashes, or discards working tree content
 - [ ] **SAFE-02**: Git staging uses explicit `git add <file>` (never `git add -A` or `git add .`)
-- [ ] **SAFE-03**: Human-in-the-loop: human drives all phase transitions; no auto-advance
+- [x] **SAFE-03**: Human-in-the-loop: human drives all phase transitions; no auto-advance ✓ 2026-02-22
 - [ ] **SAFE-04**: No automated fix loops: verifier reports and stops
 
 ## v2 Requirements
@@ -140,16 +140,16 @@
 | KNOW-04 | Phase 3 | Complete |
 | KNOW-05 | Phase 3 | Complete |
 | KNOW-06 | Phase 3 | Complete |
-| CMD-01 | Phase 4 | Pending |
-| CMD-02 | Phase 4 | Pending |
-| CMD-03 | Phase 4 | Pending |
-| CMD-04 | Phase 4 | Pending |
-| CMD-05 | Phase 4 | Pending |
-| CMD-06 | Phase 4 | Pending |
+| CMD-01 | Phase 4 | Complete (04-02) |
+| CMD-02 | Phase 4 | Complete |
+| CMD-03 | Phase 4 | Complete (04-02) |
+| CMD-04 | Phase 4 | Complete |
+| CMD-05 | Phase 4 | Complete |
+| CMD-06 | Phase 4 | Complete |
 | CMD-07 | Phase 6 | Pending |
-| CMD-08 | Phase 4 | Pending |
-| CMD-09 | Phase 4 | Pending |
-| CMD-10 | Phase 4 | Pending |
+| CMD-08 | Phase 4 | Complete |
+| CMD-09 | Phase 4 | Complete |
+| CMD-10 | Phase 4 | Complete |
 | CMD-11 | Phase 4 | Complete |
 | CMD-12 | Phase 4 | Complete |
 | AGT-01 | Phase 5 | Pending |
@@ -159,17 +159,17 @@
 | AGT-05 | Phase 5 | Pending |
 | AGT-06 | Phase 5 | Pending |
 | AGT-07 | Phase 5 | Pending |
-| STATE-01 | Phase 4 | Pending |
-| STATE-02 | Phase 4 | Pending |
-| STATE-03 | Phase 4 | Pending |
+| STATE-01 | Phase 4 | Complete (04-02) |
+| STATE-02 | Phase 4 | Complete |
+| STATE-03 | Phase 4 | Complete |
 | STATE-04 | Phase 1 | Complete |
 | STATE-05 | Phase 4 | Complete |
-| SCOPE-01 | Phase 4 | Pending |
-| SCOPE-02 | Phase 4 | Pending |
-| SCOPE-03 | Phase 4 | Pending |
+| SCOPE-01 | Phase 4 | Complete (04-02) |
+| SCOPE-02 | Phase 4 | Complete (04-02) |
+| SCOPE-03 | Phase 4 | Complete (04-02) |
 | SAFE-01 | Phase 6 | Pending |
 | SAFE-02 | Phase 6 | Pending |
-| SAFE-03 | Phase 4 | Pending |
+| SAFE-03 | Phase 4 | Complete (04-02) |
 | SAFE-04 | Phase 6 | Pending |
 
 **Coverage:**
