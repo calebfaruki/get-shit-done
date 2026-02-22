@@ -14,10 +14,10 @@
 
 ### Deterministic Tooling
 
-- [ ] **TOOL-01**: File management utilities using atomic writes (temp file + rename pattern)
-- [ ] **TOOL-02**: Codebase map staleness detection via commit SHA comparison
-- [ ] **TOOL-03**: Prerequisite checking for commands (e.g., `.planning/` exists, map not stale)
-- [ ] **TOOL-04**: `resolve-model` retained for multi-model profile resolution (quality/balanced/budget)
+- [x] **TOOL-01**: File management utilities using atomic writes (temp file + rename pattern)
+- [x] **TOOL-02**: Codebase map staleness detection via commit SHA comparison
+- [x] **TOOL-03**: Prerequisite checking for commands (e.g., `.planning/` exists, map not stale)
+- [x] **TOOL-04**: `resolve-model` retained for multi-model profile resolution (quality/balanced/budget)
 - [ ] **TOOL-05**: Todo CRUD operations (create, list, complete, delete) with area-tagged files in `.planning/todos/`
 - [ ] **TOOL-06**: `gsd-tools.cjs` calls stripped from all agents; agents use native tools (Read, Write, Glob, Grep, Bash)
 
@@ -128,10 +128,10 @@
 | CLN-02 | Phase 1 | Complete |
 | CLN-03 | Phase 1 | Complete |
 | CLN-04 | Phase 4 | Pending |
-| TOOL-01 | Phase 2 | Pending |
-| TOOL-02 | Phase 2 | Pending |
-| TOOL-03 | Phase 2 | Pending |
-| TOOL-04 | Phase 2 | Pending |
+| TOOL-01 | Phase 2 | Complete |
+| TOOL-02 | Phase 2 | Complete |
+| TOOL-03 | Phase 2 | Complete |
+| TOOL-04 | Phase 2 | Complete |
 | TOOL-05 | Phase 2 | Pending |
 | TOOL-06 | Phase 5 | Pending |
 | KNOW-01 | Phase 3 | Pending |
