@@ -6,7 +6,7 @@ A strangler fig migration of get-shit-done-cc (v1.20.5) from rigid workflow scri
 
 ## Phases
 
-- [ ] **Phase 1: Characterization Tests and Safe Deletion** - Establish behavioral baseline tests, then incrementally delete ~55 dead files
+- [x] **Phase 1: Characterization Tests and Safe Deletion** - Establish behavioral baseline tests, then incrementally delete ~55 dead files ✓ 2026-02-22
 - [ ] **Phase 2: Deterministic Tooling Foundation** - Build the mechanical operations layer (file management, SHA checks, prerequisites, model resolution, todo CRUD)
 - [ ] **Phase 3: Knowledge Document System** - Create AGENTS.md index and domain-specific reference docs that agents reason over
 - [ ] **Phase 4: Command Handlers and Project Lifecycle** - Wire up all slash commands as thin triggers that load knowledge docs and spawn agents
@@ -27,8 +27,8 @@ A strangler fig migration of get-shit-done-cc (v1.20.5) from rigid workflow scri
   4. config.json workflow configuration is removed (STATE-04)
 **Plans**: 2 plans
 Plans:
-- [ ] 01-01-PLAN.md — Characterization tests and low-risk file deletions (~38 files in 3 waves)
-- [ ] 01-02-PLAN.md — Config.json removal, high-risk deletions, and installation verification (~17 files)
+- [x] 01-01-PLAN.md — Characterization tests and low-risk file deletions (~40 files in 3 waves) ✓ 2026-02-22
+- [x] 01-02-PLAN.md — Config.json removal, high-risk deletions, and installation verification (~19 files) ✓ 2026-02-22
 
 ### Phase 2: Deterministic Tooling Foundation
 **Goal**: A tested utility library handles all mechanical operations so agents never need to implement file management, staleness checks, or prerequisite validation themselves
@@ -112,7 +112,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Characterization Tests and Safe Deletion | 0/2 | Planned | - |
+| 1. Characterization Tests and Safe Deletion | 1/2 | In progress | - |
 | 2. Deterministic Tooling Foundation | 0/TBD | Not started | - |
 | 3. Knowledge Document System | 0/TBD | Not started | - |
 | 4. Command Handlers and Project Lifecycle | 0/TBD | Not started | - |
