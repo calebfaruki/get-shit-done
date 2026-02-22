@@ -10,7 +10,7 @@
 - [x] **CLN-01**: ~55 dead GSD files deleted (workflow scripts, milestone commands, state management files that don't survive the fork) — 59 files deleted total (40 in 01-01, 19 in 01-02) ✓ 2026-02-22
 - [x] **CLN-02**: Existing test suite passes after each deletion wave (strangler fig, not big bang) — 90/90 tests + 9/9 characterization tests pass after all deletions ✓ 2026-02-22
 - [x] **CLN-03**: Installation works across Claude Code, OpenCode, and Gemini after cleanup — Verified for Claude Code (full cross-platform deferred to Phase 7) ✓ 2026-02-22
-- [ ] **CLN-04**: `gsd:` command prefix stripped; bare namespace (`/new-project` not `/gsd:new-project`)
+- [x] **CLN-04**: `gsd:` command prefix stripped; bare namespace (`/new-project` not `/gsd:new-project`)
 
 ### Deterministic Tooling
 
@@ -18,7 +18,7 @@
 - [x] **TOOL-02**: Codebase map staleness detection via commit SHA comparison
 - [x] **TOOL-03**: Prerequisite checking for commands (e.g., `.planning/` exists, map not stale)
 - [x] **TOOL-04**: `resolve-model` retained for multi-model profile resolution (quality/balanced/budget)
-- [ ] **TOOL-05**: Todo CRUD operations (create, list, complete, delete) with area-tagged files in `.planning/todos/`
+- [x] **TOOL-05**: Todo CRUD operations (create, list, complete, delete) with area-tagged files in `.planning/todos/` ✓ 2026-02-22
 - [ ] **TOOL-06**: `gsd-tools.cjs` calls stripped from all agents; agents use native tools (Read, Write, Glob, Grep, Bash)
 
 ### Knowledge Documents
@@ -48,8 +48,8 @@
 
 ### Commands — Utility
 
-- [ ] **CMD-11**: `/map` — codebase mapping with commit SHA anchoring and staleness detection
-- [ ] **CMD-12**: `/todo` — view and manage parking lot items
+- [x] **CMD-11**: `/map` — codebase mapping with commit SHA anchoring and staleness detection
+- [x] **CMD-12**: `/todo` — view and manage parking lot items
 
 ### Agent Modifications
 
@@ -67,7 +67,7 @@
 - [ ] **STATE-02**: PROJECT-PLAN.md replaces ROADMAP.md, STATE.md, MILESTONES.md
 - [ ] **STATE-03**: PROJECT-SUMMARY.md: executor appends phase blocks, overwrites on re-run
 - [x] **STATE-04**: No config.json — workflow configuration removed — config.cjs deleted, all code paths removed, hardcoded defaults in core.cjs ✓ 2026-02-22
-- [ ] **STATE-05**: Files on disk are the state; no cross-session resume/pause mechanism
+- [x] **STATE-05**: Files on disk are the state; no cross-session resume/pause mechanism
 
 ### Scope Validation
 
@@ -127,12 +127,12 @@
 | CLN-01 | Phase 1 | Complete |
 | CLN-02 | Phase 1 | Complete |
 | CLN-03 | Phase 1 | Complete |
-| CLN-04 | Phase 4 | Pending |
+| CLN-04 | Phase 4 | Complete |
 | TOOL-01 | Phase 2 | Complete |
 | TOOL-02 | Phase 2 | Complete |
 | TOOL-03 | Phase 2 | Complete |
 | TOOL-04 | Phase 2 | Complete |
-| TOOL-05 | Phase 2 | Pending |
+| TOOL-05 | Phase 2 | Complete |
 | TOOL-06 | Phase 5 | Pending |
 | KNOW-01 | Phase 3 | Complete |
 | KNOW-02 | Phase 3 | Complete |
@@ -150,8 +150,8 @@
 | CMD-08 | Phase 4 | Pending |
 | CMD-09 | Phase 4 | Pending |
 | CMD-10 | Phase 4 | Pending |
-| CMD-11 | Phase 4 | Pending |
-| CMD-12 | Phase 4 | Pending |
+| CMD-11 | Phase 4 | Complete |
+| CMD-12 | Phase 4 | Complete |
 | AGT-01 | Phase 5 | Pending |
 | AGT-02 | Phase 6 | Pending |
 | AGT-03 | Phase 5 | Pending |
@@ -163,7 +163,7 @@
 | STATE-02 | Phase 4 | Pending |
 | STATE-03 | Phase 4 | Pending |
 | STATE-04 | Phase 1 | Complete |
-| STATE-05 | Phase 4 | Pending |
+| STATE-05 | Phase 4 | Complete |
 | SCOPE-01 | Phase 4 | Pending |
 | SCOPE-02 | Phase 4 | Pending |
 | SCOPE-03 | Phase 4 | Pending |
