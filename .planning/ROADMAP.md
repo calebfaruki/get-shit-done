@@ -29,7 +29,7 @@ A strangler fig migration of get-shit-done-cc (v1.20.5) from rigid workflow scri
 Plans:
 - [x] 01-01-PLAN.md — Characterization tests and low-risk file deletions (~40 files in 3 waves) ✓ 2026-02-22
 - [x] 01-02-PLAN.md — Config.json removal, high-risk deletions, and installation verification (~19 files) ✓ 2026-02-22
-- [ ] 01-03-PLAN.md — Gap closure: fix incomplete loadConfig removal in commands.cjs (STATE-04)
+- [x] 01-03-PLAN.md — Gap closure: fix incomplete loadConfig removal in commands.cjs (STATE-04) ✓ 2026-02-22
 
 ### Phase 2: Deterministic Tooling Foundation
 **Goal**: A tested utility library handles all mechanical operations so agents never need to implement file management, staleness checks, or prerequisite validation themselves
@@ -43,8 +43,8 @@ Plans:
   5. Todo CRUD creates, lists, completes, and deletes area-tagged files in `.planning/todos/`
 **Plans**: 2 plans
 Plans:
-- [ ] 02-01-PLAN.md — Core toolkit: atomic writes, SHA staleness, prerequisite checks, model resolution (TDD)
-- [ ] 02-02-PLAN.md — Todo CRUD: create, list, complete, delete area-tagged files (TDD)
+- [x] 02-01-PLAN.md — Core toolkit: atomic writes, SHA staleness, prerequisite checks, model resolution (TDD) ✓ 2026-02-22
+- [x] 02-02-PLAN.md — Todo CRUD: create, list, complete, delete area-tagged files (TDD) ✓ 2026-02-22
 
 ### Phase 3: Knowledge Document System
 **Goal**: Agents have domain-specific reference documents to reason over instead of rigid workflow scripts
@@ -77,7 +77,13 @@ Plans:
   7. `.planning/project/` is wiped (with archive safety) when `/new-project` starts a new project
   8. PROJECT-PLAN.md replaces ROADMAP.md, STATE.md, and MILESTONES.md as the sole planning artifact
   9. Human drives all phase transitions; no auto-advance exists
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+- [ ] 04-01-PLAN.md — Infrastructure: .gitignore, bare-namespace /map and /todo commands
+- [ ] 04-02-PLAN.md — Project intake: /new-project and /discuss-project with scope validation
+- [ ] 04-03-PLAN.md — Project lifecycle: /research-project, /plan-project, /verify-project
+- [ ] 04-04-PLAN.md — Phase commands: /discuss-phase, /research-phase, /plan-phase
+- [ ] 04-05-PLAN.md — Execution: /execute-phase with PROJECT-SUMMARY.md tracking, gsd:* cleanup
 
 ### Phase 5: Agent Spawning and Handoff Protocols
 **Goal**: All subagents operate with single-commit scope framing and receive self-contained context through explicit file references
@@ -120,10 +126,10 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Characterization Tests and Safe Deletion | 2/3 | In progress | - |
-| 2. Deterministic Tooling Foundation | 2/2 | Complete    | 2026-02-22 |
-| 3. Knowledge Document System | 0/3 | Not started | - |
-| 4. Command Handlers and Project Lifecycle | 0/TBD | Not started | - |
+| 1. Characterization Tests and Safe Deletion | 3/3 | Complete | 2026-02-22 |
+| 2. Deterministic Tooling Foundation | 2/2 | Complete | 2026-02-22 |
+| 3. Knowledge Document System | 3/3 | Complete | 2026-02-22 |
+| 4. Command Handlers and Project Lifecycle | 0/5 | Not started | - |
 | 5. Agent Spawning and Handoff Protocols | 0/TBD | Not started | - |
 | 6. Verification and Git Staging | 0/TBD | Not started | - |
 | 7. Integration Testing and Migration Cleanup | 0/TBD | Not started | - |
