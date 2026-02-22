@@ -256,6 +256,177 @@ function resolveModel(cwd, agentType) {
   return resolved === 'opus' ? 'inherit' : resolved;
 }
 
+// ─── Todo CRUD ────────────────────────────────────────────────────────────────
+
+/**
+ * createTodo - Create a todo file with YAML frontmatter
+ *
+ * @param {string} cwd - Working directory
+ * @param {string} title - Todo title
+ * @param {string} area - Todo area (defaults to 'general')
+ * @param {string} body - Todo body content
+ * @returns {{success: boolean, filename?: string, path?: string, error?: string}}
+ */
+function createTodo(cwd, title, area = 'general', body = '') {
+  const todosDir = path.join(cwd, '.planning', 'todos');
+
+  // Create todos directory if it doesn't exist
+  try {
+    fs.mkdirSync(todosDir, { recursive: true });
+  } catch (err) {
+    return { success: false, error: `Failed to create todos directory: ${err.message}` };
+  }
+
+  // Slugify title
+  const baseSlug = title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+  // Handle filename collisions
+  let filename = `${baseSlug}.md`;
+  let counter = 2;
+  while (fs.existsSync(path.join(todosDir, filename))) {
+    filename = `${baseSlug}-${counter}.md`;
+    counter++;
+  }
+
+  // Build content with YAML frontmatter
+  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+  const content = `---
+area: ${area}
+created: ${today}
+---
+
+${body}`;
+
+  // Write file atomically
+  const todoPath = path.join(todosDir, filename);
+  const writeResult = atomicWrite(todoPath, content);
+
+  if (!writeResult.success) {
+    return { success: false, error: writeResult.error };
+  }
+
+  return {
+    success: true,
+    filename,
+    path: path.relative(cwd, todoPath)
+  };
+}
+
+/**
+ * listTodos - List all todos with parsed frontmatter
+ *
+ * @param {string} cwd - Working directory
+ * @param {string} area - Optional area filter
+ * @returns {{count: number, todos: Array}}
+ */
+function listTodos(cwd, area = null) {
+  const todosDir = path.join(cwd, '.planning', 'todos');
+
+  // Handle nonexistent or empty directory
+  if (!fs.existsSync(todosDir)) {
+    return { count: 0, todos: [] };
+  }
+
+  let files;
+  try {
+    files = fs.readdirSync(todosDir);
+  } catch {
+    return { count: 0, todos: [] };
+  }
+
+  // Filter to only .md files
+  const todoFiles = files.filter(f => f.endsWith('.md'));
+
+  const todos = [];
+  for (const filename of todoFiles) {
+    const todoPath = path.join(todosDir, filename);
+
+    try {
+      const content = fs.readFileSync(todoPath, 'utf-8');
+
+      // Extract frontmatter
+      const frontmatterMatch = content.match(/^---\n([\s\S]+?)\n---\n([\s\S]*)$/);
+
+      let todoArea = 'general';
+      let created = '';
+      let body = '';
+
+      if (frontmatterMatch) {
+        const yaml = frontmatterMatch[1];
+        const areaMatch = yaml.match(/^area:\s*(.+)$/m);
+        const createdMatch = yaml.match(/^created:\s*(.+)$/m);
+
+        if (areaMatch) todoArea = areaMatch[1].trim();
+        if (createdMatch) created = createdMatch[1].trim();
+
+        body = frontmatterMatch[2].trim();
+      } else {
+        body = content;
+      }
+
+      // Derive title from filename
+      const title = filename
+        .replace(/\.md$/, '')
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+
+      // Apply area filter if provided
+      if (area && todoArea !== area) {
+        continue;
+      }
+
+      todos.push({
+        filename,
+        title,
+        area: todoArea,
+        created,
+        body,
+        path: path.relative(cwd, todoPath)
+      });
+    } catch {
+      // Skip files that can't be read
+      continue;
+    }
+  }
+
+  return { count: todos.length, todos };
+}
+
+/**
+ * completeTodo - Delete a todo file (completing it)
+ *
+ * @param {string} cwd - Working directory
+ * @param {string} filename - Todo filename (with or without .md extension)
+ * @returns {{success: boolean, deleted?: string, error?: string}}
+ */
+function completeTodo(cwd, filename) {
+  // Ensure filename ends with .md
+  const todoFilename = filename.endsWith('.md') ? filename : `${filename}.md`;
+  const todoPath = path.join(cwd, '.planning', 'todos', todoFilename);
+
+  try {
+    fs.unlinkSync(todoPath);
+    return { success: true, deleted: todoFilename };
+  } catch (err) {
+    return { success: false, error: `Failed to delete todo: ${err.message}` };
+  }
+}
+
+/**
+ * deleteTodo - Delete a todo file (semantic alias for completeTodo)
+ *
+ * @param {string} cwd - Working directory
+ * @param {string} filename - Todo filename (with or without .md extension)
+ * @returns {{success: boolean, deleted?: string, error?: string}}
+ */
+function deleteTodo(cwd, filename) {
+  return completeTodo(cwd, filename);
+}
+
 // ─── Exports ──────────────────────────────────────────────────────────────────
 
 module.exports = {
@@ -266,4 +437,8 @@ module.exports = {
   checkFileExists,
   checkMapNotStale,
   resolveModel,
+  createTodo,
+  listTodos,
+  completeTodo,
+  deleteTodo,
 };
