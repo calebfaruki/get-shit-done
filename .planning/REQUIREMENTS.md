@@ -23,7 +23,7 @@
 
 ### Knowledge Documents
 
-- [ ] **KNOW-01**: AGENTS.md root index (~100 lines) pointing to domain-specific reference docs
+- [x] **KNOW-01**: AGENTS.md root index (~100 lines) pointing to domain-specific reference docs
 - [x] **KNOW-02**: Reference docs for project domain (intake patterns, scope validation, acceptance criteria)
 - [x] **KNOW-03**: Reference docs for planning domain (phase planning standards, single-commit scope)
 - [x] **KNOW-04**: Reference docs for execution domain (TDD flow, deviation rules)
@@ -134,7 +134,7 @@
 | TOOL-04 | Phase 2 | Complete |
 | TOOL-05 | Phase 2 | Pending |
 | TOOL-06 | Phase 5 | Pending |
-| KNOW-01 | Phase 3 | Pending |
+| KNOW-01 | Phase 3 | Complete |
 | KNOW-02 | Phase 3 | Complete |
 | KNOW-03 | Phase 3 | Complete |
 | KNOW-04 | Phase 3 | Complete |

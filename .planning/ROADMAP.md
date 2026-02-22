@@ -8,7 +8,7 @@ A strangler fig migration of get-shit-done-cc (v1.20.5) from rigid workflow scri
 
 - [x] **Phase 1: Characterization Tests and Safe Deletion** - Establish behavioral baseline tests, then incrementally delete ~55 dead files ✓ 2026-02-22
 - [x] **Phase 2: Deterministic Tooling Foundation** - Build the mechanical operations layer (file management, SHA checks, prerequisites, model resolution, todo CRUD) (completed 2026-02-22)
-- [ ] **Phase 3: Knowledge Document System** - Create AGENTS.md index and domain-specific reference docs that agents reason over
+- [x] **Phase 3: Knowledge Document System** - Create AGENTS.md index and domain-specific reference docs that agents reason over ✓ 2026-02-22
 - [ ] **Phase 4: Command Handlers and Project Lifecycle** - Wire up all slash commands as thin triggers that load knowledge docs and spawn agents
 - [ ] **Phase 5: Agent Spawning and Handoff Protocols** - Modify agents for single-commit scope with self-contained context propagation
 - [ ] **Phase 6: Verification and Git Staging** - Report-only verification, explicit file staging, working tree safety enforcement
@@ -59,9 +59,9 @@ Plans:
   6. Every reference doc is under 10,000 tokens to prevent context degradation
 **Plans**: 3 plans
 Plans:
-- [ ] 03-01-PLAN.md — Project and planning domain knowledge documents
-- [ ] 03-02-PLAN.md — Execution and verification domain knowledge documents
-- [ ] 03-03-PLAN.md — AGENTS.md root index and token limit validation
+- [x] 03-01-PLAN.md — Project and planning domain knowledge documents ✓ 2026-02-22
+- [x] 03-02-PLAN.md — Execution and verification domain knowledge documents ✓ 2026-02-22
+- [x] 03-03-PLAN.md — AGENTS.md root index and token limit validation ✓ 2026-02-22
 
 ### Phase 4: Command Handlers and Project Lifecycle
 **Goal**: Users can drive the full project lifecycle through slash commands that load relevant knowledge docs and manage ephemeral project state
