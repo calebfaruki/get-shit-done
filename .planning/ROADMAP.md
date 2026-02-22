@@ -77,13 +77,14 @@ Plans:
   7. `.planning/project/` is wiped (with archive safety) when `/new-project` starts a new project
   8. PROJECT-PLAN.md replaces ROADMAP.md, STATE.md, and MILESTONES.md as the sole planning artifact
   9. Human drives all phase transitions; no auto-advance exists
-**Plans**: 5 plans
+**Plans**: 6 plans
 Plans:
 - [x] 04-01-PLAN.md — Infrastructure: .gitignore, bare-namespace /map and /todo commands ✓ 2026-02-22
 - [x] 04-02-PLAN.md — Project intake: /new-project and /discuss-project with scope validation ✓ 2026-02-22
 - [ ] 04-03-PLAN.md — Project lifecycle: /research-project, /plan-project, /verify-project
 - [ ] 04-04-PLAN.md — Phase commands: /discuss-phase, /research-phase, /plan-phase
 - [ ] 04-05-PLAN.md — Execution: /execute-phase with PROJECT-SUMMARY.md tracking, gsd:* cleanup
+- [ ] 04-06-PLAN.md — Gap closure: rewrite execute-phase workflow for SPEC compliance
 
 ### Phase 5: Agent Spawning and Handoff Protocols
 **Goal**: All subagents operate with single-commit scope framing and receive self-contained context through explicit file references
