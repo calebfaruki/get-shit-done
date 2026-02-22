@@ -4,7 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
-const { safeReadFile, loadConfig, isGitIgnored, execGit, normalizePhaseName, getArchivedPhaseDirs, generateSlugInternal, getMilestoneInfo, resolveModelInternal, MODEL_PROFILES, output, error, findPhaseInternal } = require('./core.cjs');
+const { safeReadFile, getDefaultConfig, isGitIgnored, execGit, normalizePhaseName, getArchivedPhaseDirs, generateSlugInternal, getMilestoneInfo, resolveModelInternal, MODEL_PROFILES, output, error, findPhaseInternal } = require('./core.cjs');
 const { extractFrontmatter } = require('./frontmatter.cjs');
 
 function cmdGenerateSlug(text, raw) {
@@ -202,7 +202,7 @@ function cmdResolveModel(cwd, agentType, raw) {
     error('agent-type required');
   }
 
-  const config = loadConfig(cwd);
+  const config = getDefaultConfig();
   const profile = config.model_profile || 'balanced';
 
   const agentModels = MODEL_PROFILES[agentType];
@@ -223,7 +223,7 @@ function cmdCommit(cwd, message, files, raw, amend) {
     error('commit message required');
   }
 
-  const config = loadConfig(cwd);
+  const config = getDefaultConfig();
 
   // Check commit_docs config
   if (!config.commit_docs) {
