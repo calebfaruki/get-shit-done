@@ -41,7 +41,10 @@ Plans:
   3. Commands can check prerequisites (e.g., `.planning/` exists, map not stale) before executing
   4. `resolve-model` returns correct model for quality/balanced/budget profiles
   5. Todo CRUD creates, lists, completes, and deletes area-tagged files in `.planning/todos/`
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 02-01-PLAN.md — Core toolkit: atomic writes, SHA staleness, prerequisite checks, model resolution (TDD)
+- [ ] 02-02-PLAN.md — Todo CRUD: create, list, complete, delete area-tagged files (TDD)
 
 ### Phase 3: Knowledge Document System
 **Goal**: Agents have domain-specific reference documents to reason over instead of rigid workflow scripts
@@ -114,7 +117,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Characterization Tests and Safe Deletion | 2/3 | In progress | - |
-| 2. Deterministic Tooling Foundation | 0/TBD | Not started | - |
+| 2. Deterministic Tooling Foundation | 0/2 | Not started | - |
 | 3. Knowledge Document System | 0/TBD | Not started | - |
 | 4. Command Handlers and Project Lifecycle | 0/TBD | Not started | - |
 | 5. Agent Spawning and Handoff Protocols | 0/TBD | Not started | - |
