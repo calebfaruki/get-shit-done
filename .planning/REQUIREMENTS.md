@@ -24,11 +24,11 @@
 ### Knowledge Documents
 
 - [ ] **KNOW-01**: AGENTS.md root index (~100 lines) pointing to domain-specific reference docs
-- [ ] **KNOW-02**: Reference docs for project domain (intake patterns, scope validation, acceptance criteria)
-- [ ] **KNOW-03**: Reference docs for planning domain (phase planning standards, single-commit scope)
-- [ ] **KNOW-04**: Reference docs for execution domain (TDD flow, deviation rules)
-- [ ] **KNOW-05**: Reference docs for verification domain (verification standards, staging rules)
-- [ ] **KNOW-06**: Each reference doc under 10,000 tokens to prevent context degradation
+- [x] **KNOW-02**: Reference docs for project domain (intake patterns, scope validation, acceptance criteria)
+- [x] **KNOW-03**: Reference docs for planning domain (phase planning standards, single-commit scope)
+- [x] **KNOW-04**: Reference docs for execution domain (TDD flow, deviation rules)
+- [x] **KNOW-05**: Reference docs for verification domain (verification standards, staging rules)
+- [x] **KNOW-06**: Each reference doc under 10,000 tokens to prevent context degradation
 
 ### Commands — Project Level
 
@@ -135,11 +135,11 @@
 | TOOL-05 | Phase 2 | Pending |
 | TOOL-06 | Phase 5 | Pending |
 | KNOW-01 | Phase 3 | Pending |
-| KNOW-02 | Phase 3 | Pending |
-| KNOW-03 | Phase 3 | Pending |
-| KNOW-04 | Phase 3 | Pending |
-| KNOW-05 | Phase 3 | Pending |
-| KNOW-06 | Phase 3 | Pending |
+| KNOW-02 | Phase 3 | Complete |
+| KNOW-03 | Phase 3 | Complete |
+| KNOW-04 | Phase 3 | Complete |
+| KNOW-05 | Phase 3 | Complete |
+| KNOW-06 | Phase 3 | Complete |
 | CMD-01 | Phase 4 | Pending |
 | CMD-02 | Phase 4 | Pending |
 | CMD-03 | Phase 4 | Pending |
