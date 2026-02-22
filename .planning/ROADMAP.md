@@ -57,7 +57,11 @@ Plans:
   4. Reference docs exist for execution domain (TDD flow, deviation rules)
   5. Reference docs exist for verification domain (verification standards, staging rules)
   6. Every reference doc is under 10,000 tokens to prevent context degradation
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 03-01-PLAN.md — Project and planning domain knowledge documents
+- [ ] 03-02-PLAN.md — Execution and verification domain knowledge documents
+- [ ] 03-03-PLAN.md — AGENTS.md root index and token limit validation
 
 ### Phase 4: Command Handlers and Project Lifecycle
 **Goal**: Users can drive the full project lifecycle through slash commands that load relevant knowledge docs and manage ephemeral project state
@@ -118,7 +122,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 |-------|----------------|--------|-----------|
 | 1. Characterization Tests and Safe Deletion | 2/3 | In progress | - |
 | 2. Deterministic Tooling Foundation | 2/2 | Complete    | 2026-02-22 |
-| 3. Knowledge Document System | 0/TBD | Not started | - |
+| 3. Knowledge Document System | 0/3 | Not started | - |
 | 4. Command Handlers and Project Lifecycle | 0/TBD | Not started | - |
 | 5. Agent Spawning and Handoff Protocols | 0/TBD | Not started | - |
 | 6. Verification and Git Staging | 0/TBD | Not started | - |
