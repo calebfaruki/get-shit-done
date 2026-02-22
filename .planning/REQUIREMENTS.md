@@ -162,7 +162,7 @@
 | STATE-01 | Phase 4 | Pending |
 | STATE-02 | Phase 4 | Pending |
 | STATE-03 | Phase 4 | Pending |
-| STATE-04 | Phase 1 | Pending |
+| STATE-04 | Phase 1 | Complete |
 | STATE-05 | Phase 4 | Pending |
 | SCOPE-01 | Phase 4 | Pending |
 | SCOPE-02 | Phase 4 | Pending |
