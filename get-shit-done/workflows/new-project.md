@@ -33,7 +33,7 @@ Check if `.planning/project/` exists:
 
 Warn the user:
 ```
-You have an existing project in progress. Planning artifacts will be wiped.
+You have an existing project in progress: [name from PROJECT.md]. Planning artifacts will be wiped.
 
 Staged/unstaged code changes in your working tree are untouched.
 

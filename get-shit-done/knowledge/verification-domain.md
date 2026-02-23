@@ -501,7 +501,7 @@ Use **Write** to create verification reports:
 
 ```bash
 # Create verification report
-Write: .planning/phases/XX-name/XX-VERIFICATION.md
+Write: .planning/project/PHASE-N-VERIFICATION.md
 ```
 
 **NEVER use heredoc or cat:**
@@ -510,7 +510,7 @@ Write: .planning/phases/XX-name/XX-VERIFICATION.md
 cat << 'EOF' > VERIFICATION.md
 
 # CORRECT:
-Write: .planning/phases/XX-name/XX-VERIFICATION.md
+Write: .planning/project/PHASE-N-VERIFICATION.md
 ```
 
 ### Verification Workflow

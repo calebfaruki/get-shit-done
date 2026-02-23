@@ -58,7 +58,7 @@ The phase boundary comes from PROJECT-PLAN.md and is FIXED. Discussion clarifies
 **When user suggests scope creep:**
 ```
 "[Feature X] would be a new capability — that's its own phase.
-Want me to note it for the roadmap backlog?
+Want me to note it as a todo?
 
 For now, let's focus on [phase domain]."
 ```
@@ -102,7 +102,7 @@ Phase: "API documentation"
 - Technical implementation details
 - Architecture patterns
 - Performance optimization
-- Scope (roadmap defines this)
+- Scope (PROJECT-PLAN.md defines this)
 </gray_area_identification>
 
 <process>
@@ -422,7 +422,7 @@ Suggest continuing with:
 </process>
 
 <success_criteria>
-- Phase validated against roadmap
+- Phase validated against PROJECT-PLAN.md
 - Gray areas identified through intelligent analysis (not generic questions)
 - User selected which areas to discuss
 - Each selected area explored until user satisfied

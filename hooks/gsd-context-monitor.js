@@ -99,12 +99,12 @@ process.stdin.on('end', () => {
     let message;
     if (isCritical) {
       message = `CONTEXT MONITOR CRITICAL: Usage at ${usedPct}%. Remaining: ${remaining}%. ` +
-        'STOP new work immediately. Save state NOW and inform the user that context is nearly exhausted. ' +
-        'If using GSD, run /gsd:pause-work to save execution state.';
+        'STOP new work immediately. Inform the user that context is nearly exhausted. ' +
+        'Finish the current task and suggest starting a fresh session.';
     } else {
       message = `CONTEXT MONITOR WARNING: Usage at ${usedPct}%. Remaining: ${remaining}%. ` +
         'Begin wrapping up current task. Do not start new complex work. ' +
-        'If using GSD, consider /gsd:pause-work to save state.';
+        'Consider finishing and starting a fresh session soon.';
     }
 
     const output = {

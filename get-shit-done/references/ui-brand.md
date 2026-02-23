@@ -16,22 +16,20 @@ Use for major workflow transitions.
 - `QUESTIONING`
 - `RESEARCHING`
 - `DEFINING REQUIREMENTS`
-- `CREATING ROADMAP`
 - `PLANNING PHASE {N}`
-- `EXECUTING WAVE {N}`
+- `EXECUTING PHASE {N}`
 - `VERIFYING`
 - `PHASE {N} COMPLETE ✓`
-- `MILESTONE COMPLETE 🎉`
 
 ---
 
-## Checkpoint Boxes
+## Decision Boxes
 
 User action required. 62-character width.
 
 ```
 ╔══════════════════════════════════════════════════════════════╗
-║  CHECKPOINT: {Type}                                          ║
+║  DECISION: {Type}                                            ║
 ╚══════════════════════════════════════════════════════════════╝
 
 {Content}
@@ -42,9 +40,9 @@ User action required. 62-character width.
 ```
 
 **Types:**
-- `CHECKPOINT: Verification Required` → `→ Type "approved" or describe issues`
-- `CHECKPOINT: Decision Required` → `→ Select: option-a / option-b`
-- `CHECKPOINT: Action Required` → `→ Type "done" when complete`
+- `DECISION: Verification Required` → `→ Type "approved" or describe issues`
+- `DECISION: Choice Required` → `→ Select: option-a / option-b`
+- `DECISION: Action Required` → `→ Type "done" when complete`
 
 ---
 
@@ -57,14 +55,14 @@ User action required. 62-character width.
 ○  Pending
 ⚡ Auto-approved
 ⚠  Warning
-🎉 Milestone complete (only in banner)
+🎉 Project complete (only in banner)
 ```
 
 ---
 
 ## Progress Display
 
-**Phase/milestone level:**
+**Phase/project level:**
 ```
 Progress: ████████░░ 80%
 ```
@@ -115,8 +113,8 @@ Always at end of major completions.
 ───────────────────────────────────────────────────────────────
 
 **Also available:**
-- `/gsd:alternative-1` — description
-- `/gsd:alternative-2` — description
+- `/command-1` — description
+- `/command-2` — description
 
 ───────────────────────────────────────────────────────────────
 ```

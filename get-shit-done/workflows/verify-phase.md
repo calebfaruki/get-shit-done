@@ -213,7 +213,7 @@ This workflow removes from the GSD verify-phase.md:
 - ROADMAP.md/REQUIREMENTS.md references (replaced by PROJECT-PLAN.md/PHASE-N-PLAN.md)
 - Fix plan generation and re-verification routing
 - `gsd-tools.cjs` commands
-- VERIFICATION.md in .planning/phases/ directory (now .planning/project/PHASE-N-VERIFICATION.md)
+- VERIFICATION.md in .planning/phases/ directory
 - `verify_requirements` step
 - `generate_fix_plans` step
 - `gaps_found` and `human_needed` states (now only `passed` or `failed`)

@@ -1,6 +1,6 @@
 # Phase Context Template
 
-Template for `.planning/phases/XX-name/{phase_num}-CONTEXT.md` - captures implementation decisions for a phase.
+Template for `.planning/project/PHASE-{N}-CONTEXT.md` - captures implementation decisions for a phase.
 
 **Purpose:** Document decisions that downstream agents need. Researcher uses this to know WHAT to investigate. Planner uses this to know WHAT choices are locked vs flexible.
 
@@ -23,12 +23,14 @@ Template for `.planning/phases/XX-name/{phase_num}-CONTEXT.md` - captures implem
 <domain>
 ## Phase Boundary
 
-[Clear statement of what this phase delivers — the scope anchor. This comes from ROADMAP.md and is fixed. Discussion clarifies implementation within this boundary.]
+[Clear statement of what this phase delivers — the scope anchor. This comes from PROJECT-PLAN.md and is fixed. Discussion clarifies implementation within this boundary.]
 
 </domain>
 
-<decisions>
-## Implementation Decisions
+<locked_decisions>
+## Locked Decisions
+
+Executor must follow these — non-negotiable.
 
 ### [Area 1 that was discussed]
 - [Specific decision made]
@@ -40,28 +42,26 @@ Template for `.planning/phases/XX-name/{phase_num}-CONTEXT.md` - captures implem
 ### [Area 3 that was discussed]
 - [Specific decision made]
 
-### Claude's Discretion
-[Areas where user explicitly said "you decide" — Claude has flexibility here during planning/implementation]
+</locked_decisions>
 
-</decisions>
+<discretion_areas>
+## Discretion Areas
 
-<specifics>
-## Specific Ideas
+Executor can choose approach here — user explicitly said "you decide."
 
-[Any particular references, examples, or "I want it like X" moments from discussion. Product references, specific behaviors, interaction patterns.]
+- [Area where Claude has flexibility]
+- [Another area if applicable]
 
-[If none: "No specific requirements — open to standard approaches"]
+</discretion_areas>
 
-</specifics>
-
-<deferred>
+<deferred_ideas>
 ## Deferred Ideas
 
-[Ideas that came up during discussion but belong in other phases. Captured here so they're not lost, but explicitly out of scope for this phase.]
+Ideas that came up during discussion but belong in other phases or todos. Captured here so they're not lost, but explicitly out of scope for this phase.
 
 [If none: "None — discussion stayed within phase scope"]
 
-</deferred>
+</deferred_ideas>
 
 ---
 
@@ -86,8 +86,8 @@ Display posts from followed users in a scrollable feed. Users can view posts and
 
 </domain>
 
-<decisions>
-## Implementation Decisions
+<locked_decisions>
+## Locked Decisions
 
 ### Layout style
 - Card-based layout, not timeline or list
@@ -103,15 +103,17 @@ Display posts from followed users in a scrollable feed. Users can view posts and
 - Friendly illustration + "Follow people to see posts here"
 - Suggest 3-5 accounts to follow based on interests
 
-### Claude's Discretion
+</locked_decisions>
+
+<discretion_areas>
+## Discretion Areas
 - Loading skeleton design
 - Exact spacing and typography
 - Error state handling
-
-</decisions>
+</discretion_areas>
 
 <specifics>
-## Specific Ideas
+## Specific References
 
 - "I like how Twitter shows the new posts indicator without disrupting your scroll position"
 - Cards should feel like Linear's issue cards — clean, not cluttered
@@ -147,8 +149,8 @@ CLI command to backup database to local file or S3. Supports full and incrementa
 
 </domain>
 
-<decisions>
-## Implementation Decisions
+<locked_decisions>
+## Locked Decisions
 
 ### Output format
 - JSON for programmatic use, table format for humans
@@ -165,15 +167,17 @@ CLI command to backup database to local file or S3. Supports full and incrementa
 - --no-retry flag to fail fast
 - Partial backups are deleted on failure (no corrupt files)
 
-### Claude's Discretion
+</locked_decisions>
+
+<discretion_areas>
+## Discretion Areas
 - Exact progress bar implementation
 - Compression algorithm choice
 - Temp file handling
-
-</decisions>
+</discretion_areas>
 
 <specifics>
-## Specific Ideas
+## Specific References
 
 - "I want it to feel like pg_dump — familiar to database people"
 - Should work in CI pipelines (exit codes, no interactive prompts)
@@ -209,8 +213,8 @@ Organize existing photo library into structured folders. Handle duplicates and a
 
 </domain>
 
-<decisions>
-## Implementation Decisions
+<locked_decisions>
+## Locked Decisions
 
 ### Grouping criteria
 - Primary grouping by year, then by month
@@ -227,15 +231,17 @@ Organize existing photo library into structured folders. Handle duplicates and a
 - Preserve original filename as suffix for searchability
 - Handle name collisions with incrementing suffix
 
-### Claude's Discretion
+</locked_decisions>
+
+<discretion_areas>
+## Discretion Areas
 - Exact clustering algorithm
 - How to handle photos with no EXIF data
 - Folder emoji usage
-
-</decisions>
+</discretion_areas>
 
 <specifics>
-## Specific Ideas
+## Specific References
 
 - "I want to be able to find photos by roughly when they were taken"
 - Don't delete anything — worst case, move to a review folder
@@ -276,7 +282,7 @@ The output should answer: "What does the researcher need to investigate? What ch
 - "Easy to use"
 
 **After creation:**
-- File lives in phase directory: `.planning/phases/XX-name/{phase_num}-CONTEXT.md`
+- File lives in project directory: `.planning/project/PHASE-{N}-CONTEXT.md`
 - `gsd-phase-researcher` uses decisions to focus investigation
 - `gsd-planner` uses decisions + research to create executable tasks
 - Downstream agents should NOT need to ask the user again about captured decisions

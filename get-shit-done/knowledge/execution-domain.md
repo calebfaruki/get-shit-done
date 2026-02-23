@@ -264,13 +264,13 @@ No user permission needed for Rules 1-3.
 - New infrastructure
 - Breaking API changes
 
-**Action:** STOP → return checkpoint with: what found, proposed change, why needed, impact, alternatives. **User decision required.**
+**Action:** STOP → report to user with: what found, proposed change, why needed, impact, alternatives. **User decision required.**
 
 **Process:**
 1. Identify the architectural change needed
 2. STOP execution immediately
 3. Document the finding and proposed change
-4. Return to user with checkpoint message
+4. Return to user with a clear report
 5. Wait for user decision
 
 ---
@@ -297,7 +297,7 @@ No user permission needed for Rules 1-3.
 
 Only auto-fix issues DIRECTLY caused by the current task's changes. Pre-existing warnings, linting errors, or failures in unrelated files are out of scope.
 
-- Log out-of-scope discoveries to `deferred-items.md` in the phase directory
+- Log out-of-scope discoveries as todos in `.planning/todos/`
 - Do NOT fix them
 - Do NOT re-run builds hoping they resolve themselves
 
@@ -310,7 +310,7 @@ Only auto-fix issues DIRECTLY caused by the current task's changes. Pre-existing
 Track auto-fix attempts per task. After 3 auto-fix attempts on a single task:
 
 1. STOP fixing — document remaining issues in summary under "Deferred Issues"
-2. Continue to the next task (or return checkpoint if blocked)
+2. Continue to the next task (or stop and report if blocked)
 3. Do NOT restart the build to find more issues
 
 **The fix attempt limit prevents infinite loops.** If 3 attempts haven't solved it, the issue is either out of scope or needs architectural reconsideration.
@@ -353,7 +353,7 @@ Use **Read** to load plan files and context:
 
 ```bash
 # Read the plan
-Read: .planning/phases/XX-name/XX-YY-PLAN.md
+Read: .planning/project/PHASE-N-PLAN.md
 
 # Read context files
 Read: src/components/Chat.tsx

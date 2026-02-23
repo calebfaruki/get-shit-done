@@ -18,7 +18,7 @@ TDD is about design quality, not coverage metrics. The red-green-refactor cycle 
 - State machines and workflows
 - Utility functions with clear specifications
 
-**Skip TDD (use standard plan with `type="auto"` tasks):**
+**Skip TDD (use standard plan with `type: execute`):**
 - UI layout, styling, visual components
 - Configuration changes
 - Glue code connecting existing components
@@ -28,7 +28,7 @@ TDD is about design quality, not coverage metrics. The red-green-refactor cycle 
 
 **Heuristic:** Can you write `expect(fn(input)).toBe(output)` before writing `fn`?
 → Yes: Create a TDD plan
-→ No: Use standard plan, add tests after if needed
+→ No: Use `type: execute` plan, add tests after if needed
 </when_to_use_tdd>
 
 <tdd_plan_structure>
@@ -38,9 +38,13 @@ Each TDD plan implements **one feature** through the full RED-GREEN-REFACTOR cyc
 
 ```markdown
 ---
-phase: XX-name
-plan: NN
+phase: N
 type: tdd
+acceptance_criteria: [AC-1, AC-2]
+files_modified: []
+must_haves:
+  truths: []
+  artifacts: []
 ---
 
 <objective>
@@ -50,8 +54,8 @@ Output: [Working, tested feature]
 </objective>
 
 <context>
-@.planning/PROJECT.md
-@.planning/ROADMAP.md
+@.planning/project/PROJECT.md
+@.planning/project/PROJECT-PLAN.md
 @relevant/source/files.ts
 </context>
 
@@ -70,10 +74,10 @@ Output: [Working, tested feature]
 </verification>
 
 <success_criteria>
-- Failing test written and committed
+- Failing test written
 - Implementation passes test
 - Refactor complete (if needed)
-- All 2-3 commits present
+- All files tracked for verification
 </success_criteria>
 
 <output>
@@ -81,7 +85,7 @@ After completion, create SUMMARY.md with:
 - RED: What test was written, why it failed
 - GREEN: What implementation made it pass
 - REFACTOR: What cleanup was done (if any)
-- Commits: List of commits produced
+- Files: List of files created/modified
 </output>
 ```
 
@@ -96,20 +100,17 @@ After completion, create SUMMARY.md with:
 2. Write test describing expected behavior (from `<behavior>` element)
 3. Run test - it MUST fail
 4. If test passes: feature exists or test is wrong. Investigate.
-5. Commit: `test({phase}-{plan}): add failing test for [feature]`
 
 **GREEN - Implement to pass:**
 1. Write minimal code to make test pass
 2. No cleverness, no optimization - just make it work
 3. Run test - it MUST pass
-4. Commit: `feat({phase}-{plan}): implement [feature]`
 
 **REFACTOR (if needed):**
 1. Clean up implementation if obvious improvements exist
 2. Run tests - MUST still pass
-3. Only commit if changes made: `refactor({phase}-{plan}): clean up [feature]`
 
-**Result:** Each TDD plan produces 2-3 atomic commits.
+**Result:** Each TDD plan produces working, tested code. The executor never commits — `/verify-phase` stages verified work.
 </execution_flow>
 
 <test_quality>
@@ -209,43 +210,13 @@ Framework setup is a one-time cost included in the first TDD plan's RED phase.
 - Fix before proceeding
 </error_handling>
 
-<commit_pattern>
-## Commit Pattern for TDD Plans
+<execution_note>
+## Execution Note
 
-TDD plans produce 2-3 atomic commits (one per phase):
+The executor never commits or stages work. All TDD cycle output (test files, implementation, refactored code) remains unstaged. `/verify-phase` checks the work against must-haves and stages on pass.
 
-```
-test(08-02): add failing test for email validation
-
-- Tests valid email formats accepted
-- Tests invalid formats rejected
-- Tests empty input handling
-
-feat(08-02): implement email validation
-
-- Regex pattern matches RFC 5322
-- Returns boolean for validity
-- Handles edge cases (empty, null)
-
-refactor(08-02): extract regex to constant (optional)
-
-- Moved pattern to EMAIL_REGEX constant
-- No behavior changes
-- Tests still pass
-```
-
-**Comparison with standard plans:**
-- Standard plans: 1 commit per task, 2-4 commits per plan
-- TDD plans: 2-3 commits for single feature
-
-Both follow same format: `{type}({phase}-{plan}): {description}`
-
-**Benefits:**
-- Each commit independently revertable
-- Git bisect works at commit level
-- Clear history showing TDD discipline
-- Consistent with overall commit strategy
-</commit_pattern>
+The RED-GREEN-REFACTOR cycle is about **design quality**, not commit discipline. The cycle produces well-designed, well-tested code — the human commits when ready.
+</execution_note>
 
 <context_budget>
 ## Context Budget

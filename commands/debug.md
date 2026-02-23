@@ -12,7 +12,7 @@ allowed-tools:
 <objective>
 Debug issues using scientific method with subagent isolation.
 
-**Orchestrator role:** Gather symptoms, spawn gsd-debugger agent, handle checkpoints, spawn continuations.
+**Orchestrator role:** Gather symptoms, spawn gsd-debugger agent, handle decision points, spawn continuations.
 
 **Why subagent:** Investigation burns context fast (reading files, forming hypotheses, testing). Fresh 200k context per investigation. Main context stays lean for user interaction.
 </objective>
@@ -107,8 +107,8 @@ Task(
   - "Plan fix" - suggest /plan-phase --gaps
   - "Manual fix" - done
 
-**If `## CHECKPOINT REACHED`:**
-- Present checkpoint details to user
+**If `## DECISION POINT REACHED`:**
+- Present decision details to user
 - Get user response
 - Spawn continuation agent (see step 5)
 
@@ -119,9 +119,9 @@ Task(
   - "Manual investigation" - done
   - "Add more context" - gather more symptoms, spawn again
 
-## 5. Spawn Continuation Agent (After Checkpoint)
+## 5. Spawn Continuation Agent (After Decision Point)
 
-When user responds to checkpoint, spawn fresh agent:
+When user responds to decision point, spawn fresh agent:
 
 ```markdown
 <objective>
@@ -134,10 +134,10 @@ Continue debugging {slug}. Evidence is in the debug file.
 </files_to_read>
 </prior_state>
 
-<checkpoint_response>
-**Type:** {checkpoint_type}
+<decision_response>
+**Type:** {decision_type}
 **Response:** {user_response}
-</checkpoint_response>
+</decision_response>
 
 <mode>
 goal: find_and_fix
@@ -159,6 +159,6 @@ Task(
 - [ ] Active sessions checked
 - [ ] Symptoms gathered (if new)
 - [ ] gsd-debugger spawned with context
-- [ ] Checkpoints handled correctly
+- [ ] Decision points handled correctly
 - [ ] Root cause confirmed before fixing
 </success_criteria>

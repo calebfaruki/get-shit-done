@@ -7,16 +7,13 @@ Model profiles control which Claude model each GSD agent uses. This allows balan
 | Agent | `quality` | `balanced` | `budget` |
 |-------|-----------|------------|----------|
 | gsd-planner | opus | opus | sonnet |
-| gsd-roadmapper | opus | sonnet | sonnet |
 | gsd-executor | opus | sonnet | sonnet |
 | gsd-phase-researcher | opus | sonnet | haiku |
 | gsd-project-researcher | opus | sonnet | haiku |
-| gsd-research-synthesizer | sonnet | sonnet | haiku |
 | gsd-debugger | opus | sonnet | sonnet |
 | gsd-codebase-mapper | sonnet | haiku | haiku |
 | gsd-verifier | sonnet | sonnet | haiku |
 | gsd-plan-checker | sonnet | sonnet | haiku |
-| gsd-integration-checker | sonnet | sonnet | haiku |
 
 ## Profile Philosophy
 
@@ -41,7 +38,7 @@ Model profiles control which Claude model each GSD agent uses. This allows balan
 Orchestrators resolve model before spawning:
 
 ```
-1. Read .planning/config.json
+1. Read .planning/model-config.json
 2. Check model_overrides for agent-specific override
 3. If no override, look up agent in profile table
 4. Pass model parameter to Task call
@@ -65,9 +62,7 @@ Overrides take precedence over the profile. Valid values: `opus`, `sonnet`, `hai
 
 ## Switching Profiles
 
-Runtime: `/gsd:set-profile <profile>`
-
-Per-project default: Set in `.planning/config.json`:
+Per-project default: Set in `.planning/model-config.json`:
 ```json
 {
   "model_profile": "balanced"

@@ -4,7 +4,7 @@ Produces DISCOVERY.md (for Level 2-3) that informs PLAN.md creation.
 
 Called from plan-phase.md's mandatory_discovery step with a depth parameter.
 
-NOTE: For comprehensive ecosystem research ("how do experts build this"), use /gsd:research-phase instead, which produces RESEARCH.md.
+NOTE: For comprehensive ecosystem research ("how do experts build this"), use /research-phase instead, which produces RESEARCH.md.
 </purpose>
 
 <depth_levels>
@@ -116,7 +116,7 @@ For: Choosing between options, new external integration.
 
 7. Return to plan-phase.md.
 
-**Output:** `.planning/phases/XX-name/DISCOVERY.md`
+**Output:** `.planning/project/DISCOVERY.md`
 </step>
 
 <step name="level_3_deep_dive">
@@ -163,13 +163,13 @@ For: Architectural decisions, novel problems, high-risk choices.
    - Full structure from ~/.claude/get-shit-done/templates/discovery.md
    - Quality report with source attribution
    - Confidence by finding
-   - If LOW confidence on any critical finding → add validation checkpoints
+   - If LOW confidence on any critical finding → add verification notes
 
 7. **Confidence gate:** If overall confidence is LOW, present options before proceeding.
 
 8. Return to plan-phase.md.
 
-**Output:** `.planning/phases/XX-name/DISCOVERY.md` (comprehensive)
+**Output:** `.planning/project/DISCOVERY.md` (comprehensive)
 </step>
 
 <step name="identify_unknowns">
@@ -203,7 +203,7 @@ Run the discovery:
 </step>
 
 <step name="create_discovery_output">
-Write `.planning/phases/XX-name/DISCOVERY.md`:
+Write `.planning/project/DISCOVERY.md`:
 - Summary with recommendation
 - Key findings with sources
 - Code examples if applicable
@@ -246,20 +246,20 @@ If "address first": Gather user input on questions, update discovery.
 
 <step name="offer_next">
 ```
-Discovery complete: .planning/phases/XX-name/DISCOVERY.md
+Discovery complete: .planning/project/DISCOVERY.md
 Recommendation: [one-liner]
 Confidence: [level]
 
 What's next?
 
-1. Discuss phase context (/gsd:discuss-phase [current-phase])
-2. Create phase plan (/gsd:plan-phase [current-phase])
+1. Discuss phase context (/discuss-phase [current-phase])
+2. Create phase plan (/plan-phase [current-phase])
 3. Refine discovery (dig deeper)
 4. Review discovery
 
 ```
 
-NOTE: DISCOVERY.md is NOT committed separately. It will be committed with phase completion.
+NOTE: DISCOVERY.md lives in `.planning/project/` and is not tracked in git.
 </step>
 
 </process>
@@ -283,7 +283,7 @@ NOTE: DISCOVERY.md is NOT committed separately. It will be committed with phase 
 - All WebSearch findings verified against authoritative sources
 - DISCOVERY.md created with comprehensive analysis
 - Quality report with source attribution
-- If LOW confidence findings → validation checkpoints defined
+- If LOW confidence findings → verification notes defined
 - Confidence gate passed
 - Ready to inform PLAN.md creation
 </success_criteria>

@@ -10,33 +10,28 @@ Template for spawning gsd-planner agent. The agent contains all planning experti
 <planning_context>
 
 **Phase:** {phase_number}
-**Mode:** {standard | gap_closure}
 
-**Project State:**
-@.planning/STATE.md
+**Project:**
+@.planning/project/PROJECT.md
 
-**Roadmap:**
-@.planning/ROADMAP.md
+**Project Plan:**
+@.planning/project/PROJECT-PLAN.md
 
-**Requirements (if exists):**
-@.planning/REQUIREMENTS.md
+**Codebase Map (if exists):**
+@.planning/CODEBASE.md
 
 **Phase Context (if exists):**
-@.planning/phases/{phase_dir}/{phase_num}-CONTEXT.md
+@.planning/project/PHASE-{N}-CONTEXT.md
 
 **Research (if exists):**
-@.planning/phases/{phase_dir}/{phase_num}-RESEARCH.md
-
-**Gap Closure (if --gaps mode):**
-@.planning/phases/{phase_dir}/{phase_num}-VERIFICATION.md
-@.planning/phases/{phase_dir}/{phase_num}-UAT.md
+@.planning/project/PHASE-{N}-RESEARCH.md
 
 </planning_context>
 
 <downstream_consumer>
-Output consumed by /gsd:execute-phase
+Output consumed by /execute-phase
 Plans must be executable prompts with:
-- Frontmatter (wave, depends_on, files_modified, autonomous)
+- Frontmatter (acceptance_criteria, files_modified)
 - Tasks in XML format
 - Verification criteria
 - must_haves for goal-backward verification
@@ -44,11 +39,9 @@ Plans must be executable prompts with:
 
 <quality_gate>
 Before returning PLANNING COMPLETE:
-- [ ] PLAN.md files created in phase directory
-- [ ] Each plan has valid frontmatter
+- [ ] PHASE-{N}-PLAN.md created in project directory
+- [ ] Plan has valid frontmatter
 - [ ] Tasks are specific and actionable
-- [ ] Dependencies correctly identified
-- [ ] Waves assigned for parallel execution
 - [ ] must_haves derived from phase goal
 </quality_gate>
 ```
@@ -59,16 +52,14 @@ Before returning PLANNING COMPLETE:
 
 | Placeholder | Source | Example |
 |-------------|--------|---------|
-| `{phase_number}` | From roadmap/arguments | `5` or `2.1` |
-| `{phase_dir}` | Phase directory name | `05-user-profiles` |
-| `{phase}` | Phase prefix | `05` |
-| `{standard \| gap_closure}` | Mode flag | `standard` |
+| `{phase_number}` | From PROJECT-PLAN.md/arguments | `1` or `2` |
+| `{N}` | Phase number | `1` |
 
 ---
 
 ## Usage
 
-**From /gsd:plan-phase (standard mode):**
+**From /plan-phase (standard mode):**
 ```python
 Task(
   prompt=filled_template,
@@ -77,41 +68,6 @@ Task(
 )
 ```
 
-**From /gsd:plan-phase --gaps (gap closure mode):**
-```python
-Task(
-  prompt=filled_template,  # with mode: gap_closure
-  subagent_type="gsd-planner",
-  description="Plan gaps for Phase {phase}"
-)
-```
-
 ---
 
-## Continuation
-
-For checkpoints, spawn fresh agent with:
-
-```markdown
-<objective>
-Continue planning for Phase {phase_number}: {phase_name}
-</objective>
-
-<prior_state>
-Phase directory: @.planning/phases/{phase_dir}/
-Existing plans: @.planning/phases/{phase_dir}/*-PLAN.md
-</prior_state>
-
-<checkpoint_response>
-**Type:** {checkpoint_type}
-**Response:** {user_response}
-</checkpoint_response>
-
-<mode>
-Continue: {standard | gap_closure}
-</mode>
-```
-
----
-
-**Note:** Planning methodology, task breakdown, dependency analysis, wave assignment, TDD detection, and goal-backward derivation are baked into the gsd-planner agent. This template only passes context.
+**Note:** Planning methodology, task breakdown, TDD detection, and goal-backward derivation are baked into the gsd-planner agent. This template only passes context.

@@ -1,7 +1,7 @@
 <purpose>
 Orchestrate parallel debug agents to investigate UAT gaps and find root causes.
 
-After UAT finds gaps, spawn one debug agent per gap. Each agent investigates autonomously with symptoms pre-filled from UAT. Collect root causes, update UAT.md gaps with diagnosis, then hand off to plan-phase --gaps with actual diagnoses.
+After UAT finds gaps, spawn one debug agent per gap. Each agent investigates autonomously with symptoms pre-filled from UAT. Collect root causes, update UAT.md gaps with diagnosis, then present results to the user.
 
 Orchestrator stays lean: parse gaps, spawn agents, collect results, update UAT.
 </purpose>
@@ -15,7 +15,7 @@ Debug files use the `.planning/debug/` path (hidden directory with leading dot).
 <core_principle>
 **Diagnose before planning fixes.**
 
-UAT tells us WHAT is broken (symptoms). Debug agents find WHY (root cause). plan-phase --gaps then creates targeted fixes based on actual causes, not guesses.
+UAT tells us WHAT is broken (symptoms). Debug agents find WHY (root cause). Targeted fixes can then be based on actual causes, not guesses.
 
 Without diagnosis: "Comment doesn't refresh" → guess at fix → maybe wrong
 With diagnosis: "Comment doesn't refresh" → "useEffect missing dependency" → precise fix
@@ -94,7 +94,7 @@ Template placeholders:
 - `{errors}`: Any error messages from UAT (or "None reported")
 - `{reproduction}`: "Test {test_num} in UAT"
 - `{timeline}`: "Discovered during UAT"
-- `{goal}`: `find_root_cause_only` (UAT flow - plan-phase --gaps handles fixes)
+- `{goal}`: `find_root_cause_only` (UAT flow - human decides how to fix)
 - `{slug}`: Generated from truth
 </step>
 
@@ -118,7 +118,7 @@ Each agent returns with:
 - {file1}: {what's wrong}
 - {file2}: {related issue}
 
-**Suggested Fix Direction:** {brief hint for plan-phase --gaps}
+**Suggested Fix Direction:** {brief hint for resolution}
 ```
 
 Parse each return to extract:
@@ -179,15 +179,15 @@ Debug sessions: ${DEBUG_DIR}/
 Proceeding to plan fixes...
 ```
 
-Return to verify-work orchestrator for automatic planning.
-Do NOT offer manual next steps - verify-work handles the rest.
+Present diagnosis results to the user.
+Offer next steps: fix manually, re-run the phase, or adjust the plan.
 </step>
 
 </process>
 
 <context_efficiency>
 Agents start with symptoms pre-filled from UAT (no symptom gathering).
-Agents only diagnose—plan-phase --gaps handles fixes (no fix application).
+Agents only diagnose — the human decides how to fix (no fix application).
 </context_efficiency>
 
 <failure_handling>
@@ -198,12 +198,12 @@ Agents only diagnose—plan-phase --gaps handles fixes (no fix application).
 
 **Agent times out:**
 - Check DEBUG-{slug}.md for partial progress
-- Can resume with /gsd:debug
+- Can resume with /debug
 
 **All agents fail:**
 - Something systemic (permissions, git, etc.)
 - Report for manual investigation
-- Fall back to plan-phase --gaps without root causes (less precise)
+- Fall back to reporting gaps without root causes (less precise)
 </failure_handling>
 
 <success_criteria>
@@ -212,5 +212,5 @@ Agents only diagnose—plan-phase --gaps handles fixes (no fix application).
 - [ ] Root causes collected from all agents
 - [ ] UAT.md gaps updated with artifacts and missing
 - [ ] Debug sessions saved to ${DEBUG_DIR}/
-- [ ] Hand off to verify-work for automatic planning
+- [ ] Present results to user with next step options
 </success_criteria>

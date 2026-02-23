@@ -1,6 +1,6 @@
 # Verification Report Template
 
-Template for `.planning/phases/XX-name/{phase_num}-VERIFICATION.md` — phase goal verification results.
+Template for `.planning/project/PHASE-{N}-VERIFICATION.md` — phase goal verification results.
 
 ---
 
@@ -10,15 +10,15 @@ Template for `.planning/phases/XX-name/{phase_num}-VERIFICATION.md` — phase go
 ---
 phase: XX-name
 verified: YYYY-MM-DDTHH:MM:SSZ
-status: passed | gaps_found | human_needed
+status: passed | failed
 score: N/M must-haves verified
 ---
 
 # Phase {X}: {Name} Verification Report
 
-**Phase Goal:** {goal from ROADMAP.md}
+**Phase Goal:** {goal from PROJECT-PLAN.md}
 **Verified:** {timestamp}
-**Status:** {passed | gaps_found | human_needed}
+**Status:** {passed | failed}
 
 ## Goal Achievement
 
@@ -48,19 +48,18 @@ score: N/M must-haves verified
 |------|----|----|--------|---------|
 | Chat.tsx | /api/chat | fetch in useEffect | ✓ WIRED | Line 23: `fetch('/api/chat')` with response handling |
 | ChatInput | /api/chat POST | onSubmit handler | ✗ NOT WIRED | onSubmit only calls console.log |
-| /api/chat POST | database | prisma.message.create | ✗ NOT WIRED | Returns hardcoded response, no DB call |
 
 **Wiring:** {N}/{M} connections verified
 
-## Requirements Coverage
+## Acceptance Criteria Coverage
 
-| Requirement | Status | Blocking Issue |
-|-------------|--------|----------------|
-| {REQ-01}: {description} | ✓ SATISFIED | - |
-| {REQ-02}: {description} | ✗ BLOCKED | API route is stub |
-| {REQ-03}: {description} | ? NEEDS HUMAN | Can't verify WebSocket programmatically |
+| Criterion | Status | Blocking Issue |
+|-----------|--------|----------------|
+| AC-1: {description} | ✓ SATISFIED | - |
+| AC-2: {description} | ✗ BLOCKED | API route is stub |
+| AC-3: {description} | ? NEEDS HUMAN | Can't verify WebSocket programmatically |
 
-**Coverage:** {N}/{M} requirements satisfied
+**Coverage:** {N}/{M} acceptance criteria satisfied
 
 ## Anti-Patterns Found
 
@@ -68,88 +67,35 @@ score: N/M must-haves verified
 |------|------|---------|----------|--------|
 | src/app/api/chat/route.ts | 12 | `// TODO: implement` | ⚠️ Warning | Indicates incomplete |
 | src/components/Chat.tsx | 45 | `return <div>Placeholder</div>` | 🛑 Blocker | Renders no content |
-| src/hooks/useChat.ts | - | File missing | 🛑 Blocker | Expected hook doesn't exist |
 
 **Anti-patterns:** {N} found ({blockers} blockers, {warnings} warnings)
 
-## Human Verification Required
+## Diagnostics
 
-{If no human verification needed:}
-None — all verifiable items checked programmatically.
+{If passed:}
+**No issues found.** All must-haves verified. Phase work staged via `git add`.
 
-{If human verification needed:}
+{If failed:}
 
-### 1. {Test Name}
-**Test:** {What to do}
-**Expected:** {What should happen}
-**Why human:** {Why can't verify programmatically}
+### Failures
 
-### 2. {Test Name}
-**Test:** {What to do}
-**Expected:** {What should happen}
-**Why human:** {Why can't verify programmatically}
+1. **{Failure name}**
+   - What failed: {description}
+   - Why: {root cause or best assessment}
+   - Where to look: {specific files and line numbers}
 
-## Gaps Summary
+2. **{Failure name}**
+   - What failed: {description}
+   - Why: {root cause}
+   - Where to look: {files and lines}
 
-{If no gaps:}
-**No gaps found.** Phase goal achieved. Ready to proceed.
-
-{If gaps found:}
-
-### Critical Gaps (Block Progress)
-
-1. **{Gap name}**
-   - Missing: {what's missing}
-   - Impact: {why this blocks the goal}
-   - Fix: {what needs to happen}
-
-2. **{Gap name}**
-   - Missing: {what's missing}
-   - Impact: {why this blocks the goal}
-   - Fix: {what needs to happen}
-
-### Non-Critical Gaps (Can Defer)
-
-1. **{Gap name}**
-   - Issue: {what's wrong}
-   - Impact: {limited impact because...}
-   - Recommendation: {fix now or defer}
-
-## Recommended Fix Plans
-
-{If gaps found, generate fix plan recommendations:}
-
-### {phase}-{next}-PLAN.md: {Fix Name}
-
-**Objective:** {What this fixes}
-
-**Tasks:**
-1. {Task to fix gap 1}
-2. {Task to fix gap 2}
-3. {Verification task}
-
-**Estimated scope:** {Small / Medium}
-
----
-
-### {phase}-{next+1}-PLAN.md: {Fix Name}
-
-**Objective:** {What this fixes}
-
-**Tasks:**
-1. {Task}
-2. {Task}
-
-**Estimated scope:** {Small / Medium}
-
----
+**Nothing staged.** The human decides next steps: fix manually, re-run the phase, adjust the plan, or accept as-is.
 
 ## Verification Metadata
 
 **Verification approach:** Goal-backward (derived from phase goal)
-**Must-haves source:** {PLAN.md frontmatter | derived from ROADMAP.md goal}
+**Must-haves source:** PHASE-{N}-PLAN.md frontmatter
 **Automated checks:** {N} passed, {M} failed
-**Human checks required:** {N}
 **Total verification time:** {duration}
 
 ---
@@ -162,9 +108,12 @@ None — all verifiable items checked programmatically.
 ## Guidelines
 
 **Status values:**
-- `passed` — All must-haves verified, no blockers
-- `gaps_found` — One or more critical gaps found
-- `human_needed` — Automated checks pass but human verification required
+- `passed` — All must-haves verified, no blockers. Verifier stages changes via `git add`.
+- `failed` — One or more critical issues found. Nothing is staged. Diagnostics explain what failed and where.
+
+**On pass:** The verifier stages the executor's changed files (`git add`). The executor tracks files it writes; the verifier stages exactly those.
+
+**On fail:** The verifier writes diagnostics — what failed, why, where to look. No automated fix loop, no re-execution. The human decides next steps.
 
 **Evidence types:**
 - For EXISTS: "File at path, exports X"
@@ -177,12 +126,6 @@ None — all verifiable items checked programmatically.
 - ⚠️ Warning: Indicates incomplete but doesn't block
 - ℹ️ Info: Notable but not problematic
 
-**Fix plan generation:**
-- Only generate if gaps_found
-- Group related fixes into single plans
-- Keep to 2-3 tasks per plan
-- Include verification task in each plan
-
 ---
 
 ## Example
@@ -191,15 +134,15 @@ None — all verifiable items checked programmatically.
 ---
 phase: 03-chat
 verified: 2025-01-15T14:30:00Z
-status: gaps_found
-score: 2/5 must-haves verified
+status: failed
+score: 1/5 must-haves verified
 ---
 
 # Phase 3: Chat Interface Verification Report
 
 **Phase Goal:** Working chat interface where users can send and receive messages
 **Verified:** 2025-01-15T14:30:00Z
-**Status:** gaps_found
+**Status:** failed
 
 ## Goal Achievement
 
@@ -211,7 +154,7 @@ score: 2/5 must-haves verified
 | 2 | User can type a message | ✓ VERIFIED | Input field exists with onChange handler |
 | 3 | User can send a message | ✗ FAILED | onSubmit handler is console.log only |
 | 4 | Sent message appears in list | ✗ FAILED | No state update after send |
-| 5 | Messages persist across refresh | ? UNCERTAIN | Can't verify - send doesn't work |
+| 5 | Messages persist across refresh | ? UNCERTAIN | Can't verify — send doesn't work |
 
 **Score:** 1/5 truths verified
 
@@ -237,15 +180,15 @@ score: 2/5 must-haves verified
 
 **Wiring:** 0/4 connections verified
 
-## Requirements Coverage
+## Acceptance Criteria Coverage
 
-| Requirement | Status | Blocking Issue |
-|-------------|--------|----------------|
-| CHAT-01: User can send message | ✗ BLOCKED | API POST is stub |
-| CHAT-02: User can view messages | ✗ BLOCKED | Component is placeholder |
-| CHAT-03: Messages persist | ✗ BLOCKED | No database integration |
+| Criterion | Status | Blocking Issue |
+|-----------|--------|----------------|
+| AC-1: User can send message | ✗ BLOCKED | API POST is stub |
+| AC-2: User can view messages | ✗ BLOCKED | Component is placeholder |
+| AC-3: Messages persist | ✗ BLOCKED | No database integration |
 
-**Coverage:** 0/3 requirements satisfied
+**Coverage:** 0/3 acceptance criteria satisfied
 
 ## Anti-Patterns Found
 
@@ -257,63 +200,32 @@ score: 2/5 must-haves verified
 
 **Anti-patterns:** 3 found (2 blockers, 1 warning)
 
-## Human Verification Required
+## Diagnostics
 
-None needed until automated gaps are fixed.
-
-## Gaps Summary
-
-### Critical Gaps (Block Progress)
+### Failures
 
 1. **Chat component is placeholder**
-   - Missing: Actual message list rendering
-   - Impact: Users see "Chat will be here" instead of messages
-   - Fix: Implement Chat.tsx to fetch and render messages
+   - What failed: Chat.tsx renders static text instead of message list
+   - Why: Component was scaffolded but never implemented
+   - Where to look: `src/components/Chat.tsx:8`
 
 2. **API routes are stubs**
-   - Missing: Database integration in GET and POST
-   - Impact: No data persistence, no real functionality
-   - Fix: Wire prisma calls in route handlers
+   - What failed: GET returns empty array, POST returns hardcoded response
+   - Why: Database integration was never wired
+   - Where to look: `src/app/api/chat/route.ts:5-12`
 
-3. **No wiring between frontend and backend**
-   - Missing: fetch calls in components
-   - Impact: Even if API worked, UI wouldn't call it
-   - Fix: Add useEffect fetch in Chat, onSubmit fetch in ChatInput
+3. **No frontend-backend wiring**
+   - What failed: Components don't call API endpoints
+   - Why: fetch calls were never added
+   - Where to look: `src/components/Chat.tsx` (missing useEffect), `src/components/ChatInput.tsx` (onSubmit is console.log)
 
-## Recommended Fix Plans
-
-### 03-04-PLAN.md: Implement Chat API
-
-**Objective:** Wire API routes to database
-
-**Tasks:**
-1. Implement GET /api/chat with prisma.message.findMany
-2. Implement POST /api/chat with prisma.message.create
-3. Verify: API returns real data, POST creates records
-
-**Estimated scope:** Small
-
----
-
-### 03-05-PLAN.md: Implement Chat UI
-
-**Objective:** Wire Chat component to API
-
-**Tasks:**
-1. Implement Chat.tsx with useEffect fetch and message rendering
-2. Wire ChatInput onSubmit to POST /api/chat
-3. Verify: Messages display, new messages appear after send
-
-**Estimated scope:** Small
-
----
+**Nothing staged.** The human decides next steps: fix manually, re-run the phase, adjust the plan, or accept as-is.
 
 ## Verification Metadata
 
 **Verification approach:** Goal-backward (derived from phase goal)
-**Must-haves source:** 03-01-PLAN.md frontmatter
+**Must-haves source:** PHASE-3-PLAN.md frontmatter
 **Automated checks:** 2 passed, 8 failed
-**Human checks required:** 0 (blocked by automated failures)
 **Total verification time:** 2 min
 
 ---

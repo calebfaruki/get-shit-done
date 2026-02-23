@@ -156,7 +156,7 @@ ${HAS_CLAUDE ? "- ./CLAUDE.md (project-specific instructions and conventions)" :
       - **Rule 3 (Auto-fix blocking issues):** Something prevents completing task → fix blocker, continue
       - **Rule 4 (Ask about architectural changes):** Needs new DB table, service layer, framework change → STOP and return
 
-      **Scope boundary:** Only fix issues DIRECTLY caused by current task's changes. Pre-existing issues go to deferred-items list.
+      **Scope boundary:** Only fix issues DIRECTLY caused by current task's changes. Pre-existing issues are noted in the summary as out-of-scope.
 
       **Fix attempt limit:** Max 3 attempts per issue. After 3 failures, document in summary and move on.
 
@@ -336,7 +336,7 @@ Orchestrator loads minimal context (plan metadata, file paths). Executor subagen
 - **Executor returns failure status:** Report diagnostics, suggest manual review or plan adjustment
 - **Rule 4 termination:** Normal flow, not a failure — user decision required
 - **Fix attempt limit hit:** Documented in summary, execution continues
-- **Unrelated test failures:** Out of scope per scope boundary — logged to deferred-items
+- **Unrelated test failures:** Out of scope per scope boundary — noted in summary
 </failure_handling>
 
 </purpose>

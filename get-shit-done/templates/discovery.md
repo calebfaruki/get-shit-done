@@ -1,10 +1,10 @@
 # Discovery Template
 
-Template for `.planning/phases/XX-name/DISCOVERY.md` - shallow research for library/option decisions.
+Template for `.planning/project/DISCOVERY.md` - shallow research for library/option decisions.
 
 **Purpose:** Answer "which library/option should we use" questions during mandatory discovery in plan-phase.
 
-For deep ecosystem research ("how do experts build this"), use `/gsd:research-phase` which produces RESEARCH.md.
+For deep ecosystem research ("how do experts build this"), use `/research-phase` which produces RESEARCH.md.
 
 ---
 
@@ -71,7 +71,7 @@ Before completing discovery, verify:
 
 
 <output_structure>
-Create `.planning/phases/XX-name/DISCOVERY.md`:
+Create `.planning/project/DISCOVERY.md`:
 
 ```markdown
 # [Topic] Discovery
@@ -111,9 +111,9 @@ Create `.planning/phases/XX-name/DISCOVERY.md`:
 [What couldn't be determined or needs validation during implementation]
 </open_questions>
 
-<validation_checkpoints>
+<verification_notes>
 [If confidence is LOW or MEDIUM, list specific things to verify during implementation]
-</validation_checkpoints>
+</verification_notes>
 </metadata>
 ```
 </output_structure>
@@ -122,7 +122,7 @@ Create `.planning/phases/XX-name/DISCOVERY.md`:
 - All scope questions answered with authoritative sources
 - Quality checklist items completed
 - Clear primary recommendation
-- Low-confidence findings marked with validation checkpoints
+- Low-confidence findings marked with verification notes
 - Ready to inform PLAN.md creation
 </success_criteria>
 
@@ -142,5 +142,5 @@ Create `.planning/phases/XX-name/DISCOVERY.md`:
 - Niche/complex domains (3D, games, audio, shaders)
 - Need ecosystem knowledge, not just library choice
 - "How do experts build this" questions
-- Use `/gsd:research-phase` for these
+- Use `/research-phase` for these
 </guidelines>

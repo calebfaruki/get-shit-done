@@ -1,6 +1,6 @@
 # Technology Stack Template
 
-Template for `.planning/codebase/STACK.md` - captures the technology foundation.
+Section template for the Tech Stack section of `.planning/CODEBASE.md` - captures the technology foundation.
 
 **Purpose:** Document what technologies run this codebase. Focused on "what executes when you run the code."
 

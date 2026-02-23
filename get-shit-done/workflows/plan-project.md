@@ -113,7 +113,16 @@ After plan is written, verify:
 - [ ] Phase goals are outcome-shaped
 - [ ] Dependencies are clear
 
-### 6. State artifacts
+### 6. Deferred scope as todos
+
+If any acceptance criteria or scope items were shaved during planning (deemed too broad for a single project), create todos for them:
+
+- Propose each deferred item to the user before writing
+- One file per todo in `.planning/todos/`
+- Frontmatter: `area:` and `created:` fields
+- Body: freeform description of the deferred work
+
+### 7. State artifacts
 
 **CRITICAL:** Do NOT create:
 - ROADMAP.md
@@ -123,7 +132,7 @@ After plan is written, verify:
 
 PROJECT-PLAN.md is the sole planning artifact per SPEC (STATE-02).
 
-### 7. Handoff
+### 8. Handoff
 
 After planning completes:
 

@@ -1,6 +1,6 @@
 # UAT Template
 
-Template for `.planning/phases/XX-name/{phase_num}-UAT.md` — persistent UAT session tracking.
+Template for `.planning/project/PHASE-{N}-UAT.md` — persistent UAT session tracking.
 
 ---
 
@@ -57,7 +57,7 @@ skipped: [N]
 
 ## Gaps
 
-<!-- YAML format for plan-phase --gaps consumption -->
+<!-- YAML format for gap tracking -->
 - truth: "[expected behavior from test]"
   status: failed
   reason: "User reported: [verbatim response]"
@@ -98,7 +98,7 @@ skipped: [N]
 **Gaps:**
 - APPEND only when issue found (YAML format)
 - After diagnosis: fill `root_cause`, `artifacts`, `missing`, `debug_session`
-- This section feeds directly into /gsd:plan-phase --gaps
+- This section tracks gaps for diagnosis and resolution
 
 </section_rules>
 
@@ -106,13 +106,13 @@ skipped: [N]
 
 **After testing complete (status: complete), if gaps exist:**
 
-1. User runs diagnosis (from verify-work offer or manually)
+1. User runs diagnosis (from verification offer or manually via /debug)
 2. diagnose-issues workflow spawns parallel debug agents
 3. Each agent investigates one gap, returns root cause
 4. UAT.md Gaps section updated with diagnosis:
    - Each gap gets `root_cause`, `artifacts`, `missing`, `debug_session` filled
 5. status → "diagnosed"
-6. Ready for /gsd:plan-phase --gaps with root causes
+6. Ready for targeted fix planning with root causes
 
 **After diagnosis:**
 ```yaml
@@ -136,7 +136,7 @@ skipped: [N]
 
 <lifecycle>
 
-**Creation:** When /gsd:verify-work starts new session
+**Creation:** When /verify-project starts new session
 - Extract tests from SUMMARY.md files
 - Set status to "testing"
 - Current Test points to test 1

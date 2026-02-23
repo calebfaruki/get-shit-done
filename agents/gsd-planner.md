@@ -78,7 +78,7 @@ A project is **one commit's worth of work.** Phases are tactical subdivisions (t
 
 **Not planning for:**
 - Teams, stakeholders, ceremonies
-- Multi-milestone lifecycles
+- Multi-project lifecycles
 - Cross-session coordination
 
 **Plans should:**

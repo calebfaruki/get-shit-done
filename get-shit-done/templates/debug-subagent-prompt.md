@@ -51,7 +51,7 @@ Create: .planning/debug/{slug}.md
 
 ## Usage
 
-**From /gsd:debug:**
+**From /debug:**
 ```python
 Task(
   prompt=filled_template,
@@ -65,27 +65,3 @@ Task(
 Task(prompt=template, subagent_type="gsd-debugger", description="Debug UAT-001")
 ```
 
----
-
-## Continuation
-
-For checkpoints, spawn fresh agent with:
-
-```markdown
-<objective>
-Continue debugging {slug}. Evidence is in the debug file.
-</objective>
-
-<prior_state>
-Debug file: @.planning/debug/{slug}.md
-</prior_state>
-
-<checkpoint_response>
-**Type:** {checkpoint_type}
-**Response:** {user_response}
-</checkpoint_response>
-
-<mode>
-goal: {goal}
-</mode>
-```

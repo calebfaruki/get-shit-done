@@ -1,5 +1,5 @@
 <purpose>
-Create executable phase prompts (PLAN.md files) for a roadmap phase with integrated research and verification. Default flow: Research (if needed) -> Plan -> Verify -> Done. Orchestrates gsd-phase-researcher, gsd-planner, and gsd-plan-checker agents with a revision loop (max 3 iterations).
+Create executable phase prompts (PLAN.md files) for a project phase with integrated research and verification. Default flow: Research (if needed) -> Plan -> Verify -> Done. Orchestrates gsd-phase-researcher, gsd-planner, and gsd-plan-checker agents with a revision loop (max 3 iterations).
 </purpose>
 
 <required_reading>
@@ -109,7 +109,7 @@ Build planner prompt with context files per SPEC (single-commit scope):
 <objective>
 Create detailed execution plan for Phase ${PHASE}: ${PHASE_NAME}
 
-**Critical:** This is single-commit scope. One plan per phase. No waves, no parallelization, no checkpoint tasks per SPEC.
+**Critical:** This is single-commit scope. One plan per phase. No waves, no parallelization. Decisions belong in /discuss-phase, not mid-execution.
 </objective>
 
 <files_to_read>
@@ -174,7 +174,7 @@ ${HAS_CODEBASE && "@.planning/CODEBASE.md"}
 </verification>
 \`\`\`
 
-**NO wave, NO depends_on, NO checkpoint tasks per SPEC.** Decisions belong in /discuss-phase.
+**NO wave, NO depends_on.** Decisions belong in /discuss-phase, not mid-execution.
 </output_format>
 ```
 
@@ -190,8 +190,24 @@ Task(
 
 ## 7. Handle Planner Return
 
-- **`## PLANNING COMPLETE`:** Display success, show next steps
+- **`## PLANNING COMPLETE`:** Proceed to plan-checker verification (step 7.1)
 - **`## PLANNING INCONCLUSIVE`:** Show what was attempted, offer: Add context / Retry / Manual edit
+
+## 7.1. Plan-Checker Verification
+
+Spawn `gsd-plan-checker` for secondary scope validation per SPEC §2:
+
+```
+Task(
+  prompt="Check this phase plan for scope compliance and verifiability.\n\nRead: .planning/project/PHASE-${PHASE}-PLAN.md\nAlso read: .planning/project/PROJECT-PLAN.md\n\nCheck:\n- Does the plan stay within the phase's planned scope?\n- Is the work verifiable in a single commit?\n- Number of behavioral changes, systems touched, architectural boundary crossings\n- Are must_haves concrete and testable?\n\nReturn ## CHECK PASSED or ## CHECK FAILED with specific concerns.",
+  subagent_type="gsd-plan-checker",
+  description="Check Phase ${PHASE} plan"
+)
+```
+
+- **`## CHECK PASSED`:** Proceed to step 8
+- **`## CHECK FAILED`:** Show concerns, offer: Revise plan (re-run planner with checker feedback) / Accept anyway / Manual edit
+- **Revision loop:** Max 3 iterations (plan → check → revise). After 3 failures, present plan with checker warnings and let human decide.
 
 ## 8. Present Results and Next Steps
 

@@ -242,16 +242,16 @@ Plans should complete within ~50% context usage (not 80%). This prevents context
 
 **Rule:** Plans should complete within ~50% context. More plans, smaller scope, consistent quality.
 
-### Plans Per Phase
+### One Plan Per Phase
 
-**Each phase: 1-3 plans maximum.**
-**Each plan: 2-3 tasks maximum.**
+**Each phase has exactly one plan (PHASE-{N}-PLAN.md).**
+**Each plan: 2-5 tasks.**
 
-| Phase Complexity | Plans | Tasks/Plan | Context/Task | Total |
-|------------------|-------|------------|--------------|-------|
-| Simple (CRUD, config) | 1-2 | 2-3 | ~10-15% | ~30-45% |
-| Complex (auth, payments) | 2-3 | 2 | ~20-30% | ~40-50% |
-| Very complex (migrations) | 2-3 | 1-2 | ~30-40% | ~30-50% |
+| Phase Complexity | Tasks | Context/Task | Total |
+|------------------|-------|--------------|-------|
+| Simple (CRUD, config) | 2-3 | ~10-15% | ~30-45% |
+| Complex (auth, payments) | 3-4 | ~15-20% | ~45-50% |
+| Very complex (migrations) | 4-5 | ~10-15% | ~40-50% |
 
 ### Task Sizing
 
@@ -311,14 +311,14 @@ Use the Read tool with absolute paths:
 Read tool with file_path: /absolute/path/to/.planning/project/PROJECT.md
 ```
 
-**Example:** Read ROADMAP.md
+**Example:** Read PROJECT-PLAN.md
 ```
-Read tool with file_path: /absolute/path/to/.planning/ROADMAP.md
+Read tool with file_path: /absolute/path/to/.planning/project/PROJECT-PLAN.md
 ```
 
 **Example:** Read prior phase research
 ```
-Read tool with file_path: /absolute/path/to/.planning/phases/01-foundation/01-RESEARCH.md
+Read tool with file_path: /absolute/path/to/.planning/project/PHASE-1-RESEARCH.md
 ```
 
 ### Writing Plan Files
@@ -327,7 +327,7 @@ Use the Write tool with absolute paths:
 
 **Example:** Create phase plan
 ```
-Write tool with file_path: /absolute/path/to/.planning/phases/01-foundation/01-01-PLAN.md
+Write tool with file_path: /absolute/path/to/.planning/project/PHASE-1-PLAN.md
 Write tool with content: [plan markdown with frontmatter]
 ```
 
@@ -337,12 +337,12 @@ Use Glob for pattern matching:
 
 **Example:** Find all plan files
 ```
-Glob tool with pattern: .planning/phases/**/*-PLAN.md
+Glob tool with pattern: .planning/project/PHASE-*-PLAN.md
 ```
 
 **Example:** Find summary files for a phase
 ```
-Glob tool with pattern: .planning/phases/01-foundation/*-SUMMARY.md
+Glob tool with pattern: .planning/project/PROJECT-SUMMARY.md
 ```
 
 ### Searching Codebase Patterns
@@ -368,12 +368,12 @@ Use Bash for structural checks:
 
 **Example:** Check if phase directory exists
 ```
-Bash with command: [ -d .planning/phases/01-foundation ] && echo "exists" || echo "missing"
+Bash with command: [ -d .planning/project ] && echo "exists" || echo "missing"
 ```
 
 **Example:** List phase directories
 ```
-Bash with command: ls -1 .planning/phases/
+Bash with command: ls -1 .planning/project/
 ```
 
 ### Anti-Patterns (NEVER DO THIS)

@@ -1,7 +1,7 @@
 <purpose>
 Orchestrate parallel codebase mapper agents to analyze codebase and produce a single structured document in .planning/CODEBASE.md
 
-Each agent has fresh context and explores a specific focus area. The orchestrator collects findings and produces a consolidated codebase map anchored to the current git commit SHA.
+Each agent has fresh context and explores a specific focus area, returning structured findings. The orchestrator consolidates findings into a single codebase map anchored to the current git commit SHA.
 
 Output: .planning/CODEBASE.md (single file, semi-durable, commit SHA anchored)
 </purpose>
@@ -104,7 +104,7 @@ Report findings for:
 - Tech stack - Languages, runtime, frameworks, dependencies, configuration
 - Integrations - External APIs, databases, auth providers, webhooks
 
-Explore thoroughly. Return structured findings for orchestrator to consolidate."
+Explore thoroughly. Return structured markdown sections with your findings. Do NOT write any files — orchestrator consolidates into CODEBASE.md."
 )
 ```
 
@@ -124,7 +124,7 @@ Report findings for:
 - Architecture - Pattern, layers, data flow, abstractions, entry points
 - Structure - Directory layout, key locations, naming conventions
 
-Explore thoroughly. Return structured findings for orchestrator to consolidate."
+Explore thoroughly. Return structured markdown sections with your findings. Do NOT write any files — orchestrator consolidates into CODEBASE.md."
 )
 ```
 
@@ -144,7 +144,7 @@ Report findings for:
 - Conventions - Code style, naming, patterns, error handling
 - Testing - Framework, structure, mocking, coverage
 
-Explore thoroughly. Return structured findings for orchestrator to consolidate."
+Explore thoroughly. Return structured markdown sections with your findings. Do NOT write any files — orchestrator consolidates into CODEBASE.md."
 )
 ```
 
@@ -163,7 +163,7 @@ Analyze this codebase for technical debt, known issues, and areas of concern.
 Report findings for:
 - Concerns - Tech debt, bugs, security, performance, fragile areas
 
-Explore thoroughly. Return structured findings for orchestrator to consolidate."
+Explore thoroughly. Return structured markdown sections with your findings. Do NOT write any files — orchestrator consolidates into CODEBASE.md."
 )
 ```
 
@@ -176,13 +176,7 @@ Wait for all 4 agents to complete.
 Read each agent's output file to collect findings.
 
 **Expected format from each agent:**
-```
-## Mapping Complete
-
-**Focus:** {focus}
-
-[Structured findings as markdown sections]
-```
+Structured markdown sections matching the agent's focus area (e.g., `## Tech Stack`, `## Architecture`, etc.).
 
 Collect all agent findings for consolidation into single CODEBASE.md file.
 
@@ -197,7 +191,7 @@ Consolidate all agent findings into a single .planning/CODEBASE.md file.
 **File structure:**
 ```markdown
 ---
-commit: {CURRENT_SHA}
+commit_sha: {CURRENT_SHA}
 generated: {timestamp}
 ---
 
@@ -326,7 +320,7 @@ End workflow.
 <success_criteria>
 - .planning/ directory created
 - 4 parallel gsd-codebase-mapper agents spawned with run_in_background=true
-- Agents return findings (orchestrator consolidates)
+- Agent findings collected and consolidated by orchestrator
 - Single CODEBASE.md file created with commit SHA in frontmatter
 - Clear completion summary with line count and commit reference
 - User offered clear next steps

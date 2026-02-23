@@ -1,6 +1,6 @@
 # Research Template
 
-Template for `.planning/phases/XX-name/{phase_num}-RESEARCH.md` - comprehensive ecosystem research before planning.
+Template for `.planning/project/PHASE-{N}-RESEARCH.md` - comprehensive ecosystem research before planning.
 
 **Purpose:** Document what Claude needs to know to implement a phase well - not just "which library" but "how do experts build this."
 
@@ -18,7 +18,7 @@ Template for `.planning/phases/XX-name/{phase_num}-RESEARCH.md` - comprehensive 
 <user_constraints>
 ## User Constraints (from CONTEXT.md)
 
-**CRITICAL:** If CONTEXT.md exists from /gsd:discuss-phase, copy locked decisions here verbatim. These MUST be honored by the planner.
+**CRITICAL:** If CONTEXT.md exists from /discuss-phase, copy locked decisions here verbatim. These MUST be honored by the planner.
 
 ### Locked Decisions
 [Copy from CONTEXT.md `## Decisions` section - these are NON-NEGOTIABLE]
@@ -547,6 +547,6 @@ function useVehicleControls(rigidBodyRef) {
 - Code examples can be referenced in task actions
 
 **After creation:**
-- File lives in phase directory: `.planning/phases/XX-name/{phase_num}-RESEARCH.md`
+- File lives in project directory: `.planning/project/PHASE-{N}-RESEARCH.md`
 - Referenced during planning workflow
 - plan-phase loads it automatically when present

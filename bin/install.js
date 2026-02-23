@@ -1345,7 +1345,7 @@ function reportLocalPatches(configDir) {
     }
     console.log('');
     console.log('  Your modifications are saved in ' + cyan + PATCHES_DIR_NAME + '/' + reset);
-    console.log('  Run ' + cyan + '/gsd:reapply-patches' + reset + ' to merge them into the new version.');
+    console.log('  Manually compare and merge your modifications into the new version.');
     console.log('  Or manually compare and merge the files.');
     console.log('');
   }

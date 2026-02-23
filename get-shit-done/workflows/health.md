@@ -50,7 +50,7 @@ if [ -f .planning/CODEBASE.md ]; then
   CODEBASE_EXISTS=true
 
   # Extract SHA from frontmatter
-  STORED_SHA=$(grep '^sha:' .planning/CODEBASE.md | head -1 | awk '{print $2}')
+  STORED_SHA=$(grep '^commit_sha:' .planning/CODEBASE.md | head -1 | awk '{print $2}')
   CURRENT_SHA=$(git rev-parse HEAD 2>/dev/null)
 
   if [ -n "$STORED_SHA" ] && [ -n "$CURRENT_SHA" ]; then
