@@ -127,12 +127,14 @@ Plans:
   1. A project can be taken from `/new-project` through `/plan-project`, `/execute-phase`, and `/verify-phase` successfully
   2. No legacy GSD workflow scripts, state management files, or milestone commands remain in the codebase
   3. All existing tests pass plus new integration tests cover the full lifecycle
-  4. Installation works across Claude Code, OpenCode, and Gemini CLI
+  4. Installation works for Claude Code (only target platform per locked decision)
   5. health.md checks .planning/project/ structure (not ROADMAP.md/STATE.md/MILESTONES.md)
   6. toolkit.cjs MODEL_PROFILES consolidated with core.cjs (DRY violation resolved)
   7. commands.cjs cmdListTodos deduplicated with toolkit.listTodos
 **Audit gaps addressed**: health.md old state refs, DRY violations, code duplication
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 07-01-PLAN.md — Deduplicate code, delete gsd-tools.cjs, rewrite health.md, add lifecycle E2E and architecture validation tests
 
 ## Progress
 
@@ -147,7 +149,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 4. Command Handlers and Project Lifecycle | 6/6 | Complete | 2026-02-22 |
 | 5. Agent Spawning and Handoff Protocols | 1/1 | Complete | 2026-02-23 |
 | 6. Verification and Git Staging | 1/1 | Complete | 2026-02-23 |
-| 7. Integration Testing and Migration Cleanup | 0/TBD | Not started | - |
+| 7. Integration Testing and Migration Cleanup | 0/1 | Not started | - |
 
 ---
 *Roadmap created: 2026-02-22*
