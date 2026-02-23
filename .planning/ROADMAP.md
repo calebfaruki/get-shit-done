@@ -11,7 +11,7 @@ A strangler fig migration of get-shit-done-cc (v1.20.5) from rigid workflow scri
 - [x] **Phase 3: Knowledge Document System** - Create AGENTS.md index and domain-specific reference docs that agents reason over ✓ 2026-02-22
 - [x] **Phase 4: Command Handlers and Project Lifecycle** - Wire up all slash commands as thin triggers that load knowledge docs and spawn agents ✓ 2026-02-22
 - [x] **Phase 5: Agent Spawning and Handoff Protocols** - Modify agents for single-commit scope with self-contained context propagation; wire toolkit.cjs into workflows; complete knowledge doc loading ✓ 2026-02-23
-- [ ] **Phase 6: Verification and Git Staging** - Report-only verification, explicit file staging, working tree safety enforcement; rewrite verify-phase.md for PROJECT-PLAN.md architecture
+- [x] **Phase 6: Verification and Git Staging** - Report-only verification, explicit file staging, working tree safety enforcement; rewrite verify-phase.md for PROJECT-PLAN.md architecture ✓ 2026-02-23
 - [ ] **Phase 7: Integration Testing and Migration Cleanup** - End-to-end lifecycle tests, remove remaining legacy artifacts, fix health.md for new architecture, deduplicate toolkit/core.cjs
 
 ## Phase Details
@@ -117,7 +117,7 @@ Plans:
 **Audit gaps addressed**: verify-phase.md broken references, /execute-phase → /verify-phase E2E flow
 **Plans**: 1 plan
 Plans:
-- [ ] 06-01-PLAN.md — Rewrite verifier agent and verify-phase workflow for report-only verification with explicit staging
+- [x] 06-01-PLAN.md — Rewrite verifier agent and verify-phase workflow for report-only verification with explicit staging ✓ 2026-02-23
 
 ### Phase 7: Integration Testing and Migration Cleanup
 **Goal**: The full project lifecycle works end-to-end and no legacy GSD artifacts remain
@@ -146,7 +146,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 3. Knowledge Document System | 3/3 | Complete | 2026-02-22 |
 | 4. Command Handlers and Project Lifecycle | 6/6 | Complete | 2026-02-22 |
 | 5. Agent Spawning and Handoff Protocols | 1/1 | Complete | 2026-02-23 |
-| 6. Verification and Git Staging | 0/1 | Not started | - |
+| 6. Verification and Git Staging | 1/1 | Complete | 2026-02-23 |
 | 7. Integration Testing and Migration Cleanup | 0/TBD | Not started | - |
 
 ---
