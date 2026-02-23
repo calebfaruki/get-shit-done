@@ -10,35 +10,48 @@ Read all files referenced by the invoking prompt's execution_context before star
 
 <process>
 
-<step name="init_context">
-Load todo context:
+<step name="check_todos_directory">
+Check if todos directory exists:
 
 ```bash
-INIT=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs init todos)
+TODO_DIR=".planning/todos"
+if [ ! -d "$TODO_DIR" ]; then
+  echo "No pending todos."
+  echo ""
+  echo "Todos are captured during project planning with /new-project and /plan-project."
+  exit 0
+fi
 ```
-
-Extract from init JSON: `todo_count`, `todos`, `pending_dir`.
-
-If `todo_count` is 0:
-```
-No pending todos.
-
-Todos are captured during project planning with /new-project and /plan-project.
-```
-
-Exit.
 </step>
 
 <step name="parse_filter">
 Check for area filter in arguments:
 - `/todo` → show all
 - `/todo api` → filter to area:api only
+
+```bash
+AREA_FILTER="${ARGUMENTS[0]:-}"
+```
 </step>
 
 <step name="list_todos">
-Use the `todos` array from init context (already filtered by area if specified).
+Use Glob to find todo files, optionally filter by area.
 
-Parse and display as simple list:
+```bash
+if [ -n "$AREA_FILTER" ]; then
+  TODO_FILES=$(ls "$TODO_DIR"/*.md 2>/dev/null | xargs grep -l "^area: $AREA_FILTER" 2>/dev/null || echo "")
+else
+  TODO_FILES=$(ls "$TODO_DIR"/*.md 2>/dev/null || echo "")
+fi
+```
+
+If no todo files found:
+```
+No pending todos matching filter.
+```
+Exit.
+
+Parse and display as simple list using Read tool for each file:
 
 ```
 Pending Todos:

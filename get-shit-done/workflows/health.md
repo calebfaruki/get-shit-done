@@ -1,5 +1,5 @@
 <purpose>
-Validate `.planning/` directory integrity and report actionable issues. Checks for missing files, invalid configurations, inconsistent state, and orphaned plans. Optionally repairs auto-fixable issues.
+Validate `.planning/` directory integrity and report actionable issues. Checks for project structure, file existence, and codebase map freshness. Report-only, no automated repairs.
 </purpose>
 
 <required_reading>
@@ -8,33 +8,89 @@ Read all files referenced by the invoking prompt's execution_context before star
 
 <process>
 
-<step name="parse_args">
-**Parse arguments:**
+<step name="check_planning_structure">
+**Check basic .planning/ structure:**
 
-Check if `--repair` flag is present in the command arguments.
+```bash
+# Check .planning/ directory exists
+if [ ! -d .planning ]; then
+  STATUS="broken"
+  echo "ERROR: .planning/ directory not found"
+  echo "Run /new-project to initialize a project"
+  exit 1
+fi
 
-```
-REPAIR_FLAG=""
-if arguments contain "--repair"; then
-  REPAIR_FLAG="--repair"
+# Check for project files
+PROJECT_MD_EXISTS=false
+PROJECT_PLAN_EXISTS=false
+
+[ -f .planning/project/PROJECT.md ] && PROJECT_MD_EXISTS=true
+[ -f .planning/project/PROJECT-PLAN.md ] && PROJECT_PLAN_EXISTS=true
+
+# Determine overall status
+if [ "$PROJECT_MD_EXISTS" = "false" ]; then
+  STATUS="degraded"
+elif [ "$PROJECT_PLAN_EXISTS" = "false" ]; then
+  STATUS="healthy-unplanned"
+else
+  STATUS="healthy"
 fi
 ```
 </step>
 
-<step name="run_health_check">
-**Run health validation:**
+<step name="check_codebase_map">
+**Check codebase map status:**
 
 ```bash
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs validate health $REPAIR_FLAG
-```
+# Check if CODEBASE.md exists
+CODEBASE_EXISTS=false
+CODEBASE_STALE=""
 
-Parse JSON output:
-- `status`: "healthy" | "degraded" | "broken"
-- `errors[]`: Critical issues (code, message, fix, repairable)
-- `warnings[]`: Non-critical issues
-- `info[]`: Informational notes
-- `repairable_count`: Number of auto-fixable issues
-- `repairs_performed[]`: Actions taken if --repair was used
+if [ -f .planning/CODEBASE.md ]; then
+  CODEBASE_EXISTS=true
+
+  # Extract SHA from frontmatter
+  STORED_SHA=$(grep '^sha:' .planning/CODEBASE.md | head -1 | awk '{print $2}')
+  CURRENT_SHA=$(git rev-parse HEAD 2>/dev/null)
+
+  if [ -n "$STORED_SHA" ] && [ -n "$CURRENT_SHA" ]; then
+    if [ "$STORED_SHA" != "$CURRENT_SHA" ]; then
+      CODEBASE_STALE="yes"
+    else
+      CODEBASE_STALE="no"
+    fi
+  else
+    CODEBASE_STALE="unknown"
+  fi
+fi
+```
+</step>
+
+<step name="count_todos">
+**Count pending todos:**
+
+```bash
+TODO_COUNT=0
+
+if [ -d .planning/todos ]; then
+  TODO_COUNT=$(find .planning/todos -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+fi
+```
+</step>
+
+<step name="list_phase_plans">
+**List phase plan files:**
+
+```bash
+# Find all PHASE-*-PLAN.md files in .planning/project/
+PHASE_PLANS=()
+
+if [ -d .planning/project ]; then
+  while IFS= read -r -d '' file; do
+    PHASE_PLANS+=("$(basename "$file")")
+  done < <(find .planning/project -maxdepth 1 -name "PHASE-*-PLAN.md" -print0 2>/dev/null | sort -z)
+fi
+```
 </step>
 
 <step name="format_output">
@@ -42,115 +98,80 @@ Parse JSON output:
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- GSD Health Check
+ Health Check
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Status: HEALTHY | DEGRADED | BROKEN
-Errors: N | Warnings: N | Info: N
-```
+Status: ${STATUS}
 
-**If repairs were performed:**
-```
-## Repairs Performed
+## Project Structure
 
-- ✓ config.json: Created with defaults
-- ✓ STATE.md: Regenerated from roadmap
-```
+- .planning/ directory: ✓ exists
+- PROJECT.md: ${PROJECT_MD_EXISTS ? "✓ exists" : "✗ missing"}
+- PROJECT-PLAN.md: ${PROJECT_PLAN_EXISTS ? "✓ exists" : "○ not yet planned"}
 
-**If errors exist:**
-```
-## Errors
+## Codebase Map
 
-- [E001] config.json: JSON parse error at line 5
-  Fix: Run /gsd:health --repair to reset to defaults
+- CODEBASE.md: ${CODEBASE_EXISTS ? "✓ exists" : "○ not mapped"}
+${CODEBASE_STALE === "yes" ? "  ⚠ Map is stale (commit SHA mismatch)" : ""}
+${CODEBASE_STALE === "no" ? "  ✓ Map is current" : ""}
 
-- [E002] PROJECT.md not found
-  Fix: Run /gsd:new-project to create
-```
+## Phase Plans
 
-**If warnings exist:**
-```
-## Warnings
+${PHASE_PLANS.length > 0 ? PHASE_PLANS.map(p => `- ${p}`).join('\n') : "  No phase plans found"}
 
-- [W001] STATE.md references phase 5, but only phases 1-3 exist
-  Fix: Run /gsd:health --repair to regenerate
+## Todos
 
-- [W005] Phase directory "1-setup" doesn't follow NN-name format
-  Fix: Rename to match pattern (e.g., 01-setup)
-```
-
-**If info exists:**
-```
-## Info
-
-- [I001] 02-implementation/02-01-PLAN.md has no SUMMARY.md
-  Note: May be in progress
-```
-
-**Footer (if repairable issues exist and --repair was NOT used):**
-```
----
-N issues can be auto-repaired. Run: /gsd:health --repair
-```
-</step>
-
-<step name="offer_repair">
-**If repairable issues exist and --repair was NOT used:**
-
-Ask user if they want to run repairs:
+- Pending: ${TODO_COUNT}
 
 ```
-Would you like to run /gsd:health --repair to fix N issues automatically?
+
+**Status meanings:**
+- `healthy`: PROJECT.md and PROJECT-PLAN.md exist
+- `healthy-unplanned`: PROJECT.md exists but no PROJECT-PLAN.md yet
+- `degraded`: Missing PROJECT.md
+- `broken`: .planning/ directory missing
+
+**If degraded:**
+```
+## Actions
+
+Run /new-project to create PROJECT.md
 ```
 
-If yes, re-run with --repair flag and display results.
-</step>
+**If healthy-unplanned:**
+```
+## Actions
 
-<step name="verify_repairs">
-**If repairs were performed:**
-
-Re-run health check without --repair to confirm issues are resolved:
-
-```bash
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs validate health
+Run /plan-project to create PROJECT-PLAN.md
 ```
 
-Report final status.
+**If codebase map stale:**
+```
+## Actions
+
+Run /map to update codebase map
+```
 </step>
 
 </process>
 
 <error_codes>
 
-| Code | Severity | Description | Repairable |
-|------|----------|-------------|------------|
-| E001 | error | .planning/ directory not found | No |
-| E002 | error | PROJECT.md not found | No |
-| E003 | error | ROADMAP.md not found | No |
-| E004 | error | STATE.md not found | Yes |
-| E005 | error | config.json parse error | Yes |
-| W001 | warning | PROJECT.md missing required section | No |
-| W002 | warning | STATE.md references invalid phase | Yes |
-| W003 | warning | config.json not found | Yes |
-| W004 | warning | config.json invalid field value | No |
-| W005 | warning | Phase directory naming mismatch | No |
-| W006 | warning | Phase in ROADMAP but no directory | No |
-| W007 | warning | Phase on disk but not in ROADMAP | No |
-| I001 | info | Plan without SUMMARY (may be in progress) | No |
+| Code | Severity | Description | Action |
+|------|----------|-------------|--------|
+| E001 | error | .planning/ directory not found | Run /new-project |
+| E002 | error | PROJECT.md not found | Run /new-project |
+| E003 | info | PROJECT-PLAN.md not found (project not yet planned) | Run /plan-project |
+| W001 | warning | Codebase map is stale | Run /map |
 
 </error_codes>
 
-<repair_actions>
+<notes>
 
-| Action | Effect | Risk |
-|--------|--------|------|
-| createConfig | Create config.json with defaults | None |
-| resetConfig | Delete + recreate config.json | Loses custom settings |
-| regenerateState | Create STATE.md from ROADMAP structure | Loses session history |
+**Verification is report-only**: Health check does NOT auto-repair. It reports status and suggests commands to run.
 
-**Not repairable (too risky):**
-- PROJECT.md, ROADMAP.md content
-- Phase directory renaming
-- Orphaned plan cleanup
+**No legacy file checks**: Does not check for ROADMAP.md, STATE.md, MILESTONES.md, config.json — these are not part of the new architecture.
 
-</repair_actions>
+**Phase directory validation removed**: Phase plans live in .planning/project/ with flat naming (PHASE-N-PLAN.md), not in phase directories with NN-name format.
+
+</notes>

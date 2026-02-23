@@ -9,21 +9,15 @@ From `$ARGUMENTS`:
 - Extract flags (prefixed with `--`)
 - Remaining text is description (for insert/add commands)
 
-## Using gsd-tools
+## Phase Resolution
 
-The `find-phase` command handles normalization and validation in one step:
+Phase resolution is now handled directly by workflows reading PROJECT-PLAN.md.
 
-```bash
-PHASE_INFO=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs find-phase "${PHASE}")
-```
-
-Returns JSON with:
-- `found`: true/false
-- `directory`: Full path to phase directory
-- `phase_number`: Normalized number (e.g., "06", "06.1")
-- `phase_name`: Name portion (e.g., "foundation")
-- `plans`: Array of PLAN.md files
-- `summaries`: Array of SUMMARY.md files
+The workflow logic:
+- Reads PROJECT-PLAN.md frontmatter to extract phase list
+- Normalizes phase numbers (zero-pad to 2 digits, preserve decimals)
+- Validates phase exists in PROJECT-PLAN.md
+- Locates PHASE-N-PLAN.md files in .planning/project/
 
 ## Manual Normalization (Legacy)
 
@@ -42,20 +36,10 @@ fi
 
 ## Validation
 
-Use `roadmap get-phase` to validate phase exists:
+Workflows validate phases by reading PROJECT-PLAN.md:
 
-```bash
-PHASE_CHECK=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs roadmap get-phase "${PHASE}")
-if [ "$(echo "$PHASE_CHECK" | jq -r '.found')" = "false" ]; then
-  echo "ERROR: Phase ${PHASE} not found in roadmap"
-  exit 1
-fi
-```
+1. Parse PROJECT-PLAN.md frontmatter for phase list
+2. Check if requested phase exists in the list
+3. Verify corresponding PHASE-N-PLAN.md file exists in .planning/project/
 
-## Directory Lookup
-
-Use `find-phase` for directory lookup:
-
-```bash
-PHASE_DIR=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs find-phase "${PHASE}" --raw)
-```
+No external tools needed — workflows use native file operations and frontmatter parsing.

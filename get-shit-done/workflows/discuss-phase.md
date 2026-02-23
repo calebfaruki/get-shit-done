@@ -41,7 +41,7 @@ Ask about vision and implementation choices. Capture decisions for downstream ag
 <scope_guardrail>
 **CRITICAL: No scope creep.**
 
-The phase boundary comes from ROADMAP.md and is FIXED. Discussion clarifies HOW to implement what's scoped, never WHETHER to add new capabilities.
+The phase boundary comes from PROJECT-PLAN.md and is FIXED. Discussion clarifies HOW to implement what's scoped, never WHETHER to add new capabilities.
 
 **Allowed (clarifying ambiguity):**
 - "How should posts be displayed?" (layout, density, info shown)
@@ -71,7 +71,7 @@ Gray areas are **implementation decisions the user cares about** — things that
 
 **How to identify gray areas:**
 
-1. **Read the phase goal** from ROADMAP.md
+1. **Read the phase goal** from PROJECT-PLAN.md
 2. **Understand the domain** — What kind of thing is being built?
    - Something users SEE → visual presentation, interactions, states matter
    - Something users CALL → interface contracts, responses, errors matter
@@ -110,66 +110,93 @@ Phase: "API documentation"
 <step name="initialize" priority="first">
 Phase number from argument (required).
 
+**Prerequisite check:** Verify `.planning/project/PROJECT-PLAN.md` exists.
+
 ```bash
-INIT=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs init phase-op "${PHASE}")
+if [ ! -f ".planning/project/PROJECT-PLAN.md" ]; then
+  echo "PROJECT-PLAN.md not found."
+  echo ""
+  echo "Run /plan-project first to break your project into phases."
+  exit 1
+fi
 ```
 
-Parse JSON for: `commit_docs`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `padded_phase`, `has_research`, `has_context`, `has_plans`, `has_verification`, `plan_count`, `roadmap_exists`, `planning_exists`.
-
-**If `phase_found` is false:**
+**Parse phase number:**
+```bash
+PHASE="$1"
 ```
-Phase [X] not found in roadmap.
 
-Use /gsd:progress to see available phases.
+**Validate phase exists in PROJECT-PLAN.md:**
+```bash
+grep -q "^### Phase ${PHASE}:" .planning/project/PROJECT-PLAN.md 2>/dev/null
+```
+
+**If phase not found:**
+```
+Phase ${PHASE} not found in PROJECT-PLAN.md.
+
+Check PROJECT-PLAN.md for available phases.
 ```
 Exit workflow.
 
-**If `phase_found` is true:** Continue to check_existing.
+**If phase found:** Continue to check_existing.
 </step>
 
 <step name="check_existing">
-Check if CONTEXT.md already exists using `has_context` from init.
+Check if PHASE-N-CONTEXT.md already exists:
 
 ```bash
-ls ${phase_dir}/*-CONTEXT.md 2>/dev/null
+ls .planning/project/PHASE-${PHASE}-CONTEXT.md 2>/dev/null
 ```
 
 **If exists:**
 Use AskUserQuestion:
 - header: "Context"
-- question: "Phase [X] already has context. What do you want to do?"
+- question: "Phase ${PHASE} already has context. What do you want to do?"
 - options:
   - "Update it" — Review and revise existing context
   - "View it" — Show me what's there
   - "Skip" — Use existing context as-is
 
 If "Update": Load existing, continue to analyze_phase
-If "View": Display CONTEXT.md, then offer update/skip
+If "View": Display PHASE-N-CONTEXT.md, then offer update/skip
 If "Skip": Exit workflow
 
 **If doesn't exist:**
 
-Check `has_plans` and `plan_count` from init. **If `has_plans` is true:**
+Check if PHASE-N-PLAN.md exists:
+
+```bash
+ls .planning/project/PHASE-${PHASE}-PLAN.md 2>/dev/null
+```
+
+**If plan exists:**
 
 Use AskUserQuestion:
-- header: "Plans exist"
-- question: "Phase [X] already has {plan_count} plan(s) created without user context. Your decisions here won't affect existing plans unless you replan."
+- header: "Plan exists"
+- question: "Phase ${PHASE} already has a plan created without user context. Your decisions here won't affect the existing plan unless you replan."
 - options:
-  - "Continue and replan after" — Capture context, then run /gsd:plan-phase {X} to replan
-  - "View existing plans" — Show plans before deciding
+  - "Continue and replan after" — Capture context, then run /plan-phase ${PHASE} to replan
+  - "View existing plan" — Show plan before deciding
   - "Cancel" — Skip discuss-phase
 
 If "Continue and replan after": Continue to analyze_phase.
-If "View existing plans": Display plan files, then offer "Continue" / "Cancel".
+If "View existing plan": Display plan file, then offer "Continue" / "Cancel".
 If "Cancel": Exit workflow.
 
-**If `has_plans` is false:** Continue to analyze_phase.
+**If plan doesn't exist:** Continue to analyze_phase.
 </step>
 
 <step name="analyze_phase">
 Analyze the phase to identify gray areas worth discussing.
 
-**Read the phase description from ROADMAP.md and determine:**
+**Read the phase description from PROJECT-PLAN.md and determine:**
+
+```bash
+PHASE_SECTION=$(sed -n "/^### Phase ${PHASE}:/,/^### Phase [0-9]/p" .planning/project/PROJECT-PLAN.md | head -n -1)
+PHASE_NAME=$(echo "$PHASE_SECTION" | head -1 | sed 's/^### Phase [0-9]*: //')
+PHASE_GOAL=$(echo "$PHASE_SECTION" | grep "^\*\*Goal\*\*:" | sed 's/^\*\*Goal\*\*: //')
+```
 
 1. **Domain boundary** — What capability is this phase delivering? State it clearly.
 
@@ -301,229 +328,96 @@ Track deferred ideas internally.
 </step>
 
 <step name="write_context">
-Create CONTEXT.md capturing decisions made.
+Create PHASE-N-CONTEXT.md capturing decisions made.
 
-**Find or create phase directory:**
+**Ensure .planning/project/ directory exists:**
 
-Use values from init: `phase_dir`, `phase_slug`, `padded_phase`.
-
-If `phase_dir` is null (phase exists in roadmap but no directory):
 ```bash
-mkdir -p ".planning/phases/${padded_phase}-${phase_slug}"
+mkdir -p .planning/project
 ```
 
-**File location:** `${phase_dir}/${padded_phase}-CONTEXT.md`
+**File location:** `.planning/project/PHASE-${PHASE}-CONTEXT.md`
 
-**Structure the content by what was discussed:**
+**Structure per SPEC — three-category output:**
 
 ```markdown
-# Phase [X]: [Name] - Context
+# Phase ${PHASE}: ${PHASE_NAME} - Context
 
-**Gathered:** [date]
+**Gathered:** $(date +%Y-%m-%d)
 **Status:** Ready for planning
 
-<domain>
-## Phase Boundary
+## Locked Decisions
 
-[Clear statement of what this phase delivers — the scope anchor]
-
-</domain>
-
-<decisions>
-## Implementation Decisions
+[Decisions that the planner and executor MUST follow — non-negotiable constraints]
 
 ### [Category 1 that was discussed]
-- [Decision or preference captured]
-- [Another decision if applicable]
+- [Locked decision or requirement]
+- [Another locked decision if applicable]
 
 ### [Category 2 that was discussed]
-- [Decision or preference captured]
+- [Locked decision or requirement]
 
-### Claude's Discretion
-[Areas where user said "you decide" — note that Claude has flexibility here]
+[If none: "No locked decisions — standard approaches acceptable"]
 
-</decisions>
+## Discretion Areas
 
-<specifics>
-## Specific Ideas
+[Areas where Claude can choose the implementation approach]
 
-[Any particular references, examples, or "I want it like X" moments from discussion]
+### [Category where user said "you decide"]
+- [Area description and any guidance provided]
 
-[If none: "No specific requirements — open to standard approaches"]
+[If none: "No discretion areas specified — follow research and best practices"]
 
-</specifics>
-
-<deferred>
 ## Deferred Ideas
 
-[Ideas that came up but belong in other phases. Don't lose them.]
+[Ideas that came up but belong in future work. These are OUT OF SCOPE for this phase.]
+
+- [Deferred idea 1] — potential future enhancement
+- [Deferred idea 2] — potential future phase
 
 [If none: "None — discussion stayed within phase scope"]
 
-</deferred>
-
 ---
 
-*Phase: XX-name*
-*Context gathered: [date]*
+*Phase: ${PHASE}*
+*Context gathered: $(date +%Y-%m-%d)*
 ```
 
-Write file.
+Write file using Write tool.
 </step>
 
 <step name="confirm_creation">
 Present summary and next steps:
 
 ```
-Created: .planning/phases/${PADDED_PHASE}-${SLUG}/${PADDED_PHASE}-CONTEXT.md
+Created: .planning/project/PHASE-${PHASE}-CONTEXT.md
 
 ## Decisions Captured
 
-### [Category]
-- [Key decision]
+### Locked Decisions
+- [Key locked decision]
 
-### [Category]
-- [Key decision]
+### Discretion Areas
+- [Key discretion area]
 
 [If deferred ideas exist:]
 ## Noted for Later
-- [Deferred idea] — future phase
+- [Deferred idea] — future enhancement
 
 ---
 
-## ▶ Next Up
+## Next Steps
 
-**Phase ${PHASE}: [Name]** — [Goal from ROADMAP.md]
-
-`/gsd:plan-phase ${PHASE}`
-
-<sub>`/clear` first → fresh context window</sub>
-
----
-
-**Also available:**
-- `/gsd:plan-phase ${PHASE} --skip-research` — plan without research
-- Review/edit CONTEXT.md before continuing
+Suggest continuing with:
+- `/research-phase ${PHASE}` — investigate implementation details
+- `/plan-phase ${PHASE}` — create detailed execution plan
 
 ---
 ```
+
+**Never auto-advance** — user decides next command.
 </step>
 
-<step name="git_commit">
-Commit phase context (uses `commit_docs` from init internally):
-
-```bash
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs commit "docs(${padded_phase}): capture phase context" --files "${phase_dir}/${padded_phase}-CONTEXT.md"
-```
-
-Confirm: "Committed: docs(${padded_phase}): capture phase context"
-</step>
-
-<step name="update_state">
-Update STATE.md with session info:
-
-```bash
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs state record-session \
-  --stopped-at "Phase ${PHASE} context gathered" \
-  --resume-file "${phase_dir}/${padded_phase}-CONTEXT.md"
-```
-
-Commit STATE.md:
-
-```bash
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs commit "docs(state): record phase ${PHASE} context session" --files .planning/STATE.md
-```
-</step>
-
-<step name="auto_advance">
-Check for auto-advance trigger:
-
-1. Parse `--auto` flag from $ARGUMENTS
-2. Read `workflow.auto_advance` from config:
-   ```bash
-   AUTO_CFG=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs config-get workflow.auto_advance 2>/dev/null || echo "false")
-   ```
-
-**If `--auto` flag present AND `AUTO_CFG` is not true:** Persist auto-advance to config (handles direct `--auto` usage without new-project):
-```bash
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs config-set workflow.auto_advance true
-```
-
-**If `--auto` flag present OR `AUTO_CFG` is true:**
-
-Display banner:
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- GSD ► AUTO-ADVANCING TO PLAN
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Context captured. Spawning plan-phase...
-```
-
-Spawn plan-phase as Task with direct workflow file reference (do NOT use Skill tool — Skills don't resolve inside Task subagents):
-```
-Task(
-  prompt="
-    <objective>
-    You are the plan-phase orchestrator. Create executable plans for Phase ${PHASE}: ${PHASE_NAME}, then auto-advance to execution.
-    </objective>
-
-    <execution_context>
-    @~/.claude/get-shit-done/workflows/plan-phase.md
-    @~/.claude/get-shit-done/references/ui-brand.md
-    @~/.claude/get-shit-done/references/model-profile-resolution.md
-    </execution_context>
-
-    <arguments>
-    PHASE=${PHASE}
-    ARGUMENTS='${PHASE} --auto'
-    </arguments>
-
-    <instructions>
-    1. Read plan-phase.md from execution_context for your complete workflow
-    2. Follow ALL steps: initialize, validate, load context, research, plan, verify, auto-advance
-    3. When spawning agents (gsd-phase-researcher, gsd-planner, gsd-plan-checker), use Task with specified subagent_type and model
-    4. For step 14 (auto-advance to execute): spawn execute-phase as a Task with DIRECT file reference — tell it to read execute-phase.md. Include @file refs to execute-phase.md, checkpoints.md, tdd.md, model-profile-resolution.md. Pass --no-transition flag so execute-phase returns results instead of chaining further.
-    5. Do NOT use the Skill tool or /gsd: commands. Read workflow .md files directly.
-    6. Return: PHASE COMPLETE (full pipeline success), PLANNING COMPLETE (planning done but execute failed/skipped), PLANNING INCONCLUSIVE, or GAPS FOUND
-    </instructions>
-  ",
-  subagent_type="general-purpose",
-  description="Plan Phase ${PHASE}"
-)
-```
-
-**Handle plan-phase return:**
-- **PHASE COMPLETE** → Full chain succeeded. Display:
-  ```
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   GSD ► PHASE ${PHASE} COMPLETE
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-  Auto-advance pipeline finished: discuss → plan → execute
-
-  Next: /gsd:discuss-phase ${NEXT_PHASE} --auto
-  <sub>/clear first → fresh context window</sub>
-  ```
-- **PLANNING COMPLETE** → Planning done, execution didn't complete:
-  ```
-  Auto-advance partial: Planning complete, execution did not finish.
-  Continue: /gsd:execute-phase ${PHASE}
-  ```
-- **PLANNING INCONCLUSIVE / CHECKPOINT** → Stop chain:
-  ```
-  Auto-advance stopped: Planning needs input.
-  Continue: /gsd:plan-phase ${PHASE}
-  ```
-- **GAPS FOUND** → Stop chain:
-  ```
-  Auto-advance stopped: Gaps found during execution.
-  Continue: /gsd:plan-phase ${PHASE} --gaps
-  ```
-
-**If neither `--auto` nor config enabled:**
-Route to `confirm_creation` step (existing behavior — show manual next steps).
-</step>
 
 </process>
 
@@ -535,6 +429,5 @@ Route to `confirm_creation` step (existing behavior — show manual next steps).
 - Scope creep redirected to deferred ideas
 - CONTEXT.md captures actual decisions, not vague vision
 - Deferred ideas preserved for future phases
-- STATE.md updated with session info
 - User knows next steps
 </success_criteria>

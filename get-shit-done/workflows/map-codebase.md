@@ -23,16 +23,12 @@ Documents are reference material for Claude when planning/executing. Always incl
 <process>
 
 <step name="init_context" priority="first">
-Load codebase mapping context:
+Get current git commit SHA for anchoring the codebase map:
 
 ```bash
-INIT=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs init map-codebase)
-CURRENT_SHA=$(git rev-parse HEAD)
+CURRENT_SHA=$(git rev-parse HEAD 2>/dev/null || echo "unknown")
+MAPPER_MODEL="sonnet"  # Default model for codebase mapping
 ```
-
-Extract from init JSON: `mapper_model`.
-
-Store current git commit SHA for anchoring the codebase map.
 </step>
 
 <step name="check_existing">

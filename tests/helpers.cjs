@@ -6,17 +6,29 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-const TOOLS_PATH = path.join(__dirname, '..', 'get-shit-done', 'bin', 'gsd-tools.cjs');
+const TEST_CLI_PATH = path.join(__dirname, '..', 'get-shit-done', 'bin', 'lib', 'test-cli.cjs');
 
-// Helper to run gsd-tools command
+// Helper to run commands via test CLI wrapper
 function runGsdTools(args, cwd = process.cwd()) {
   try {
-    const result = execSync(`node "${TOOLS_PATH}" ${args}`, {
-      cwd,
-      encoding: 'utf-8',
-      stdio: ['pipe', 'pipe', 'pipe'],
-    });
-    return { success: true, output: result.trim() };
+    const testCli = require(TEST_CLI_PATH);
+    const argArray = args.split(/\s+/).filter(a => a);
+
+    // Capture stdout
+    let output = '';
+    const originalStdoutWrite = process.stdout.write;
+    process.stdout.write = (chunk) => {
+      output += chunk;
+      return true;
+    };
+
+    try {
+      testCli.execute(argArray, cwd);
+    } finally {
+      process.stdout.write = originalStdoutWrite;
+    }
+
+    return { success: true, output: output.trim() };
   } catch (err) {
     return {
       success: false,
@@ -37,4 +49,4 @@ function cleanup(tmpDir) {
   fs.rmSync(tmpDir, { recursive: true, force: true });
 }
 
-module.exports = { runGsdTools, createTempProject, cleanup, TOOLS_PATH };
+module.exports = { runGsdTools, createTempProject, cleanup };
