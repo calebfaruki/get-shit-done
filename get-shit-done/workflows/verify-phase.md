@@ -1,242 +1,236 @@
 <purpose>
-Verify phase goal achievement through goal-backward analysis. Check that the codebase delivers what the phase promised, not just that tasks completed.
-
-Executed by a verification subagent spawned from execute-phase.md.
+Verify phase results against PHASE-N-PLAN.md must_haves. Spawns a verifier subagent that checks artifacts, stages files on pass, reports diagnostics on fail.
 </purpose>
 
 <core_principle>
-**Task completion ≠ Goal achievement**
+The verifier is separate from the executor. It checks must_haves from PHASE-N-PLAN.md and stages the executor's changed files on pass. Report-only — never attempts fixes.
 
-A task "create chat component" can be marked complete when the component is a placeholder. The task was done — but the goal "working chat interface" was not achieved.
-
-Goal-backward verification:
-1. What must be TRUE for the goal to be achieved?
-2. What must EXIST for those truths to hold?
-3. What must be WIRED for those artifacts to function?
-
-Then verify each level against the actual codebase.
+**From SPEC section 4:** Executor implements, verifier checks, human commits. The verifier uses goal-backward methodology to verify goal achievement, not just task completion.
 </core_principle>
 
 <required_reading>
-@~/.claude/get-shit-done/references/verification-patterns.md
-@~/.claude/get-shit-done/templates/verification-report.md
+@~/.claude/get-shit-done/knowledge/verification-domain.md
 </required_reading>
 
 <process>
 
-<step name="load_context" priority="first">
-Load phase operation context:
+<step name="check_prerequisites" priority="first">
+Soft prerequisite checks (warn and offer help, not hard error):
 
 ```bash
-INIT=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs init phase-op "${PHASE_ARG}")
+PHASE_ARG="${ARGUMENTS[0]}"
+PHASE_PLAN=".planning/project/PHASE-${PHASE_ARG}-PLAN.md"
+PROJECT_SUMMARY=".planning/project/PROJECT-SUMMARY.md"
+PROJECT_PLAN=".planning/project/PROJECT-PLAN.md"
+
+if [ ! -f "$PHASE_PLAN" ]; then
+  echo "⚠️  Phase plan not found: $PHASE_PLAN"
+  echo "Run: /plan-phase ${PHASE_ARG}"
+  exit 1
+fi
+
+if [ ! -f "$PROJECT_SUMMARY" ]; then
+  echo "⚠️  Execution summary not found: $PROJECT_SUMMARY"
+  echo "Run: /execute-phase ${PHASE_ARG}"
+  exit 1
+fi
 ```
-
-Extract from init JSON: `phase_dir`, `phase_number`, `phase_name`, `has_plans`, `plan_count`.
-
-Then load phase details and list plans/summaries:
-```bash
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs roadmap get-phase "${phase_number}"
-grep -E "^| ${phase_number}" .planning/REQUIREMENTS.md 2>/dev/null
-ls "$phase_dir"/*-SUMMARY.md "$phase_dir"/*-PLAN.md 2>/dev/null
-```
-
-Extract **phase goal** from ROADMAP.md (the outcome to verify, not tasks) and **requirements** from REQUIREMENTS.md if it exists.
 </step>
 
-<step name="establish_must_haves">
-**Option A: Must-haves in PLAN frontmatter**
-
-Use gsd-tools to extract must_haves from each PLAN:
-
-```bash
-for plan in "$PHASE_DIR"/*-PLAN.md; do
-  MUST_HAVES=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs frontmatter get "$plan" --field must_haves)
-  echo "=== $plan ===" && echo "$MUST_HAVES"
-done
-```
-
-Returns JSON: `{ truths: [...], artifacts: [...], key_links: [...] }`
-
-Aggregate all must_haves across plans for phase-level verification.
-
-**Option B: Use Success Criteria from ROADMAP.md**
-
-If no must_haves in frontmatter (MUST_HAVES returns error or empty), check for Success Criteria:
+<step name="bootstrap">
+Load phase context using Read tool:
 
 ```bash
-PHASE_DATA=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs roadmap get-phase "${phase_number}" --raw)
+PHASE_NUM="${ARGUMENTS[0]}"
+PHASE_PLAN=".planning/project/PHASE-${PHASE_NUM}-PLAN.md"
+PROJECT_PLAN=".planning/project/PROJECT-PLAN.md"
+PROJECT_SUMMARY=".planning/project/PROJECT-SUMMARY.md"
+PROJECT_FILE=".planning/project/PROJECT.md"
 ```
 
-Parse the `success_criteria` array from the JSON output. If non-empty:
-1. Use each Success Criterion directly as a **truth** (they are already written as observable, testable behaviors)
-2. Derive **artifacts** (concrete file paths for each truth)
-3. Derive **key links** (critical wiring where stubs hide)
-4. Document the must-haves before proceeding
+Use **Read** to load:
+- `$PHASE_PLAN` (must_haves)
+- `$PROJECT_PLAN` (phase goal and acceptance criteria)
+- `$PROJECT_SUMMARY` (executor's file list)
+- `$PROJECT_FILE` (project context)
 
-Success Criteria from ROADMAP.md are the contract — they override PLAN-level must_haves when both exist.
+Parse must_haves from PHASE-N-PLAN.md frontmatter:
+- `must_haves.truths`: Observable behaviors that must be verified
+- `must_haves.artifacts`: Files that must exist with substantive implementation
+- `must_haves.key_links`: Critical connections between artifacts
 
-**Option C: Derive from phase goal (fallback)**
+Report what will be verified:
+```
+## Verifying Phase ${PHASE_NUM}
 
-If no must_haves in frontmatter AND no Success Criteria in ROADMAP:
-1. State the goal from ROADMAP.md
-2. Derive **truths** (3-7 observable behaviors, each testable)
-3. Derive **artifacts** (concrete file paths for each truth)
-4. Derive **key links** (critical wiring where stubs hide)
-5. Document derived must-haves before proceeding
+**Truths:** ${TRUTH_COUNT}
+**Artifacts:** ${ARTIFACT_COUNT}
+**Key Links:** ${LINK_COUNT}
+
+Starting verifier...
+```
 </step>
 
-<step name="verify_truths">
-For each observable truth, determine if the codebase enables it.
+<step name="spawn_verifier">
+Spawn verifier subagent with explicit context via `<files_to_read>`:
 
-**Status:** ✓ VERIFIED (all supporting artifacts pass) | ✗ FAILED (artifact missing/stub/unwired) | ? UNCERTAIN (needs human)
+```
+Task(
+  subagent_type="gsd-verifier",
+  model="sonnet",
+  prompt="
+    <objective>
+    Verify phase ${PHASE_NUM} against PHASE-${PHASE_NUM}-PLAN.md must_haves.
 
-For each truth: identify supporting artifacts → check artifact status → check wiring → determine truth status.
+    On pass, stage files. On fail, report diagnostics. Never attempt fixes.
+    </objective>
 
-**Example:** Truth "User can see existing messages" depends on Chat.tsx (renders), /api/chat GET (provides), Message model (schema). If Chat.tsx is a stub or API returns hardcoded [] → FAILED. If all exist, are substantive, and connected → VERIFIED.
-</step>
+    <execution_context>
+    @~/.claude/get-shit-done/knowledge/verification-domain.md
+    </execution_context>
 
-<step name="verify_artifacts">
-Use gsd-tools for artifact verification against must_haves in each PLAN:
+    <files_to_read>
+    Read these files at verification start using the Read tool:
+    - .planning/project/PHASE-${PHASE_NUM}-PLAN.md (must_haves)
+    - .planning/project/PROJECT.md (project context)
+    - .planning/project/PROJECT-PLAN.md (phase goal and acceptance criteria)
+    - .planning/project/PROJECT-SUMMARY.md (executor's work)
+    - ./CLAUDE.md (if exists — project instructions)
+    </files_to_read>
 
-```bash
-for plan in "$PHASE_DIR"/*-PLAN.md; do
-  ARTIFACT_RESULT=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs verify artifacts "$plan")
-  echo "=== $plan ===" && echo "$ARTIFACT_RESULT"
-done
+    <verification_rules>
+    Check each truth in must_haves against codebase:
+    1. **Truths:** Determine if codebase enables the behavior
+    2. **Artifacts:** Three-level check (exists, substantive, wired)
+    3. **Key Links:** Verify connections exist via pattern matching
+
+    **Three-level artifact checks:**
+    - Level 1 (Exists): File present at expected path
+    - Level 2 (Substantive): Real implementation, not placeholder/stub
+    - Level 3 (Wired): Connected to rest of system, not orphaned
+
+    **Verification status:**
+    - ✓ VERIFIED: All supporting artifacts pass all checks
+    - ✗ FAILED: One or more artifacts missing, stub, or unwired
+    - ? UNCERTAIN: Can't verify programmatically (note for human)
+    </verification_rules>
+
+    <staging_rules>
+    On PASS (all truths verified):
+    1. Read PROJECT-SUMMARY.md "Files changed" section to get file list
+    2. Filter out any .planning/ paths (ephemeral, never staged)
+    3. Stage each remaining file individually via \`git add <file>\`
+    4. Verify staging via \`git diff --cached --name-only\`
+    5. Write PHASE-${PHASE_NUM}-VERIFICATION.md with PASSED status
+
+    On FAIL (any truth failed):
+    1. Write diagnostics with specific truth, artifact, issue, file, line numbers
+    2. Do NOT stage any files
+    3. Write PHASE-${PHASE_NUM}-VERIFICATION.md with FAILED status
+    4. Return to orchestrator
+
+    **Staging protocol:**
+    - Always \`git add <file>\` (explicit paths only)
+    - NEVER \`git add .\` or \`git add -A\`
+    - Filter out \`.planning/\` paths before staging
+    - Stage all files atomically (only if ALL checks pass)
+
+    **Report-only:** Never attempt fixes. Diagnostics only.
+    </staging_rules>
+
+    <output>
+    Write .planning/project/PHASE-${PHASE_NUM}-VERIFICATION.md with:
+    - Status: PASSED | FAILED
+    - Per-truth verification results (✓ VERIFIED | ✗ FAILED | ? UNCERTAIN)
+    - Per-artifact checks (exists, substantive, wired)
+    - If PASSED: list of staged files
+    - If FAILED: diagnostics with file paths, line numbers, suggested fixes
+    - Score: N/M truths verified
+    </output>
+
+    <success_criteria>
+    - [ ] All must_haves checked (truths, artifacts, key_links)
+    - [ ] Truths verified or failures documented
+    - [ ] On pass: files staged via explicit \`git add <file>\` (never bulk)
+    - [ ] On pass: .planning/ files filtered out before staging
+    - [ ] On fail: diagnostics with specific file locations and line numbers
+    - [ ] No automated fix attempted (report-only)
+    - [ ] PHASE-${PHASE_NUM}-VERIFICATION.md written
+    </success_criteria>
+  "
+)
 ```
 
-Parse JSON result: `{ all_passed, passed, total, artifacts: [{path, exists, issues, passed}] }`
-
-**Artifact status from result:**
-- `exists=false` → MISSING
-- `issues` not empty → STUB (check issues for "Only N lines" or "Missing pattern")
-- `passed=true` → VERIFIED (Levels 1-2 pass)
-
-**Level 3 — Wired (manual check for artifacts that pass Levels 1-2):**
-```bash
-grep -r "import.*$artifact_name" src/ --include="*.ts" --include="*.tsx"  # IMPORTED
-grep -r "$artifact_name" src/ --include="*.ts" --include="*.tsx" | grep -v "import"  # USED
-```
-WIRED = imported AND used. ORPHANED = exists but not imported/used.
-
-| Exists | Substantive | Wired | Status |
-|--------|-------------|-------|--------|
-| ✓ | ✓ | ✓ | ✓ VERIFIED |
-| ✓ | ✓ | ✗ | ⚠️ ORPHANED |
-| ✓ | ✗ | - | ✗ STUB |
-| ✗ | - | - | ✗ MISSING |
+**Wait for subagent to complete.**
 </step>
 
-<step name="verify_wiring">
-Use gsd-tools for key link verification against must_haves in each PLAN:
+<step name="report_results">
+Read PHASE-${PHASE_NUM}-VERIFICATION.md to get results.
 
-```bash
-for plan in "$PHASE_DIR"/*-PLAN.md; do
-  LINKS_RESULT=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs verify key-links "$plan")
-  echo "=== $plan ===" && echo "$LINKS_RESULT"
-done
+If **PASSED**:
+```
+## Phase ${PHASE_NUM} Verification: PASSED
+
+All must_haves verified. ${FILE_COUNT} files staged.
+
+**Staged files:**
+${FILE_LIST}
+
+Use \`git diff --cached\` to review staged changes.
+
+---
+**Next:** /verify-phase ${PHASE_NUM + 1} or /verify-project
 ```
 
-Parse JSON result: `{ all_verified, verified, total, links: [{from, to, via, verified, detail}] }`
+If **FAILED**:
+```
+## Phase ${PHASE_NUM} Verification: FAILED
 
-**Link status from result:**
-- `verified=true` → WIRED
-- `verified=false` with "not found" → NOT_WIRED
-- `verified=false` with "Pattern not found" → PARTIAL
+${FAILED_COUNT} of ${TOTAL_COUNT} truths failed:
+${FAILURE_LIST}
 
-**Fallback patterns (if key_links not in must_haves):**
+Nothing staged. See .planning/project/PHASE-${PHASE_NUM}-VERIFICATION.md for diagnostics.
 
-| Pattern | Check | Status |
-|---------|-------|--------|
-| Component → API | fetch/axios call to API path, response used (await/.then/setState) | WIRED / PARTIAL (call but unused response) / NOT_WIRED |
-| API → Database | Prisma/DB query on model, result returned via res.json() | WIRED / PARTIAL (query but not returned) / NOT_WIRED |
-| Form → Handler | onSubmit with real implementation (fetch/axios/mutate/dispatch), not console.log/empty | WIRED / STUB (log-only/empty) / NOT_WIRED |
-| State → Render | useState variable appears in JSX (`{stateVar}` or `{stateVar.property}`) | WIRED / NOT_WIRED |
+---
+**Next steps (you decide):**
+1. Fix issues manually and re-run /execute-phase ${PHASE_NUM}
+2. Adjust phase plan to match reality
+3. Accept current state as-is
 
-Record status and evidence for each key link.
-</step>
-
-<step name="verify_requirements">
-If REQUIREMENTS.md exists:
-```bash
-grep -E "Phase ${PHASE_NUM}" .planning/REQUIREMENTS.md 2>/dev/null
+The verifier does not auto-fix. You decide how to proceed.
 ```
 
-For each requirement: parse description → identify supporting truths/artifacts → status: ✓ SATISFIED / ✗ BLOCKED / ? NEEDS HUMAN.
-</step>
-
-<step name="scan_antipatterns">
-Extract files modified in this phase from SUMMARY.md, scan each:
-
-| Pattern | Search | Severity |
-|---------|--------|----------|
-| TODO/FIXME/XXX/HACK | `grep -n -E "TODO\|FIXME\|XXX\|HACK"` | ⚠️ Warning |
-| Placeholder content | `grep -n -iE "placeholder\|coming soon\|will be here"` | 🛑 Blocker |
-| Empty returns | `grep -n -E "return null\|return \{\}\|return \[\]\|=> \{\}"` | ⚠️ Warning |
-| Log-only functions | Functions containing only console.log | ⚠️ Warning |
-
-Categorize: 🛑 Blocker (prevents goal) | ⚠️ Warning (incomplete) | ℹ️ Info (notable).
-</step>
-
-<step name="identify_human_verification">
-**Always needs human:** Visual appearance, user flow completion, real-time behavior (WebSocket/SSE), external service integration, performance feel, error message clarity.
-
-**Needs human if uncertain:** Complex wiring grep can't trace, dynamic state-dependent behavior, edge cases.
-
-Format each as: Test Name → What to do → Expected result → Why can't verify programmatically.
-</step>
-
-<step name="determine_status">
-**passed:** All truths VERIFIED, all artifacts pass levels 1-3, all key links WIRED, no blocker anti-patterns.
-
-**gaps_found:** Any truth FAILED, artifact MISSING/STUB, key link NOT_WIRED, or blocker found.
-
-**human_needed:** All automated checks pass but human verification items remain.
-
-**Score:** `verified_truths / total_truths`
-</step>
-
-<step name="generate_fix_plans">
-If gaps_found:
-
-1. **Cluster related gaps:** API stub + component unwired → "Wire frontend to backend". Multiple missing → "Complete core implementation". Wiring only → "Connect existing components".
-
-2. **Generate plan per cluster:** Objective, 2-3 tasks (files/action/verify each), re-verify step. Keep focused: single concern per plan.
-
-3. **Order by dependency:** Fix missing → fix stubs → fix wiring → verify.
-</step>
-
-<step name="create_report">
-```bash
-REPORT_PATH="$PHASE_DIR/${PHASE_NUM}-VERIFICATION.md"
-```
-
-Fill template sections: frontmatter (phase/timestamp/status/score), goal achievement, artifact table, wiring table, requirements coverage, anti-patterns, human verification, gaps summary, fix plans (if gaps_found), metadata.
-
-See ~/.claude/get-shit-done/templates/verification-report.md for complete template.
-</step>
-
-<step name="return_to_orchestrator">
-Return status (`passed` | `gaps_found` | `human_needed`), score (N/M must-haves), report path.
-
-If gaps_found: list gaps + recommended fix plan names.
-If human_needed: list items requiring human testing.
-
-Orchestrator routes: `passed` → update_roadmap | `gaps_found` → create/execute fixes, re-verify | `human_needed` → present to user.
+**Never auto-fix.** Always defer to human decision.
 </step>
 
 </process>
 
+<removed_from_gsd>
+This workflow removes from the GSD verify-phase.md:
+
+**Removed:**
+- Gap-closure loop (verifier no longer generates fix plans)
+- ROADMAP.md/REQUIREMENTS.md references (replaced by PROJECT-PLAN.md/PHASE-N-PLAN.md)
+- Fix plan generation and re-verification routing
+- `gsd-tools.cjs` commands
+- VERIFICATION.md in .planning/phases/ directory (now .planning/project/PHASE-N-VERIFICATION.md)
+- `verify_requirements` step
+- `generate_fix_plans` step
+- `gaps_found` and `human_needed` states (now only `passed` or `failed`)
+- Multi-file output (now single PHASE-N-VERIFICATION.md)
+
+**Kept:**
+- Goal-backward verification principle
+- Three-level artifact checks (exists, substantive, wired)
+- Stub detection and antipattern scanning
+- Report-only verification (no automated fixes)
+- Explicit per-file staging on pass
+</removed_from_gsd>
+
 <success_criteria>
-- [ ] Must-haves established (from frontmatter or derived)
-- [ ] All truths verified with status and evidence
-- [ ] All artifacts checked at all three levels
-- [ ] All key links verified
-- [ ] Requirements coverage assessed (if applicable)
-- [ ] Anti-patterns scanned and categorized
-- [ ] Human verification items identified
-- [ ] Overall status determined
-- [ ] Fix plans generated (if gaps_found)
-- [ ] VERIFICATION.md created with complete report
-- [ ] Results returned to orchestrator
+- Phase plan must_haves checked against codebase
+- On pass: files staged via explicit `git add <file>`
+- On fail: diagnostics provided with file locations
+- Report-only — no automated fixes
+- verification-domain.md loaded via execution_context
 </success_criteria>
