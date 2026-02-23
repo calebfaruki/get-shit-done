@@ -9,10 +9,10 @@ A strangler fig migration of get-shit-done-cc (v1.20.5) from rigid workflow scri
 - [x] **Phase 1: Characterization Tests and Safe Deletion** - Establish behavioral baseline tests, then incrementally delete ~55 dead files ✓ 2026-02-22
 - [x] **Phase 2: Deterministic Tooling Foundation** - Build the mechanical operations layer (file management, SHA checks, prerequisites, model resolution, todo CRUD) (completed 2026-02-22)
 - [x] **Phase 3: Knowledge Document System** - Create AGENTS.md index and domain-specific reference docs that agents reason over ✓ 2026-02-22
-- [ ] **Phase 4: Command Handlers and Project Lifecycle** - Wire up all slash commands as thin triggers that load knowledge docs and spawn agents
-- [ ] **Phase 5: Agent Spawning and Handoff Protocols** - Modify agents for single-commit scope with self-contained context propagation
-- [ ] **Phase 6: Verification and Git Staging** - Report-only verification, explicit file staging, working tree safety enforcement
-- [ ] **Phase 7: Integration Testing and Migration Cleanup** - End-to-end lifecycle tests, remove remaining legacy artifacts, validate full pipeline
+- [x] **Phase 4: Command Handlers and Project Lifecycle** - Wire up all slash commands as thin triggers that load knowledge docs and spawn agents ✓ 2026-02-22
+- [x] **Phase 5: Agent Spawning and Handoff Protocols** - Modify agents for single-commit scope with self-contained context propagation; wire toolkit.cjs into workflows; complete knowledge doc loading ✓ 2026-02-23
+- [ ] **Phase 6: Verification and Git Staging** - Report-only verification, explicit file staging, working tree safety enforcement; rewrite verify-phase.md for PROJECT-PLAN.md architecture
+- [ ] **Phase 7: Integration Testing and Migration Cleanup** - End-to-end lifecycle tests, remove remaining legacy artifacts, fix health.md for new architecture, deduplicate toolkit/core.cjs
 
 ## Phase Details
 
@@ -81,10 +81,10 @@ Plans:
 Plans:
 - [x] 04-01-PLAN.md — Infrastructure: .gitignore, bare-namespace /map and /todo commands ✓ 2026-02-22
 - [x] 04-02-PLAN.md — Project intake: /new-project and /discuss-project with scope validation ✓ 2026-02-22
-- [ ] 04-03-PLAN.md — Project lifecycle: /research-project, /plan-project, /verify-project
-- [ ] 04-04-PLAN.md — Phase commands: /discuss-phase, /research-phase, /plan-phase
-- [ ] 04-05-PLAN.md — Execution: /execute-phase with PROJECT-SUMMARY.md tracking, gsd:* cleanup
-- [ ] 04-06-PLAN.md — Gap closure: rewrite execute-phase workflow for SPEC compliance
+- [x] 04-03-PLAN.md — Project lifecycle: /research-project, /plan-project, /verify-project ✓ 2026-02-22
+- [x] 04-04-PLAN.md — Phase commands: /discuss-phase, /research-phase, /plan-phase ✓ 2026-02-22
+- [x] 04-05-PLAN.md — Execution: /execute-phase with PROJECT-SUMMARY.md tracking, gsd:* cleanup ✓ 2026-02-22
+- [x] 04-06-PLAN.md — Gap closure: rewrite execute-phase workflow for SPEC compliance ✓ 2026-02-22
 
 ### Phase 5: Agent Spawning and Handoff Protocols
 **Goal**: All subagents operate with single-commit scope framing and receive self-contained context through explicit file references
@@ -96,7 +96,12 @@ Plans:
   3. Planner agent frames plans for single-commit scope with fewer phases
   4. Plan checker warns when scope is not verifiable (greenfield/mechanical/brownfield heuristics)
   5. All subagent spawns include `<files_to_read>` blocks for self-contained context
-**Plans**: TBD
+  6. Knowledge docs loaded in command execution_context (planning-domain.md in /plan-phase, verification-domain.md in /verify-*)
+  7. Workflows consume toolkit.cjs functions where applicable (prerequisite checks, atomic writes)
+**Audit gaps addressed**: toolkit.cjs orphaned exports, knowledge doc loading gaps
+**Plans**: 1 plan
+Plans:
+- [x] 05-01-PLAN.md — Rewrite all agents for single-commit scope, strip gsd-tools.cjs from workflows/commands, wire knowledge docs ✓ 2026-02-23
 
 ### Phase 6: Verification and Git Staging
 **Goal**: The verification pipeline checks results against acceptance criteria and stages files safely without touching the working tree
@@ -107,7 +112,12 @@ Plans:
   2. Verifier stages files on pass using explicit `git add <file>` (never `git add -A` or `git add .`)
   3. Verifier reports and stops on fail (no automated gap-closure loop)
   4. Pipeline manages `.planning/` files only; never commits, resets, checks out, stashes, or discards working tree content
-**Plans**: TBD
+  5. verify-phase.md reads from PROJECT-PLAN.md and PHASE-N-PLAN.md (not ROADMAP.md/REQUIREMENTS.md)
+  6. verification-domain.md loaded in verify-phase and verify-project execution_context
+**Audit gaps addressed**: verify-phase.md broken references, /execute-phase → /verify-phase E2E flow
+**Plans**: 1 plan
+Plans:
+- [ ] 06-01-PLAN.md — Rewrite verifier agent and verify-phase workflow for report-only verification with explicit staging
 
 ### Phase 7: Integration Testing and Migration Cleanup
 **Goal**: The full project lifecycle works end-to-end and no legacy GSD artifacts remain
@@ -118,6 +128,10 @@ Plans:
   2. No legacy GSD workflow scripts, state management files, or milestone commands remain in the codebase
   3. All existing tests pass plus new integration tests cover the full lifecycle
   4. Installation works across Claude Code, OpenCode, and Gemini CLI
+  5. health.md checks .planning/project/ structure (not ROADMAP.md/STATE.md/MILESTONES.md)
+  6. toolkit.cjs MODEL_PROFILES consolidated with core.cjs (DRY violation resolved)
+  7. commands.cjs cmdListTodos deduplicated with toolkit.listTodos
+**Audit gaps addressed**: health.md old state refs, DRY violations, code duplication
 **Plans**: TBD
 
 ## Progress
@@ -130,9 +144,9 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 1. Characterization Tests and Safe Deletion | 3/3 | Complete | 2026-02-22 |
 | 2. Deterministic Tooling Foundation | 2/2 | Complete | 2026-02-22 |
 | 3. Knowledge Document System | 3/3 | Complete | 2026-02-22 |
-| 4. Command Handlers and Project Lifecycle | 2/5 | In Progress|  |
-| 5. Agent Spawning and Handoff Protocols | 0/TBD | Not started | - |
-| 6. Verification and Git Staging | 0/TBD | Not started | - |
+| 4. Command Handlers and Project Lifecycle | 6/6 | Complete | 2026-02-22 |
+| 5. Agent Spawning and Handoff Protocols | 1/1 | Complete | 2026-02-23 |
+| 6. Verification and Git Staging | 0/1 | Not started | - |
 | 7. Integration Testing and Migration Cleanup | 0/TBD | Not started | - |
 
 ---
