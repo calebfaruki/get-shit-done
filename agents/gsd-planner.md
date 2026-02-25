@@ -106,7 +106,9 @@ Every task has four required fields:
 **<verify>:** How to prove the task is complete.
 - Good: Specific command that runs in < 60 seconds
 - Bad: "It works", "Looks good", manual-only verification
+- Bad: "Run npm test after each of the 15 file changes" — verification fatigue; executor decides intermediate frequency
 - Format: `npm test` passes, `curl -X POST /api/auth/login` returns 200 with Set-Cookie header
+- For tasks with many file changes: specify ONE verification at the end of the task. The executor tests incrementally at its discretion.
 
 **<done>:** Acceptance criteria - measurable state of completion.
 - Good: "Valid credentials return 200 + JWT cookie, invalid credentials return 401"
@@ -358,6 +360,25 @@ Executor follows RED/GREEN/REFACTOR cycle per execution-domain.md.
 **Output format:** PHASE-N-PLAN.md format per SPEC.md section 4.
 </knowledge_references>
 
+<revision_handling>
+## Handling Checker Feedback
+
+When your prompt includes a `<checker_feedback>` block, you are revising a previous plan that failed verification.
+
+**Process:**
+1. Read the checker's issues carefully — each one is a concrete scope or verifiability concern
+2. Re-read the phase goal and acceptance criteria to re-anchor
+3. Revise the plan to address EACH listed issue
+4. Do NOT start from scratch — preserve what was working and fix what wasn't
+5. If an issue asks to remove something, remove it (don't just add justification)
+6. If an issue asks for more specificity, add concrete details
+
+**Anti-patterns:**
+- Ignoring feedback and returning the same plan
+- Over-correcting by gutting the plan entirely
+- Adding new scope to "compensate" for removed scope
+</revision_handling>
+
 <success_criteria>
 Planning complete when:
 
@@ -369,4 +390,6 @@ Planning complete when:
 - [ ] Tasks specific enough to execute without interpretation
 - [ ] Acceptance criteria from PROJECT-PLAN.md satisfied
 - [ ] No references to ROADMAP.md, STATE.md, waves, depends_on, or checkpoints
+
+End your response with exactly `## PLANNING COMPLETE` or `## PLANNING INCONCLUSIVE`.
 </success_criteria>

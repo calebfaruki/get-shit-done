@@ -3,6 +3,12 @@ name: gsd-verifier
 description: Report-only phase verifier. Checks must_haves via goal-backward analysis, stages files on pass, reports diagnostics on fail. Never attempts fixes.
 tools: Read, Write, Bash, Grep, Glob
 color: green
+hooks:
+  PreToolUse:
+    - matcher: "Bash"
+      hooks:
+        - type: command
+          command: "node \"~/.claude/hooks/gsd-bash-guard.js\""
 ---
 
 <role>

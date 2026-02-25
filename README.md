@@ -6,16 +6,7 @@
 
 **Solves context rot through fresh subagent contexts and structured planning.**
 
-[![npm version](https://img.shields.io/npm/v/get-shit-done-cc?style=for-the-badge&logo=npm&logoColor=white&color=CB3837)](https://www.npmjs.com/package/get-shit-done-cc)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
-
-<br>
-
-```bash
-npx get-shit-done-cc@latest
-```
-
-**Works on Mac, Windows, and Linux.**
 
 <br>
 
@@ -61,14 +52,14 @@ If you want the full GSD multi-milestone project management system, use [upstrea
 
 A project is one commit's worth of work. You describe what you want, the system helps you plan and implement it, verifies the result, stages it, and hands back a clean diff for you to review and commit.
 
-> **Already have code?** Run `/gsd:map` first. It analyzes your codebase (anchored to current commit SHA) so planning commands understand your stack and conventions.
+> **Already have code?** Run `/map` first. It analyzes your codebase (anchored to current commit SHA) so planning commands understand your stack and conventions.
 
 ---
 
 ### 1. Define the Project
 
 ```
-/gsd:new-project
+/new-project
 ```
 
 The system asks clarifying questions until it understands your goal completely, then writes **PROJECT.md** with:
@@ -81,7 +72,7 @@ The system asks clarifying questions until it understands your goal completely, 
 
 **Input quality gates**:
 - Trivial fixes (typos, single-line bugs) → "Just ask me directly, no project needed"
-- Vague one-liners → "Talk it through first, then run `/gsd:new-project` when you can describe what you want"
+- Vague one-liners → "Talk it through first, then run `/new-project` when you can describe what you want"
 - Moderate/detailed requests → 1-5 clarifying questions to nail down acceptance criteria
 
 ---
@@ -89,7 +80,7 @@ The system asks clarifying questions until it understands your goal completely, 
 ### 2. Research (Optional)
 
 ```
-/gsd:research-project
+/research-project
 ```
 
 Strategic research when the project involves unfamiliar libraries, patterns, or architectural decisions. The researcher spawns as a subagent, investigates the domain (web search + codebase analysis), and writes **PROJECT-RESEARCH.md** with:
@@ -98,14 +89,14 @@ Strategic research when the project involves unfamiliar libraries, patterns, or 
 - Critical pitfalls
 - Open questions
 
-Run this before `/gsd:discuss-project` so decisions are grounded in what's actually available.
+Run this before `/discuss-project` so decisions are grounded in what's actually available.
 
 ---
 
 ### 3. Discuss (Optional)
 
 ```
-/gsd:discuss-project
+/discuss-project
 ```
 
 Deeper exploration of gray areas, edge cases, and implementation preferences. Updates **PROJECT.md** with additional context and decisions.
@@ -115,7 +106,7 @@ Deeper exploration of gray areas, edge cases, and implementation preferences. Up
 ### 4. Plan the Project
 
 ```
-/gsd:plan-project
+/plan-project
 ```
 
 Breaks the project into phases (strategic breakdown). Each phase has:
@@ -132,9 +123,9 @@ Writes **PROJECT-PLAN.md**. Typically 1-2 phases for single-commit scope, rarely
 ### 5. Plan Each Phase
 
 ```
-/gsd:discuss-phase 1   # Optional: clarify implementation decisions
-/gsd:research-phase 1  # Optional: tactical research (library details, gotchas)
-/gsd:plan-phase 1      # Required: detailed execution plan
+/discuss-phase 1   # Optional: clarify implementation decisions
+/research-phase 1  # Optional: tactical research (library details, gotchas)
+/plan-phase 1      # Required: detailed execution plan
 ```
 
 **Phase planning produces PHASE-{N}-PLAN.md** with:
@@ -150,18 +141,18 @@ The phase planner is a subagent that reads PROJECT-PLAN.md, CODEBASE.md, phase c
 ### 6. Execute and Verify
 
 ```
-/gsd:execute-phase 1
-/gsd:verify-phase 1
+/execute-phase 1
+/verify-phase 1
 ```
 
-**Execution** (`/gsd:execute-phase`):
+**Execution** (`/execute-phase`):
 - Fresh subagent context (no accumulated context rot)
 - Implements the phase plan
 - Tracks what changed, what deviated
 - Updates **PROJECT-SUMMARY.md**
 - Leaves all changes **unstaged**
 
-**Verification** (`/gsd:verify-phase`):
+**Verification** (`/verify-phase`):
 - Separate agent checks the work against must-haves
 - On pass: stages the changes via `git add`
 - On fail: writes diagnostics (what failed, why, where to look)
@@ -175,11 +166,11 @@ This creates two views for you:
 ### 7. Repeat for Remaining Phases
 
 ```
-/gsd:discuss-phase 2
-/gsd:research-phase 2
-/gsd:plan-phase 2
-/gsd:execute-phase 2
-/gsd:verify-phase 2
+/discuss-phase 2
+/research-phase 2
+/plan-phase 2
+/execute-phase 2
+/verify-phase 2
 ```
 
 Loop through phases at your own pace. The human decides when to move forward.
@@ -189,7 +180,7 @@ Loop through phases at your own pace. The human decides when to move forward.
 ### 8. Verify the Full Project
 
 ```
-/gsd:verify-project
+/verify-project
 ```
 
 Checks the final result against all project-level acceptance criteria. Writes **PROJECT-VERIFICATION.md** with pass/fail per criterion and diagnostics for any failures.
@@ -210,7 +201,7 @@ The system never commits for you. You commit when ready.
 After committing, regenerate the map to capture what changed:
 
 ```
-/gsd:map
+/map
 ```
 
 The map anchors to the current commit SHA. Future projects will see updated stack knowledge and conventions.
@@ -225,7 +216,7 @@ Every stage uses the right context at the right time:
 
 | File | Purpose | Lifecycle |
 |------|---------|-----------|
-| `PROJECT.md` | Project vision and acceptance criteria | Ephemeral (wiped on `/gsd:new-project`) |
+| `PROJECT.md` | Project vision and acceptance criteria | Ephemeral (wiped on `/new-project`) |
 | `PROJECT-PLAN.md` | Strategic phase breakdown | Ephemeral |
 | `PROJECT-SUMMARY.md` | What happened during execution | Ephemeral |
 | `PROJECT-VERIFICATION.md` | Pass/fail vs acceptance criteria | Ephemeral |
@@ -241,13 +232,13 @@ Every command spawns specialized subagents:
 
 | Command | What Happens |
 |---------|--------------|
-| `/gsd:research-project` | Research agent investigates domain, writes PROJECT-RESEARCH.md |
-| `/gsd:plan-project` | Planner breaks project into phases, maps acceptance criteria |
-| `/gsd:plan-phase N` | Phase planner creates detailed execution plan |
-| `/gsd:execute-phase N` | Executor implements in fresh 200k context, leaves work unstaged |
-| `/gsd:verify-phase N` | Verifier checks must-haves, stages on pass |
-| `/gsd:verify-project` | Project verifier checks final result vs all criteria |
-| `/gsd:map` | Mapper analyzes codebase, anchors to commit SHA |
+| `/research-project` | Research agent investigates domain, writes PROJECT-RESEARCH.md |
+| `/plan-project` | Planner breaks project into phases, maps acceptance criteria |
+| `/plan-phase N` | Phase planner creates detailed execution plan |
+| `/execute-phase N` | Executor implements in fresh 200k context, leaves work unstaged |
+| `/verify-phase N` | Verifier checks must-haves, stages on pass |
+| `/verify-project` | Project verifier checks final result vs all criteria |
+| `/map` | Mapper analyzes codebase, anchors to commit SHA |
 
 Your main context window stays clean. The work happens in specialized subagent contexts.
 
@@ -276,8 +267,8 @@ Precise instructions. Clear verification steps. No guessing.
 
 Two scope gates protect verifiability:
 
-1. **Project-level** (`/gsd:new-project`): Can a human review this diff and confidently say it's correct?
-2. **Plan-level** (`/gsd:plan-phase`): Plan checker validates the phase plan achieves phase goals without scope creep
+1. **Project-level** (`/new-project`): Can a human review this diff and confidently say it's correct?
+2. **Plan-level** (`/plan-phase`): Plan checker validates the phase plan achieves phase goals without scope creep
 
 When scope is too broad, the system recommends scoping down and captures deferred work in todos. You decide whether to accept the recommendation.
 
@@ -289,31 +280,31 @@ When scope is too broad, the system recommends scoping down and captures deferre
 
 | Command | Purpose |
 |---------|---------|
-| `/gsd:new-project` | Define project with acceptance criteria |
-| `/gsd:research-project` | Strategic research (libraries, architecture, approaches) |
-| `/gsd:discuss-project` | Deeper exploration of decisions and edge cases |
-| `/gsd:plan-project` | Break project into phases, map acceptance criteria |
-| `/gsd:verify-project` | Check final result against acceptance criteria |
+| `/new-project` | Define project with acceptance criteria |
+| `/research-project` | Strategic research (libraries, architecture, approaches) |
+| `/discuss-project` | Deeper exploration of decisions and edge cases |
+| `/plan-project` | Break project into phases, map acceptance criteria |
+| `/verify-project` | Check final result against acceptance criteria |
 
 ### Phase Lifecycle
 
 | Command | Purpose |
 |---------|---------|
-| `/gsd:discuss-phase N` | Clarify implementation decisions for phase N |
-| `/gsd:research-phase N` | Tactical research (implementation details, gotchas) |
-| `/gsd:plan-phase N` | Create detailed execution plan for phase N |
-| `/gsd:execute-phase N` | Execute phase plan (leaves changes unstaged) |
-| `/gsd:verify-phase N` | Verify must-haves, stage on pass |
+| `/discuss-phase N` | Clarify implementation decisions for phase N |
+| `/research-phase N` | Tactical research (implementation details, gotchas) |
+| `/plan-phase N` | Create detailed execution plan for phase N |
+| `/execute-phase N` | Execute phase plan (leaves changes unstaged) |
+| `/verify-phase N` | Verify must-haves, stage on pass |
 
 ### Utilities
 
 | Command | Purpose |
 |---------|---------|
-| `/gsd:map` | Analyze codebase (SHA-anchored) |
-| `/gsd:todo` | View parking lot items |
-| `/gsd:debug` | Systematic debugging |
-| `/gsd:health` | Validate `.planning/` integrity |
-| `/gsd:help` | Show all commands |
+| `/map` | Analyze codebase (SHA-anchored) |
+| `/todo` | View parking lot items |
+| `/debug` | Systematic debugging |
+| `/health` | Validate `.planning/` integrity |
+| `/help` | Show all commands |
 
 ---
 
@@ -326,7 +317,7 @@ All planning artifacts live in `.planning/` (gitignored):
 ├── CODEBASE.md              # semi-durable — anchored to commit SHA
 ├── todos/                   # semi-durable — parking lot items
 │   └── *.md
-└── project/                 # ephemeral — wiped on /gsd:new-project
+└── project/                 # ephemeral — wiped on /new-project
     ├── PROJECT.md
     ├── PROJECT-PLAN.md
     ├── PROJECT-SUMMARY.md
@@ -339,43 +330,27 @@ All planning artifacts live in `.planning/` (gitignored):
 
 **Lifecycle**:
 - `CODEBASE.md` and `todos/` persist across projects
-- `project/` is ephemeral — `/gsd:new-project` wipes it after confirmation
+- `project/` is ephemeral — `/new-project` wipes it after confirmation
 - The system never touches your working tree (staged/unstaged code changes)
-- The only git write operation is `git add` (by `/gsd:verify-phase` on pass)
+- The only git write operation is `git add` (by `/verify-phase` on pass)
 
 ---
 
 ## Installation
 
-```bash
-npx get-shit-done-cc@latest
-```
-
-The installer prompts you to choose:
-1. **Runtime** — Claude Code, OpenCode, Gemini, or all
-2. **Location** — Global (all projects) or local (current project only)
-
-Verify with `/gsd:help` inside your chosen runtime.
-
-### Non-interactive Install
+Install from a local clone of this repo:
 
 ```bash
-# Claude Code
-npx get-shit-done-cc --claude --global   # Install to ~/.claude/
-npx get-shit-done-cc --claude --local    # Install to ./.claude/
-
-# OpenCode
-npx get-shit-done-cc --opencode --global # Install to ~/.config/opencode/
-
-# Gemini CLI
-npx get-shit-done-cc --gemini --global   # Install to ~/.gemini/
-
-# All runtimes
-npx get-shit-done-cc --all --global      # Install to all directories
+git clone <this-repo> ~/get-shit-done
+cd ~/get-shit-done
+node bin/install.js --claude --global
 ```
 
-Use `--global` (`-g`) or `--local` (`-l`) to skip the location prompt.
-Use `--claude`, `--opencode`, `--gemini`, or `--all` to skip the runtime prompt.
+This copies commands, agents, hooks, and the skill library to `~/.claude/`. To reinstall after making changes:
+
+```bash
+node bin/install.js --claude --global
+```
 
 ### Recommended: Skip Permissions Mode
 
@@ -470,47 +445,11 @@ This prevents Claude from reading these files entirely.
 
 **Commands not found after install?**
 - Restart Claude Code to reload slash commands
-- Verify files exist in `~/.claude/commands/gsd/` (global) or `./.claude/commands/gsd/` (local)
+- Verify files exist in `~/.claude/commands/gsd/`
 
 **Commands not working as expected?**
-- Run `/gsd:help` to verify installation
-- Re-run `npx get-shit-done-cc` to reinstall
-
-**Updating to the latest version?**
-```bash
-npx get-shit-done-cc@latest
-```
-
-**Using Docker or containerized environments?**
-
-If file reads fail with tilde paths (`~/.claude/...`), set `CLAUDE_CONFIG_DIR` before installing:
-```bash
-CLAUDE_CONFIG_DIR=/home/youruser/.claude npx get-shit-done-cc --global
-```
-
-### Uninstalling
-
-```bash
-# Global installs
-npx get-shit-done-cc --claude --global --uninstall
-npx get-shit-done-cc --opencode --global --uninstall
-
-# Local installs
-npx get-shit-done-cc --claude --local --uninstall
-```
-
----
-
-## Community Ports
-
-OpenCode and Gemini CLI are natively supported via `npx get-shit-done-cc`.
-
-These community ports pioneered multi-runtime support:
-
-| Project | Platform | Description |
-|---------|----------|-------------|
-| [gsd-opencode](https://github.com/rokicool/gsd-opencode) | OpenCode | Original OpenCode adaptation |
-| gsd-gemini (archived) | Gemini CLI | Original Gemini adaptation |
+- Run `/help` to verify installation
+- Re-run `node bin/install.js --claude --global` to reinstall
 
 ---
 

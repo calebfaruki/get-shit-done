@@ -18,15 +18,22 @@ The statusline shows context usage to the **user**, but the **agent** has no awa
 | Level | Remaining | Agent Behavior |
 |-------|-----------|----------------|
 | Normal | > 35% | No warning |
-| WARNING | <= 35% | Wrap up current task, avoid starting new complex work |
-| CRITICAL | <= 25% | Stop immediately, finish current task only |
+| WARNING | <= 35% | Finish current action, do not start new work, update PROJECT-SUMMARY.md |
+| CRITICAL | <= 25% | Stop after current operation, save state, inform user session must end |
+| EXHAUSTED | <= 15% | Stop immediately, no more tool calls, summarize to user |
 
 ## Debounce
 
-To avoid spamming the agent with repeated warnings:
+To avoid spamming the agent with repeated warnings, debounce is level-aware:
+
+| Level | Min tool uses between warnings |
+|-------|-------------------------------|
+| WARNING | 5 |
+| CRITICAL | 2 |
+| EXHAUSTED | 1 (fires every time) |
+
 - First warning always fires immediately
-- Subsequent warnings require 5 tool uses between them
-- Severity escalation (WARNING -> CRITICAL) bypasses debounce
+- Severity escalation (e.g. WARNING -> CRITICAL) bypasses debounce
 
 ## Architecture
 
@@ -54,9 +61,48 @@ The bridge file is a simple JSON object:
 }
 ```
 
+## Example Messages
+
+**WARNING (35%):**
+```
+---CONTEXT MONITOR---
+CONTEXT WINDOW WARNING — 32% remaining.
+
+Stop what you are planning and follow these steps in order:
+1. Finish your current in-progress action (complete the file edit or test you started).
+2. Do NOT begin new file modifications or start new subtasks.
+3. Update PROJECT-SUMMARY.md with: what you completed, what remains, and any state the next session needs.
+4. Tell the user that context is running low and that they must start a fresh session after this task.
+---END CONTEXT MONITOR---
+```
+
+**CRITICAL (25%):**
+```
+---CONTEXT MONITOR---
+CONTEXT WINDOW CRITICAL — 22% remaining.
+
+These instructions override your current task. You must stop after your current action. Do the following immediately:
+1. Complete only the single operation you are currently performing. Do not start another.
+2. Write your progress to PROJECT-SUMMARY.md: completed work, incomplete work, next steps, and any relevant file paths or error states.
+3. Tell the user: context is nearly exhausted, the session must end, and provide a summary of what was accomplished and what remains.
+4. Do not make any further tool calls after the summary unless the user explicitly asks.
+---END CONTEXT MONITOR---
+```
+
+**EXHAUSTED (15%):**
+```
+---CONTEXT MONITOR---
+CONTEXT WINDOW EXHAUSTED — 12% remaining.
+
+These instructions override your current task. STOP. Do not make any more tool calls. Your only remaining action is to write a message to the user summarizing session state. If you have not updated PROJECT-SUMMARY.md, include all progress notes in your message directly.
+
+Do not make any tool calls. Write your summary message now.
+---END CONTEXT MONITOR---
+```
+
 ## Integration with GSD
 
-Planning files persist on disk, so no explicit state-save is needed. The WARNING message suggests wrapping up. The CRITICAL message instructs the agent to stop after the current task.
+Planning files persist on disk, so no explicit state-save is needed beyond PROJECT-SUMMARY.md. The WARNING message tells the agent to wrap up. The CRITICAL message instructs the agent to stop after the current task. The EXHAUSTED message demands an immediate halt.
 
 ## Setup
 

@@ -299,6 +299,82 @@ On pass, changes are staged. On fail, diagnostics are provided.
 Current work is saved in PROJECT-SUMMARY.md.
 All changes remain unstaged.
 ```
+
+**If status is "Stopped (Hung Process)":**
+
+Extract the hung process details from PROJECT-SUMMARY.md Notes, then spawn the debugger:
+
+```
+Task(
+  subagent_type="gsd-debugger",
+  model="sonnet",
+  description="Debug hung process",
+  prompt=`
+<objective>
+Investigate hung process. A Bash command produced no output for 60 seconds
+and was killed by the idle timeout monitor.
+
+Determine root cause: is this a command/environment problem (wrong command,
+missing dependency, port conflict, locked resource, missing env var) or an
+application bug (deadlock, infinite loop, unresolved promise, blocking I/O,
+database lock, test that never resolves)?
+</objective>
+
+<symptoms>
+expected: Command completes or produces continuous output within 60 seconds
+actual: No stdout or stderr for 60 seconds; killed by idle timeout
+errors: GSD IDLE TIMEOUT after 60s of silence
+reproduction: Re-run the command
+timeline: During phase ${PHASE} execution, just now
+</symptoms>
+
+<hung_command>
+\`\`\`
+${command from executor return}
+\`\`\`
+</hung_command>
+
+<executor_context>
+task: ${task from executor return}
+goal: ${context from executor return}
+</executor_context>
+
+<last_output>
+\`\`\`
+${last_output from executor return}
+\`\`\`
+</last_output>
+
+<files_to_read>
+- .planning/project/PROJECT-SUMMARY.md
+- .planning/project/PHASE-${PHASE}-PLAN.md
+- .planning/project/PROJECT.md
+</files_to_read>
+
+<mode>
+symptoms_prefilled: true
+goal: find_and_fix
+</mode>
+`
+)
+```
+
+Report debugger results to user:
+```
+## Phase ${PHASE} Stopped — Hung Process Investigated
+
+**Hung command:** ${command}
+**Task:** ${task}
+
+### Debugger Findings
+${debugger return summary}
+
+### Options
+1. Fix the issue and re-execute: /execute-phase ${PHASE}
+2. Adjust the plan: /plan-phase ${PHASE}
+3. Debug further: /gsd:debug ${description}
+4. Manual investigation
+```
 </step>
 
 </process>
@@ -337,6 +413,11 @@ Orchestrator loads minimal context (plan metadata, file paths). Executor subagen
 - **Rule 4 termination:** Normal flow, not a failure — user decision required
 - **Fix attempt limit hit:** Documented in summary, execution continues
 - **Unrelated test failures:** Out of scope per scope boundary — noted in summary
+- **Hung process (Stopped):** Executor returned "HUNG PROCESS — DEBUGGER REQUIRED". Spawn gsd-debugger to investigate:
+  1. Extract command, task, context, last_output from executor return message
+  2. Spawn gsd-debugger with pre-filled symptoms (see hung process template in report_completion)
+  3. Report debugger findings to user
+  4. User decides: fix and re-execute, adjust plan, or manual investigation
 </failure_handling>
 
 </purpose>

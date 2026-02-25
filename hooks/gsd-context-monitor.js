@@ -11,20 +11,25 @@
 //    as additionalContext, which the agent sees in its conversation
 //
 // Thresholds:
-//   WARNING  (remaining <= 35%): Agent should wrap up current task
-//   CRITICAL (remaining <= 25%): Agent should stop immediately and save state
+//   WARNING   (remaining <= 35%): Agent should wrap up current task
+//   CRITICAL  (remaining <= 25%): Agent must stop after current action
+//   EXHAUSTED (remaining <= 15%): Agent must stop immediately
 //
-// Debounce: 5 tool uses between warnings to avoid spam
-// Severity escalation bypasses debounce (WARNING -> CRITICAL fires immediately)
+// Debounce (level-aware):
+//   WARNING: 5 tool uses between warnings
+//   CRITICAL: 2 tool uses between warnings
+//   EXHAUSTED: 1 tool use (fires every time)
+// Severity escalation bypasses debounce
 
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const WARNING_THRESHOLD = 35;  // remaining_percentage <= 35%
-const CRITICAL_THRESHOLD = 25; // remaining_percentage <= 25%
-const STALE_SECONDS = 60;      // ignore metrics older than 60s
-const DEBOUNCE_CALLS = 5;      // min tool uses between warnings
+const WARNING_THRESHOLD = 35;
+const CRITICAL_THRESHOLD = 25;
+const EXHAUSTED_THRESHOLD = 15;
+const STALE_SECONDS = 60;
+const DEBOUNCE_BY_LEVEL = { warning: 5, critical: 2, exhausted: 1 };
 
 let input = '';
 process.stdin.setEncoding('utf8');
@@ -41,7 +46,6 @@ process.stdin.on('end', () => {
     const tmpDir = os.tmpdir();
     const metricsPath = path.join(tmpDir, `claude-ctx-${sessionId}.json`);
 
-    // If no metrics file, this is a subagent or fresh session -- exit silently
     if (!fs.existsSync(metricsPath)) {
       process.exit(0);
     }
@@ -49,17 +53,24 @@ process.stdin.on('end', () => {
     const metrics = JSON.parse(fs.readFileSync(metricsPath, 'utf8'));
     const now = Math.floor(Date.now() / 1000);
 
-    // Ignore stale metrics
     if (metrics.timestamp && (now - metrics.timestamp) > STALE_SECONDS) {
       process.exit(0);
     }
 
     const remaining = metrics.remaining_percentage;
-    const usedPct = metrics.used_pct;
 
-    // No warning needed
     if (remaining > WARNING_THRESHOLD) {
       process.exit(0);
+    }
+
+    // Determine current level
+    let currentLevel;
+    if (remaining <= EXHAUSTED_THRESHOLD) {
+      currentLevel = 'exhausted';
+    } else if (remaining <= CRITICAL_THRESHOLD) {
+      currentLevel = 'critical';
+    } else {
+      currentLevel = 'warning';
     }
 
     // Debounce: check if we warned recently
@@ -78,14 +89,12 @@ process.stdin.on('end', () => {
 
     warnData.callsSinceWarn = (warnData.callsSinceWarn || 0) + 1;
 
-    const isCritical = remaining <= CRITICAL_THRESHOLD;
-    const currentLevel = isCritical ? 'critical' : 'warning';
+    const LEVEL_ORDER = { warning: 0, critical: 1, exhausted: 2 };
+    const severityEscalated = warnData.lastLevel &&
+      LEVEL_ORDER[currentLevel] > LEVEL_ORDER[warnData.lastLevel];
 
-    // Emit immediately on first warning, then debounce subsequent ones
-    // Severity escalation (WARNING -> CRITICAL) bypasses debounce
-    const severityEscalated = currentLevel === 'critical' && warnData.lastLevel === 'warning';
-    if (!firstWarn && warnData.callsSinceWarn < DEBOUNCE_CALLS && !severityEscalated) {
-      // Update counter and exit without warning
+    const debounceLimit = DEBOUNCE_BY_LEVEL[currentLevel];
+    if (!firstWarn && warnData.callsSinceWarn < debounceLimit && !severityEscalated) {
       fs.writeFileSync(warnPath, JSON.stringify(warnData));
       process.exit(0);
     }
@@ -97,14 +106,37 @@ process.stdin.on('end', () => {
 
     // Build warning message
     let message;
-    if (isCritical) {
-      message = `CONTEXT MONITOR CRITICAL: Usage at ${usedPct}%. Remaining: ${remaining}%. ` +
-        'STOP new work immediately. Inform the user that context is nearly exhausted. ' +
-        'Finish the current task and suggest starting a fresh session.';
+    if (currentLevel === 'exhausted') {
+      message =
+        '---CONTEXT MONITOR---\n' +
+        `CONTEXT WINDOW EXHAUSTED — ${remaining}% remaining.\n` +
+        '\n' +
+        'These instructions override your current task. STOP. Do not make any more tool calls. Your only remaining action is to write a message to the user summarizing session state. If you have not updated PROJECT-SUMMARY.md, include all progress notes in your message directly.\n' +
+        '\n' +
+        'Do not make any tool calls. Write your summary message now.\n' +
+        '---END CONTEXT MONITOR---';
+    } else if (currentLevel === 'critical') {
+      message =
+        '---CONTEXT MONITOR---\n' +
+        `CONTEXT WINDOW CRITICAL — ${remaining}% remaining.\n` +
+        '\n' +
+        'These instructions override your current task. You must stop after your current action. Do the following immediately:\n' +
+        '1. Complete only the single operation you are currently performing. Do not start another.\n' +
+        '2. Write your progress to PROJECT-SUMMARY.md: completed work, incomplete work, next steps, and any relevant file paths or error states.\n' +
+        '3. Tell the user: context is nearly exhausted, the session must end, and provide a summary of what was accomplished and what remains.\n' +
+        '4. Do not make any further tool calls after the summary unless the user explicitly asks.\n' +
+        '---END CONTEXT MONITOR---';
     } else {
-      message = `CONTEXT MONITOR WARNING: Usage at ${usedPct}%. Remaining: ${remaining}%. ` +
-        'Begin wrapping up current task. Do not start new complex work. ' +
-        'Consider finishing and starting a fresh session soon.';
+      message =
+        '---CONTEXT MONITOR---\n' +
+        `CONTEXT WINDOW WARNING — ${remaining}% remaining.\n` +
+        '\n' +
+        'Stop what you are planning and follow these steps in order:\n' +
+        '1. Finish your current in-progress action (complete the file edit or test you started).\n' +
+        '2. Do NOT begin new file modifications or start new subtasks.\n' +
+        '3. Update PROJECT-SUMMARY.md with: what you completed, what remains, and any state the next session needs.\n' +
+        '4. Tell the user that context is running low and that they must start a fresh session after this task.\n' +
+        '---END CONTEXT MONITOR---';
     }
 
     const output = {

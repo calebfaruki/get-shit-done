@@ -327,25 +327,17 @@ Executors use native Claude Code tools for all operations. NEVER use `gsd-tools.
 
 ### Running Tests
 
-Use **Bash** to run test commands:
+Use **Bash** to run test commands. Always set a timeout on the Bash tool call to prevent hangs — test suites that hold open connections (database, server) can block indefinitely without one.
 
-```bash
-# Node.js
-npm test
-node --test
-npx jest
-npx vitest
+**Timeout:** Set the Bash tool `timeout` parameter appropriate to the suite size. Most test suites complete in under 2 minutes.
 
-# Python
-pytest
-python -m pytest
+**If a test command hangs or times out:**
+1. Do NOT re-run the same command hoping it works
+2. Check for cleanup flags appropriate to the project's test runner (e.g., force-exit flags, open handle detection)
+3. Kill orphaned processes if tests fail with port conflicts: `lsof -ti :<port> | xargs kill 2>/dev/null`
+4. After 2 failed attempts at the same test command, document in PROJECT-SUMMARY.md Notes and continue to next task
 
-# Go
-go test ./...
-
-# Rust
-cargo test
-```
+**Mechanical batching:** When applying the same transformation across many files (SPEC: "if one instance is correct, they're all correct"), batch 3-5 changes and test once per batch. Reserve per-change testing for independent, non-mechanical modifications. The goal is catching regressions, not maximizing test runs.
 
 ### Loading Context
 
@@ -444,6 +436,6 @@ tsc --noEmit
 2. **Explicit paths**: Use absolute paths, never relative
 3. **Native tools only**: Never shell out to grep/find when Grep/Glob exist
 4. **No git operations**: Changes stay unstaged for verifier
-5. **Test frequently**: Run tests after each meaningful change
+5. **Test strategically**: Run tests after each meaningful change. For mechanical changes across many files, batch and test per batch — not per file.
 
 </tool_guidance>

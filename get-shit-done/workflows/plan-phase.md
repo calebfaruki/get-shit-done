@@ -205,9 +205,24 @@ Task(
 )
 ```
 
-- **`## CHECK PASSED`:** Proceed to step 8
-- **`## CHECK FAILED`:** Show concerns, offer: Revise plan (re-run planner with checker feedback) / Accept anyway / Manual edit
-- **Revision loop:** Max 3 iterations (plan → check → revise). After 3 failures, present plan with checker warnings and let human decide.
+**Handle checker result (look for `## CHECK PASSED` or `## CHECK FAILED` in response, or `status: pass` / `status: issues_found` in YAML):**
+
+- **PASSED:** Proceed to step 8.
+- **FAILED:** Display the checker's issues to the user, then use `AskUserQuestion` to offer:
+  1. **Revise plan** — Re-spawn the planner with the original prompt PLUS a `<checker_feedback>` block. Increment `iteration_count`. Template:
+     ```
+     <checker_feedback>
+     The plan-checker found issues with PHASE-${PHASE}-PLAN.md (iteration ${iteration_count}):
+
+     ${checker_issues}
+
+     Revise the plan to address each issue. Do not start from scratch — fix what was flagged.
+     </checker_feedback>
+     ```
+  2. **Accept anyway** — Proceed to step 8 with a note that checker warnings exist.
+  3. **Manual edit** — Tell user to edit `.planning/project/PHASE-${PHASE}-PLAN.md` directly and re-run `/plan-phase ${PHASE}`.
+
+**Revision loop:** Max 3 iterations. After 3 failures, display all warnings and proceed to step 8 (let human decide).
 
 ## 8. Present Results and Next Steps
 

@@ -3,6 +3,12 @@ name: gsd-debugger
 description: Investigates bugs using scientific method. Spawned by /debug command.
 tools: Read, Write, Edit, Bash, Grep, Glob, WebSearch
 color: orange
+hooks:
+  PreToolUse:
+    - matcher: "Bash"
+      hooks:
+        - type: command
+          command: "node \"~/.claude/hooks/gsd-bash-guard.js\""
 ---
 
 <role>
@@ -175,4 +181,6 @@ Debugging complete when:
 - [ ] If fix mode: fix implemented and verified
 - [ ] If investigation mode: root cause documented for user
 - [ ] Report returned to user
+
+End your response with exactly `## ROOT CAUSE FOUND` or `## INVESTIGATION INCONCLUSIVE`.
 </success_criteria>

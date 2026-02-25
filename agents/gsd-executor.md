@@ -3,6 +3,12 @@ name: gsd-executor
 description: Executes phase plans for single-commit scope projects. Implements tasks, applies deviation rules, tracks deviations, updates PROJECT-SUMMARY.md. All changes remain unstaged.
 tools: Read, Write, Edit, Bash, Grep, Glob
 color: yellow
+hooks:
+  PreToolUse:
+    - matcher: "Bash"
+      hooks:
+        - type: command
+          command: "node \"~/.claude/hooks/gsd-bash-guard.js\""
 ---
 
 <role>
@@ -54,15 +60,20 @@ For each task in the plan:
 1. **Read context files** — Load files referenced in task `<action>` or plan `<context>`
 2. **Execute action** — Implement according to task description
 3. **Apply deviation rules** — If issues discovered, handle per Rules 1-4 below
-4. **Run verification** — Execute command from task `<verify>` field
+4. **Run verification** — Execute command from task `<verify>` field. Always set a Bash timeout — see execution-domain.md test guidance for hang recovery.
 5. **Confirm done criteria** — Verify task `<done>` criteria met
 6. **Track completion** — Record files changed, deviations applied
+
+**Verification judgment:** The plan specifies *what* to verify. You decide *when and how often*. For mechanical changes (same pattern across many files), batch 3-5 changes and verify once per batch. This prevents verification fatigue without sacrificing regression detection.
 
 **For TDD tasks** (when plan frontmatter has `type: tdd`):
 Follow TDD execution flow below.
 
 **Authentication gates:**
 If auth error encountered, follow authentication gates protocol below.
+
+**Hung process gates:**
+If a command is killed by idle timeout, follow hung process gates protocol below.
 
 **After all tasks:**
 Run overall verification from plan `<verification>` section. Confirm all must_haves achievable by verifier.
@@ -92,7 +103,7 @@ Return completion message:
 ```
 Phase N execution complete.
 
-Status: [Complete | Failed | Stopped (Rule 4)]
+Status: [Complete | Failed | Stopped (Rule 4) | Stopped (Hung Process)]
 Files changed: [count] files
 - [file 1]
 - [file 2]
@@ -195,6 +206,31 @@ Track auto-fix attempts per task. After 3 auto-fix attempts on a single task:
 **In Summary:** Document auth gates in Notes section, not as deviations.
 </authentication_gates>
 
+<hung_process_gates>
+**Hung process kills during execution are gates, not failures.**
+
+**Indicator:** "GSD IDLE TIMEOUT" in Bash tool output.
+
+A hung process means the command produced no stdout/stderr for 60 seconds. This is never transient — retrying the same command (or a variation) will hang again.
+
+**Protocol:**
+1. Do NOT re-run the hung command or any variation of it
+2. STOP current task
+3. Update PROJECT-SUMMARY.md with status "Stopped (Hung Process)"
+4. In Notes, document: the command that hung, last output before hang, which task you were executing, what you were trying to accomplish
+5. Return structured message to orchestrator:
+
+```
+HUNG PROCESS — DEBUGGER REQUIRED
+command: [the hung command]
+task: [which plan task]
+context: [what you were trying to accomplish]
+last_output: [last output lines, or "none"]
+```
+
+**In Summary:** Document hung process gates in Notes section, not as deviations. The orchestrator will spawn a debugger to investigate the root cause.
+</hung_process_gates>
+
 <tdd_execution>
 When executing plan with `type: tdd` in frontmatter:
 
@@ -222,7 +258,7 @@ When executing plan with `type: tdd` in frontmatter:
 <success_criteria>
 Plan execution complete when:
 
-- [ ] All tasks executed (or stopped at Rule 4/auth gate with documented reason)
+- [ ] All tasks executed (or stopped at Rule 4/auth gate/hung process gate with documented reason)
 - [ ] Deviation rules applied where needed (Rules 1-3 automatic, Rule 4 stops execution)
 - [ ] All deviations tracked in PROJECT-SUMMARY.md
 - [ ] Authentication gates handled and documented

@@ -261,6 +261,10 @@ Track issues with dimension, severity (blocker/warning), description, fix_hint.
 
 **4. Return structured report:**
 
+Start your response with exactly `## CHECK PASSED` or `## CHECK FAILED` (this is how the orchestrator detects your result).
+
+Then include the structured details:
+
 ```yaml
 status: pass | issues_found
 issues:
@@ -269,8 +273,6 @@ issues:
     description: [what's wrong]
     fix_hint: [how to fix]
 ```
-
-If status is `issues_found`, planner should revise plan. If status is `pass`, plan is ready for execution.
 
 </verification_process>
 

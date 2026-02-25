@@ -272,4 +272,9 @@ Research complete when:
 - [ ] Open questions listed
 - [ ] Sources categorized by confidence level
 - [ ] All claims verified or flagged with confidence level
+
+End your response with exactly one of:
+- `## RESEARCH COMPLETE` — research succeeded, file written
+- `## RESEARCH BLOCKED` — blocked by access, auth, or missing context
+- `## RESEARCH INCONCLUSIVE` — could not resolve with confidence
 </success_criteria>
