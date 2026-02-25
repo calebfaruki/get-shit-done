@@ -66,6 +66,56 @@ The workflow provides user decisions via PHASE-N-CONTEXT.md (if `/discuss-phase 
 - Note in task action: "Using X per user decision (research suggested Y)"
 </context_fidelity>
 
+<research_consumption>
+## Consuming Research Sections
+
+PHASE-N-RESEARCH.md contains XML-tagged sections from multiple researchers. Here's how to use each:
+
+**Core sections (from phase researcher):**
+
+| Section | How You Use It |
+|---------|---------------------|
+| `<user_constraints>` | **CRITICAL: Honor locked decisions exactly** |
+| `<standard_stack>` | Plans use these libraries, not alternatives |
+| `<implementation_patterns>` | Task structure follows these patterns |
+| `<common_pitfalls>` | Verification steps check for these |
+| `<sources>` | Confidence validation for recommendations |
+
+**Supplemental sections (from parallel researchers — may not always be present):**
+
+| Section | How You Use It |
+|---------|---------------------|
+| `<codebase_conventions>` | Task `<action>` fields reference these patterns to stay consistent with existing code |
+| `<domain_best_practices>` | Task `<action>` fields apply these as community-endorsed approaches |
+| `<safety_analysis>` | `<verify>` and `<done>` fields address items from the Prevention Checklist |
+| `<open_questions>` | Note in relevant task `<action>` fields as "unresolved — validate during execution" |
+
+**Rules for supplemental sections:**
+
+1. **Safety Prevention Checklist → task `<verify>` fields.** If `<safety_analysis>` contains a Prevention Checklist, those items MUST appear in the relevant task's `<verify>` field. Items that apply across tasks go in the plan's `<verification>` section.
+
+2. **Codebase conventions → task `<action>` fields.** Reference relevant conventions (e.g., "Follow error handling pattern from `src/lib/errors.ts`"). Don't repeat conventions — just reference them.
+
+3. **Best practices → task `<action>` fields.** Incorporate recommended patterns. When best practices conflict with codebase conventions, prefer codebase conventions (consistency over theory) and note the deviation.
+
+4. **Route findings mechanically — do not duplicate.**
+   When multiple researchers cover the same topic, route each finding to exactly one location using this procedure:
+   - Safety findings (from `<safety_analysis>`) → task `<verify>` fields (or plan `<verification>` for cross-cutting items)
+   - Conventions findings (from `<codebase_conventions>`) → task `<action>` fields as pattern references
+   - Best practices findings (from `<domain_best_practices>`) → task `<action>` fields as approach guidance
+   - Phase research findings → task `<action>` or `<done>` fields as implementation details
+   - Open questions (from `<open_questions>`) → relevant task `<action>` fields as "unresolved — validate during execution"
+
+   **When sources conflict, resolve by priority:**
+   1. User constraints (from `<user_constraints>`) — always wins
+   2. Safety (from `<safety_analysis>`) — override practices that introduce risk
+   3. Codebase conventions (from `<codebase_conventions>`) — consistency over theory
+   4. Phase research — implementation specifics
+   5. Best practices (from `<domain_best_practices>`) — general guidance, lowest priority
+
+5. **Missing sections are fine.** If a supplemental section is absent, plan without it. These are additive, not required.
+</research_consumption>
+
 <single_commit_scope>
 ## Single-Commit Scope Framing
 
@@ -389,6 +439,7 @@ Planning complete when:
 - [ ] Must-haves derived using goal-backward methodology
 - [ ] Tasks specific enough to execute without interpretation
 - [ ] Acceptance criteria from PROJECT-PLAN.md satisfied
+- [ ] Prevention Checklist items from `<safety_analysis>` addressed in task verify/done fields (if section exists)
 - [ ] No references to ROADMAP.md, STATE.md, waves, depends_on, or checkpoints
 
 End your response with exactly `## PLANNING COMPLETE` or `## PLANNING INCONCLUSIVE`.

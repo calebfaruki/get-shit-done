@@ -1,5 +1,5 @@
 <purpose>
-Research how to implement a phase. Spawns researcher subagent with phase context.
+Research how to implement a phase. Spawns 4 parallel researcher subagents covering implementation details, codebase conventions, domain best practices, and safety analysis.
 
 Standalone research command. For most workflows, use `/plan-phase` which can integrate research automatically.
 </purpose>
@@ -49,7 +49,7 @@ If exists: Offer update/view/skip options (re-run overwrites per SPEC).
 
 ## Step 3: Gather Phase Context
 
-Collect file paths for researcher to load:
+Collect file paths for researchers to load:
 
 ```bash
 PROJECT_PLAN_PATH=".planning/project/PROJECT-PLAN.md"
@@ -62,9 +62,13 @@ CODEBASE_PATH=".planning/CODEBASE.md"
 [ -f "$CODEBASE_PATH" ] && HAS_CODEBASE=true || HAS_CODEBASE=false
 ```
 
-## Step 4: Spawn Researcher
+## Step 4: Spawn All 4 Researchers in Parallel
 
-Build researcher prompt with XML-tagged sections per SPEC:
+Build prompts and spawn all agents with `run_in_background=true`.
+
+### Agent 1: Phase Researcher (existing — writes PHASE-N-RESEARCH.md)
+
+Same prompt as before — this agent writes the base research file.
 
 ```markdown
 <objective>
@@ -139,21 +143,174 @@ Write to: .planning/project/PHASE-${PHASE}-RESEARCH.md
 </output_format>
 ```
 
-Spawn researcher subagent:
-
 ```
 Task(
   prompt=filled_prompt,
   subagent_type="gsd-phase-researcher",
+  run_in_background=true,
   description="Research Phase ${PHASE}"
 )
 ```
 
-## Step 5: Handle Return
+### Agent 2: Conventions Researcher (returns findings to orchestrator)
 
-- `## RESEARCH COMPLETE` — Display summary, suggest next steps
-- `## RESEARCH BLOCKED` — Display blocker, offer alternatives
-- `## RESEARCH INCONCLUSIVE` — Show attempts, offer: Add context/Retry/Manual
+```markdown
+<objective>
+Analyze codebase conventions relevant to Phase ${PHASE}: ${PHASE_NAME}
+
+Answer: "What conventions does this codebase follow that are relevant to this phase's work?"
+</objective>
+
+<files_to_read>
+${HAS_CODEBASE && "- .planning/CODEBASE.md (Codebase context)"}
+${HAS_PROJECT_PLAN && "- .planning/project/PROJECT-PLAN.md (Project phases)"}
+</files_to_read>
+
+<phase_context>
+**Phase number:** ${PHASE}
+**Phase name:** ${PHASE_NAME}
+**Phase goal:** ${PHASE_GOAL}
+</phase_context>
+```
+
+```
+Task(
+  prompt=filled_prompt,
+  subagent_type="gsd-conventions-researcher",
+  run_in_background=true,
+  description="Research Phase ${PHASE} conventions"
+)
+```
+
+### Agent 3: Best Practices Researcher (returns findings to orchestrator)
+
+```markdown
+<objective>
+Research community best practices for the domain of Phase ${PHASE}: ${PHASE_NAME}
+
+Answer: "What do experts agree you should always/never do in this domain?"
+</objective>
+
+<files_to_read>
+${HAS_PROJECT_PLAN && "- .planning/project/PROJECT-PLAN.md (Project phases)"}
+${HAS_CONTEXT && "- .planning/project/PHASE-${PHASE}-CONTEXT.md (User decisions from /discuss-phase)"}
+</files_to_read>
+
+<phase_context>
+**Phase number:** ${PHASE}
+**Phase name:** ${PHASE_NAME}
+**Phase goal:** ${PHASE_GOAL}
+</phase_context>
+```
+
+```
+Task(
+  prompt=filled_prompt,
+  subagent_type="gsd-bestpractices-researcher",
+  run_in_background=true,
+  description="Research Phase ${PHASE} best practices"
+)
+```
+
+### Agent 4: Safety Researcher (returns findings to orchestrator)
+
+```markdown
+<objective>
+Analyze safety risks for Phase ${PHASE}: ${PHASE_NAME}
+
+Answer: "What could go catastrophically wrong during this phase, and how do we prevent it?"
+</objective>
+
+<files_to_read>
+${HAS_CODEBASE && "- .planning/CODEBASE.md (Codebase context)"}
+${HAS_PROJECT_PLAN && "- .planning/project/PROJECT-PLAN.md (Project phases)"}
+</files_to_read>
+
+<phase_context>
+**Phase number:** ${PHASE}
+**Phase name:** ${PHASE_NAME}
+**Phase goal:** ${PHASE_GOAL}
+</phase_context>
+```
+
+```
+Task(
+  prompt=filled_prompt,
+  subagent_type="gsd-safety-researcher",
+  run_in_background=true,
+  description="Research Phase ${PHASE} safety"
+)
+```
+
+**CRITICAL:** All 4 Task calls must be in a single message for parallel execution.
+
+## Step 5: Wait and Collect Results
+
+Wait for all 4 agents to complete. Read each agent's output.
+
+Track outcomes:
+
+```
+PHASE_RESEARCHER: COMPLETE | BLOCKED | INCONCLUSIVE
+CONVENTIONS: COMPLETE | BLOCKED
+BESTPRACTICES: COMPLETE | BLOCKED
+SAFETY: COMPLETE | BLOCKED
+```
+
+**Minimum viable output:** The phase researcher's file (PHASE-N-RESEARCH.md) must exist. The 3 supplemental agents are additive — if they fail, log the failure and continue.
+
+## Step 6: Append Supplemental Research
+
+**Guard:** If the phase researcher returned BLOCKED or INCONCLUSIVE, skip this step — there is no base research file to append to. Proceed directly to Step 7.
+
+Read `PHASE-${PHASE}-RESEARCH.md` (written by the phase researcher in Step 4).
+
+For each successful supplemental agent (conventions, best practices, safety), append its XML block to the end of the research file:
+
+```markdown
+[existing PHASE-N-RESEARCH.md content from phase researcher]
+
+<codebase_conventions>
+[Conventions researcher findings]
+</codebase_conventions>
+
+<domain_best_practices>
+[Best practices researcher findings]
+</domain_best_practices>
+
+<safety_analysis>
+[Safety researcher findings]
+</safety_analysis>
+```
+
+Only append sections from agents that returned successfully. Skip sections from failed agents.
+
+Write the updated file back to `.planning/project/PHASE-${PHASE}-RESEARCH.md`.
+
+## Step 7: Handle Return
+
+Report outcomes for all 4 agents:
+
+```
+Research complete for Phase ${PHASE}.
+
+Phase Research:      [COMPLETE/BLOCKED/INCONCLUSIVE]
+Conventions:         [COMPLETE/BLOCKED]
+Best Practices:      [COMPLETE/BLOCKED]
+Safety Analysis:     [COMPLETE/BLOCKED]
+
+Written to: .planning/project/PHASE-${PHASE}-RESEARCH.md
+```
+
+If phase researcher succeeded:
+- Display summary from `<research_summary>` section
+- Note which supplemental sections were added
+- Suggest next steps
+
+If phase researcher failed:
+- Display blocker
+- Offer alternatives
+- Do NOT attempt to use supplemental research as a substitute
 
 **Handoff suggestion:** Recommend `/plan-phase ${PHASE}` after successful research.
 

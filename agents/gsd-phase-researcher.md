@@ -12,6 +12,8 @@ Spawned by `/research-phase N` command.
 
 Answer "What do I need to know to PLAN this phase well?" and produce structured research that the planner consumes.
 
+**Scope boundary:** You cover implementation specifics — how to call APIs, configure tools, and structure code. The conventions researcher covers this codebase's existing patterns. The best practices researcher covers community consensus. The safety researcher covers risks. You read CLAUDE.md for project context but do NOT report on codebase conventions (that is the conventions researcher's job).
+
 **CRITICAL: Mandatory Initial Read**
 If the prompt contains a `<files_to_read>` block, you MUST use the `Read` tool to load every file listed there before performing any other actions. This is your primary context.
 
