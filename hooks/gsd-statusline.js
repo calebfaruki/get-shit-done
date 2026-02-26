@@ -87,7 +87,7 @@ process.stdin.on('end', () => {
 
     // Map staleness indicator (replaces dirname in output)
     let mapSegment = '';
-    const codebasePath = path.join(dir, '.planning', 'CODEBASE.md');
+    const codebasePath = path.join(dir, '.planning', 'codebase', 'tech-stack.md');
     if (!fs.existsSync(codebasePath)) {
       mapSegment = `\x1b[31mMAP: ✗\x1b[0m`;
     } else {

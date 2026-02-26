@@ -272,7 +272,7 @@ Optional deeper exploration of an existing PROJECT.md.
 
 Break project into phases (strategic).
 
-**Reads**: PROJECT.md, CODEBASE.md, PROJECT-RESEARCH.md (if exists), relevant todos.
+**Reads**: PROJECT.md, codebase files (if they exist), PROJECT-RESEARCH.md (if exists), relevant todos.
 
 **Output**: PROJECT-PLAN.md. Phases, their order, acceptance criteria mapping. Does NOT produce phase-level plans.
 
@@ -413,7 +413,7 @@ Optional tactical research — narrow, prescriptive, implementation-focused. Hon
 
 Produce detailed execution plan for phase N.
 
-**Reads**: PROJECT-PLAN.md, CODEBASE.md, PHASE-{N}-CONTEXT.md and PHASE-{N}-RESEARCH.md if they exist, relevant source files.
+**Reads**: PROJECT-PLAN.md, codebase files (if they exist), PHASE-{N}-CONTEXT.md and PHASE-{N}-RESEARCH.md if they exist, relevant source files.
 
 **Output**: PHASE-{N}-PLAN.md — the executor's instruction set.
 
@@ -436,7 +436,10 @@ must_haves:
 
 <context>
 @.planning/project/PROJECT.md
-@.planning/CODEBASE.md
+@.planning/codebase/architecture.md
+@.planning/codebase/conventions.md
+@.planning/codebase/tech-stack.md
+@.planning/codebase/concerns.md
 @src/relevant/file.rb
 </context>
 
@@ -464,7 +467,7 @@ must_haves:
 Execute phase N according to the phase plan.
 
 **Flow**:
-1. **Bootstrap** — read PROJECT.md, phase plan, CODEBASE.md, PHASE-{N}-CONTEXT.md if it exists
+1. **Bootstrap** — read PROJECT.md, phase plan, codebase files, PHASE-{N}-CONTEXT.md if it exists
 2. **Load phase plan** — parse frontmatter, enumerate tasks in execution order
 3. **Execute tasks** — apply deviation rules (carried forward from GSD unchanged):
    - Rule 1: Auto-fix bugs encountered during implementation
@@ -527,7 +530,11 @@ All in `.planning/` (gitignored).
 
 ```
 .planning/
-├── CODEBASE.md              # semi-durable — codebase map with commit SHA anchor
+├── codebase/                # semi-durable — codebase map with commit SHA anchor
+│   ├── tech-stack.md
+│   ├── architecture.md
+│   ├── conventions.md
+│   └── concerns.md
 ├── todos/                   # semi-durable — parking lot items, one file per todo
 │   └── *.md
 └── project/                 # ephemeral — everything for the current project
@@ -541,7 +548,7 @@ All in `.planning/` (gitignored).
     └── PHASE-{N}-PLAN.md
 ```
 
-**Directory lifecycle**: `todos/` and `CODEBASE.md` persist across projects. `project/` is ephemeral — `/new-project` wipes it (after human confirmation) and recreates it.
+**Directory lifecycle**: `codebase/` and `todos/` persist across projects. `project/` is ephemeral — `/new-project` wipes it (after human confirmation) and recreates it.
 
 **Naming convention**: Project-level files prefixed `PROJECT-`. Phase-level files prefixed `PHASE-{N}-`.
 

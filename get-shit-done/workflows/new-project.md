@@ -55,10 +55,10 @@ mkdir -p .planning/project/
 
 ## 4. Check Codebase Map Staleness
 
-Read `.planning/CODEBASE.md` if it exists:
+Read `.planning/codebase/tech-stack.md` if it exists (contains commit_sha in frontmatter):
 
 ```bash
-[ -f .planning/CODEBASE.md ] && cat .planning/CODEBASE.md | head -n 10 || echo "No codebase map"
+[ -f .planning/codebase/tech-stack.md ] && cat .planning/codebase/tech-stack.md | head -n 10 || echo "No codebase map"
 ```
 
 **If map exists:**

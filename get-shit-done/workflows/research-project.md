@@ -28,7 +28,10 @@ Agent: `gsd-project-researcher` (use `resolve-model` for model selection)
 
 **Files to read** (`<files_to_read>` block in subagent spawn):
 - `.planning/project/PROJECT.md`
-- `.planning/CODEBASE.md` (if exists)
+- `.planning/codebase/architecture.md` (if exists)
+- `.planning/codebase/conventions.md` (if exists)
+- `.planning/codebase/tech-stack.md` (if exists)
+- `.planning/codebase/concerns.md` (if exists)
 - `get-shit-done/knowledge/project-domain.md`
 
 **Agent task:**
@@ -38,7 +41,7 @@ Agent: `gsd-project-researcher` (use `resolve-model` for model selection)
    - Common patterns and anti-patterns
    - Critical pitfalls and gotchas
    - Best practices
-3. Analyze codebase (if CODEBASE.md exists) to understand:
+3. Analyze codebase (if codebase files exist) to understand:
    - Existing tech stack
    - Current patterns in use
    - Constraints from existing architecture
@@ -133,7 +136,7 @@ Present exactly ONE next step from the resolver. Do not list alternatives.
 
 - [ ] PROJECT.md was read by subagent
 - [ ] Web search was performed
-- [ ] CODEBASE.md was considered if it exists
+- [ ] Codebase files were considered if they exist
 - [ ] PROJECT-RESEARCH.md written to `.planning/project/`
 - [ ] Research follows SPEC format (Summary, Stack, Approach, Pitfalls, Questions, Sources)
 - [ ] Handoff message suggests next steps without auto-advancing

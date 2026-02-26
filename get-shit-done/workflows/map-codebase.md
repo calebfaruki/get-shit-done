@@ -1,16 +1,15 @@
 <purpose>
-Orchestrate parallel codebase mapper agents to analyze codebase and produce a single structured document in .planning/CODEBASE.md
+Orchestrate parallel codebase mapper agents to analyze codebase and produce 4 specialized files in .planning/codebase/
 
-Each agent has fresh context and explores a specific focus area, returning structured findings. The orchestrator consolidates findings into a single codebase map anchored to the current git commit SHA.
+Each agent has fresh context, explores a specific focus area, and writes its file directly. No consolidation step needed.
 
-Output: .planning/CODEBASE.md (single file, semi-durable, commit SHA anchored)
+Output: .planning/codebase/ directory with 4 topic-specific files (architecture.md, conventions.md, tech-stack.md, concerns.md), each with its own commit_sha in YAML frontmatter
 </purpose>
 
 <philosophy>
 **Why dedicated mapper agents:**
 - Fresh context per domain (no token contamination)
-- Agents write documents directly (no context transfer back to orchestrator)
-- Orchestrator only summarizes what was created (minimal context usage)
+- Agents write files directly (no context transfer back to orchestrator)
 - Faster execution (agents run simultaneously)
 
 **Document quality over length:**
@@ -23,7 +22,7 @@ Documents are reference material for Claude when planning/executing. Always incl
 <process>
 
 <step name="init_context" priority="first">
-Get current git commit SHA for anchoring the codebase map:
+Get current git commit SHA for anchoring the codebase files:
 
 ```bash
 CURRENT_SHA=$(git rev-parse HEAD 2>/dev/null || echo "unknown")
@@ -32,28 +31,28 @@ MAPPER_MODEL="sonnet"  # Default model for codebase mapping
 </step>
 
 <step name="check_existing">
-Check if .planning/CODEBASE.md already exists:
+Check if .planning/codebase/ directory and its files already exist:
 
 ```bash
-test -f .planning/CODEBASE.md && echo "exists" || echo "not found"
+test -d .planning/codebase && ls .planning/codebase/*.md 2>/dev/null || echo "not found"
 ```
 
-**If exists:**
-Read the file and extract the stored commit SHA from the frontmatter.
+**If files exist:**
+Read any existing file and extract the stored commit SHA from its frontmatter.
 
 Compare stored SHA against CURRENT_SHA:
 - If they match: Map is fresh (anchored to same commit)
 - If they diverge: Map is stale (codebase changed since mapping)
 
 ```
-.planning/CODEBASE.md exists (anchored to commit [stored_sha]).
+.planning/codebase/ files exist (anchored to commit [stored_sha]).
 
 Current HEAD: [current_sha]
 Status: [Fresh/Stale - [N] commits ahead]
 
 What's next?
-1. Refresh - Regenerate codebase map
-2. Skip - Use existing codebase map as-is
+1. Refresh - Regenerate codebase files
+2. Skip - Use existing codebase files as-is
 ```
 
 Wait for user response.
@@ -66,17 +65,17 @@ Continue to create_structure.
 </step>
 
 <step name="create_structure">
-Create .planning/ directory if needed:
+Create .planning/codebase/ directory:
 
 ```bash
-mkdir -p .planning
+mkdir -p .planning/codebase
 ```
 
-**Expected output:** Single consolidated file .planning/CODEBASE.md with sections for:
-- Tech stack and integrations
-- Architecture and structure
-- Conventions and testing
-- Concerns and technical debt
+**Expected output:** 4 files in .planning/codebase/:
+- architecture.md - Architecture and structure
+- conventions.md - Conventions and testing
+- tech-stack.md - Tech stack and integrations
+- concerns.md - Concerns and technical debt
 
 Continue to spawn_agents.
 </step>
@@ -86,7 +85,7 @@ Spawn 4 parallel gsd-codebase-mapper agents.
 
 Use Task tool with `subagent_type="gsd-codebase-mapper"`, `model="{mapper_model}"`, and `run_in_background=true` for parallel execution.
 
-**CRITICAL:** Use the dedicated `gsd-codebase-mapper` agent, NOT `Explore`. The mapper agent analyzes and returns findings.
+**CRITICAL:** Use the dedicated `gsd-codebase-mapper` agent, NOT `Explore`. The mapper agent analyzes and writes its file directly.
 
 **Agent 1: Tech Focus**
 
@@ -97,6 +96,8 @@ Task(
   run_in_background=true,
   description="Map codebase tech stack",
   prompt="Focus: tech
+Commit SHA: {CURRENT_SHA}
+Output file: .planning/codebase/tech-stack.md
 
 Analyze this codebase for technology stack and external integrations.
 
@@ -104,7 +105,7 @@ Report findings for:
 - Tech stack - Languages, runtime, frameworks, dependencies, configuration
 - Integrations - External APIs, databases, auth providers, webhooks
 
-Explore thoroughly. Return structured markdown sections with your findings. Do NOT write any files — orchestrator consolidates into CODEBASE.md."
+Explore thoroughly. Write your findings directly to .planning/codebase/tech-stack.md with commit_sha in YAML frontmatter."
 )
 ```
 
@@ -117,6 +118,8 @@ Task(
   run_in_background=true,
   description="Map codebase architecture",
   prompt="Focus: arch
+Commit SHA: {CURRENT_SHA}
+Output file: .planning/codebase/architecture.md
 
 Analyze this codebase architecture and directory structure.
 
@@ -124,7 +127,7 @@ Report findings for:
 - Architecture - Pattern, layers, data flow, abstractions, entry points
 - Structure - Directory layout, key locations, naming conventions
 
-Explore thoroughly. Return structured markdown sections with your findings. Do NOT write any files — orchestrator consolidates into CODEBASE.md."
+Explore thoroughly. Write your findings directly to .planning/codebase/architecture.md with commit_sha in YAML frontmatter."
 )
 ```
 
@@ -137,6 +140,8 @@ Task(
   run_in_background=true,
   description="Map codebase conventions",
   prompt="Focus: quality
+Commit SHA: {CURRENT_SHA}
+Output file: .planning/codebase/conventions.md
 
 Analyze this codebase for coding conventions and testing patterns.
 
@@ -144,7 +149,7 @@ Report findings for:
 - Conventions - Code style, naming, patterns, error handling
 - Testing - Framework, structure, mocking, coverage
 
-Explore thoroughly. Return structured markdown sections with your findings. Do NOT write any files — orchestrator consolidates into CODEBASE.md."
+Explore thoroughly. Write your findings directly to .planning/codebase/conventions.md with commit_sha in YAML frontmatter."
 )
 ```
 
@@ -157,13 +162,15 @@ Task(
   run_in_background=true,
   description="Map codebase concerns",
   prompt="Focus: concerns
+Commit SHA: {CURRENT_SHA}
+Output file: .planning/codebase/concerns.md
 
 Analyze this codebase for technical debt, known issues, and areas of concern.
 
 Report findings for:
 - Concerns - Tech debt, bugs, security, performance, fragile areas
 
-Explore thoroughly. Return structured markdown sections with your findings. Do NOT write any files — orchestrator consolidates into CODEBASE.md."
+Explore thoroughly. Write your findings directly to .planning/codebase/concerns.md with commit_sha in YAML frontmatter."
 )
 ```
 
@@ -173,88 +180,48 @@ Continue to collect_confirmations.
 <step name="collect_confirmations">
 Wait for all 4 agents to complete.
 
-Read each agent's output file to collect findings.
+Verify that each of the 4 files exists in `.planning/codebase/`:
+- `.planning/codebase/tech-stack.md`
+- `.planning/codebase/architecture.md`
+- `.planning/codebase/conventions.md`
+- `.planning/codebase/concerns.md`
 
-**Expected format from each agent:**
-Structured markdown sections matching the agent's focus area (e.g., `## Tech Stack`, `## Architecture`, etc.).
-
-Collect all agent findings for consolidation into single CODEBASE.md file.
-
-If any agent failed, note the failure and continue with successful findings.
-
-Continue to write_codebase_map.
-</step>
-
-<step name="write_codebase_map">
-Consolidate all agent findings into a single .planning/CODEBASE.md file.
-
-**File structure:**
-```markdown
----
-commit_sha: {CURRENT_SHA}
-generated: {timestamp}
----
-
-# Codebase Map
-
-[Consolidated findings from all 4 agents, organized into coherent sections]
-
-## Tech Stack
-[Agent 1 tech findings]
-
-## Integrations
-[Agent 1 integration findings]
-
-## Architecture
-[Agent 2 architecture findings]
-
-## Structure
-[Agent 2 structure findings]
-
-## Conventions
-[Agent 3 convention findings]
-
-## Testing
-[Agent 3 testing findings]
-
-## Concerns
-[Agent 4 concerns findings]
-```
-
-Write the consolidated file.
+If any agent failed, note the failure and report to the user.
 
 Continue to verify_output.
 </step>
 
 <step name="verify_output">
-Verify CODEBASE.md created successfully:
+Verify all 4 codebase files created successfully:
 
 ```bash
-test -f .planning/CODEBASE.md && wc -l .planning/CODEBASE.md || echo "File missing"
+ls -la .planning/codebase/
+head -3 .planning/codebase/*.md
+wc -l .planning/codebase/*.md
 ```
 
 **Verification checklist:**
-- File exists
-- Not empty (should have >50 lines)
-- Contains commit SHA in frontmatter
+- All 4 files exist (architecture.md, conventions.md, tech-stack.md, concerns.md)
+- None are empty (each should have >20 lines)
+- Each contains commit_sha in frontmatter
 
 Continue to scan_for_secrets.
 </step>
 
 <step name="scan_for_secrets">
-**CRITICAL SECURITY CHECK:** Scan output file for accidentally leaked secrets.
+**CRITICAL SECURITY CHECK:** Scan output files for accidentally leaked secrets.
 
 Run secret pattern detection:
 
 ```bash
 # Check for common API key patterns in generated docs
-grep -E '(sk-[a-zA-Z0-9]{20,}|sk_live_[a-zA-Z0-9]+|sk_test_[a-zA-Z0-9]+|ghp_[a-zA-Z0-9]{36}|gho_[a-zA-Z0-9]{36}|glpat-[a-zA-Z0-9_-]+|AKIA[A-Z0-9]{16}|xox[baprs]-[a-zA-Z0-9-]+|-----BEGIN.*PRIVATE KEY|eyJ[a-zA-Z0-9_-]+\.eyJ[a-zA-Z0-9_-]+\.)' .planning/CODEBASE.md 2>/dev/null && SECRETS_FOUND=true || SECRETS_FOUND=false
+grep -E '(sk-[a-zA-Z0-9]{20,}|sk_live_[a-zA-Z0-9]+|sk_test_[a-zA-Z0-9]+|ghp_[a-zA-Z0-9]{36}|gho_[a-zA-Z0-9]{36}|glpat-[a-zA-Z0-9_-]+|AKIA[A-Z0-9]{16}|xox[baprs]-[a-zA-Z0-9-]+|-----BEGIN.*PRIVATE KEY|eyJ[a-zA-Z0-9_-]+\.eyJ[a-zA-Z0-9_-]+\.)' .planning/codebase/*.md 2>/dev/null && SECRETS_FOUND=true || SECRETS_FOUND=false
 ```
 
 **If SECRETS_FOUND=true:**
 
 ```
-⚠️  SECURITY ALERT: Potential secrets detected in codebase document!
+⚠️  SECURITY ALERT: Potential secrets detected in codebase files!
 
 Found patterns that look like API keys or tokens.
 
@@ -265,7 +232,7 @@ This would expose credentials if committed.
 2. If these are real secrets, they must be removed
 3. Consider adding sensitive files to Claude Code "Deny" permissions
 
-Pausing. Reply "safe to proceed" if the flagged content is not actually sensitive, or edit the file first.
+Pausing. Reply "safe to proceed" if the flagged content is not actually sensitive, or edit the files first.
 ```
 
 Wait for user confirmation before continuing to offer_next.
@@ -278,10 +245,10 @@ Continue to offer_next.
 <step name="offer_next">
 Present completion summary and next steps.
 
-**Get line count and commit SHA:**
+**Get line counts and commit SHA:**
 ```bash
-wc -l .planning/CODEBASE.md
-head -3 .planning/CODEBASE.md | grep commit
+wc -l .planning/codebase/*.md
+head -3 .planning/codebase/tech-stack.md | grep commit
 ```
 
 **Output format:**
@@ -289,7 +256,12 @@ head -3 .planning/CODEBASE.md | grep commit
 ```
 Codebase mapping complete.
 
-Created .planning/CODEBASE.md ([N] lines)
+Created .planning/codebase/ files:
+- architecture.md ([N] lines)
+- conventions.md ([N] lines)
+- tech-stack.md ([N] lines)
+- concerns.md ([N] lines)
+
 Anchored to commit: [SHA]
 
 ---
@@ -306,7 +278,7 @@ Anchored to commit: [SHA]
 
 **Also available:**
 - Re-run mapping: `/map`
-- Review codebase map: `cat .planning/CODEBASE.md`
+- Review codebase files: `ls .planning/codebase/`
 - Edit before proceeding
 
 ---
@@ -318,10 +290,10 @@ End workflow.
 </process>
 
 <success_criteria>
-- .planning/ directory created
+- .planning/codebase/ directory created
 - 4 parallel gsd-codebase-mapper agents spawned with run_in_background=true
-- Agent findings collected and consolidated by orchestrator
-- Single CODEBASE.md file created with commit SHA in frontmatter
-- Clear completion summary with line count and commit reference
+- Each agent writes its file directly (no consolidation step)
+- 4 files created in .planning/codebase/, each with commit_sha in frontmatter
+- Clear completion summary with line counts and commit reference
 - User offered clear next steps
 </success_criteria>

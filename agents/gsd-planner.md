@@ -237,7 +237,10 @@ Output: [Artifacts created]
 
 <context>
 @.planning/project/PROJECT.md
-@.planning/CODEBASE.md
+@.planning/codebase/architecture.md
+@.planning/codebase/conventions.md
+@.planning/codebase/tech-stack.md
+@.planning/codebase/concerns.md
 @src/relevant/file.rb
 </context>
 
@@ -272,7 +275,7 @@ Output: [Artifacts created]
 
 Only include file references the executor needs to read:
 - PROJECT.md (always)
-- CODEBASE.md (if exists)
+- .planning/codebase/ files (if they exist)
 - Source files being modified
 - PHASE-N-CONTEXT.md and PHASE-N-RESEARCH.md are passed via workflow `<files_to_read>`, not `<context>`
 

@@ -134,7 +134,7 @@ Writes **PROJECT-PLAN.md**. Typically 1-2 phases for single-commit scope, rarely
 - Task breakdown with verification steps
 - Must-haves (observable behaviors and required artifacts)
 
-The phase planner is a subagent that reads PROJECT-PLAN.md, CODEBASE.md, phase context/research (if you ran the optional steps), and relevant source files.
+The phase planner is a subagent that reads PROJECT-PLAN.md, codebase files, phase context/research (if you ran the optional steps), and relevant source files.
 
 ---
 
@@ -221,7 +221,7 @@ Every stage uses the right context at the right time:
 | `PROJECT-SUMMARY.md` | What happened during execution | Ephemeral |
 | `PROJECT-VERIFICATION.md` | Pass/fail vs acceptance criteria | Ephemeral |
 | `PHASE-{N}-PLAN.md` | Detailed execution instructions | Ephemeral |
-| `CODEBASE.md` | Stack, architecture, conventions (SHA-anchored) | Semi-durable (regenerate after commits) |
+| `codebase/*.md` | Stack, architecture, conventions, concerns (SHA-anchored) | Semi-durable (regenerate after commits) |
 | `todos/*.md` | Parking lot for deferred scope | Semi-durable (human manages lifecycle) |
 
 Size limits keep Claude's quality high. Fresh subagent contexts for research, planning, execution, and verification prevent context rot.
@@ -314,7 +314,11 @@ All planning artifacts live in `.planning/` (gitignored):
 
 ```
 .planning/
-├── CODEBASE.md              # semi-durable — anchored to commit SHA
+├── codebase/                # semi-durable — anchored to commit SHA
+│   ├── tech-stack.md
+│   ├── architecture.md
+│   ├── conventions.md
+│   └── concerns.md
 ├── todos/                   # semi-durable — parking lot items
 │   └── *.md
 └── project/                 # ephemeral — wiped on /new-project
@@ -329,7 +333,7 @@ All planning artifacts live in `.planning/` (gitignored):
 ```
 
 **Lifecycle**:
-- `CODEBASE.md` and `todos/` persist across projects
+- `codebase/` and `todos/` persist across projects
 - `project/` is ephemeral — `/new-project` wipes it after confirmation
 - The system never touches your working tree (staged/unstaged code changes)
 - The only git write operation is `git add` (by `/verify-phase` on pass)

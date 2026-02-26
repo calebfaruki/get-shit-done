@@ -29,7 +29,7 @@ If exists: Inform user that re-running will overwrite existing plan. Confirm bef
 
 **Optional (read if exist):**
 - `.planning/project/PROJECT-RESEARCH.md`
-- `.planning/CODEBASE.md`
+- `.planning/codebase/` directory (architecture.md, conventions.md, tech-stack.md, concerns.md)
 - Relevant todos from `.planning/todos/`
 
 ### 3. Spawn planning subagent
@@ -39,14 +39,17 @@ Agent: Use `resolve-model` for model selection (typically planner profile)
 **Files to read** (`<files_to_read>` block in subagent spawn):
 - `.planning/project/PROJECT.md`
 - `.planning/project/PROJECT-RESEARCH.md` (if exists)
-- `.planning/CODEBASE.md` (if exists)
+- `.planning/codebase/architecture.md` (if exists)
+- `.planning/codebase/conventions.md` (if exists)
+- `.planning/codebase/tech-stack.md` (if exists)
+- `.planning/codebase/concerns.md` (if exists)
 - `get-shit-done/knowledge/planning-domain.md`
 - `get-shit-done/knowledge/project-domain.md`
 
 **Agent task:**
 1. Read PROJECT.md acceptance criteria
 2. Read PROJECT-RESEARCH.md recommendations (if exists)
-3. Read CODEBASE.md to understand existing architecture (if exists)
+3. Read codebase files to understand existing architecture (if they exist)
 4. Break project into phases using goal-backward methodology
 5. Map each acceptance criterion to a phase
 6. Verify all criteria are covered (no orphans)
@@ -165,7 +168,7 @@ Present exactly ONE next step from the resolver. Do not list alternatives.
 
 - [ ] PROJECT.md was read
 - [ ] PROJECT-RESEARCH.md was considered if it exists
-- [ ] CODEBASE.md was considered if it exists
+- [ ] Codebase files were considered if they exist
 - [ ] PROJECT-PLAN.md written to `.planning/project/`
 - [ ] YAML frontmatter includes project, phases, acceptance_criteria_count
 - [ ] All acceptance criteria from PROJECT.md are mapped to phases

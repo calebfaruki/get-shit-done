@@ -36,7 +36,7 @@ Context files are resolved inside the workflow. The executor subagent receives e
 Execute the execute-phase workflow from @~/.claude/get-shit-done/workflows/execute-phase.md end-to-end.
 
 The workflow:
-1. Bootstraps (reads PROJECT.md, phase plan, CODEBASE.md if exists, context/research if exists)
+1. Bootstraps (reads PROJECT.md, phase plan, codebase files if they exist, context/research if exists)
 2. Spawns executor subagent with `<files_to_read>` block
 3. Agent executes tasks with deviation rules (Rules 1-4 from execution-domain.md)
 4. Agent updates PROJECT-SUMMARY.md (appends phase block, overwrites on re-run)

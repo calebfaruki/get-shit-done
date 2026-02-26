@@ -18,7 +18,10 @@ Template for spawning gsd-planner agent. The agent contains all planning experti
 @.planning/project/PROJECT-PLAN.md
 
 **Codebase Map (if exists):**
-@.planning/CODEBASE.md
+@.planning/codebase/architecture.md
+@.planning/codebase/conventions.md
+@.planning/codebase/tech-stack.md
+@.planning/codebase/concerns.md
 
 **Phase Context (if exists):**
 @.planning/project/PHASE-{N}-CONTEXT.md

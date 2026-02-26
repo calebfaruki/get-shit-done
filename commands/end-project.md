@@ -10,7 +10,7 @@ allowed-tools:
 <objective>
 End the current project by wiping all planning artifacts under `.planning/project/`.
 
-CODEBASE.md and todos/ are preserved. Only project-specific artifacts are removed.
+codebase/ and todos/ are preserved. Only project-specific artifacts are removed.
 </objective>
 
 <process>

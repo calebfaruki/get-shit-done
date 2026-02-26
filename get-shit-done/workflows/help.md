@@ -51,7 +51,11 @@ Repeat steps 3-5 for each phase. When done, review `git diff --cached` and commi
 
 ```
 .planning/
-├── CODEBASE.md              # Semi-durable — codebase map with commit SHA
+├── codebase/                # Semi-durable — codebase map with commit SHA
+│   ├── tech-stack.md
+│   ├── architecture.md
+│   ├── conventions.md
+│   └── concerns.md
 ├── todos/                   # Semi-durable — parking lot items
 │   └── *.md
 └── project/                 # Ephemeral — current project artifacts
@@ -65,7 +69,7 @@ Repeat steps 3-5 for each phase. When done, review `git diff --cached` and commi
     └── PHASE-{N}-PLAN.md
 ```
 
-**Lifecycle:** `todos/` and `CODEBASE.md` persist across projects. `project/` is ephemeral — `/new-project` wipes it (after confirmation) and starts fresh.
+**Lifecycle:** `codebase/` and `todos/` persist across projects. `project/` is ephemeral — `/new-project` wipes it (after confirmation) and starts fresh.
 
 ## Common Workflows
 

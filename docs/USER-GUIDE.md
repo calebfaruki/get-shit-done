@@ -119,9 +119,9 @@ A detailed reference for workflows, troubleshooting, and configuration. For quic
   /map
          │
          ├── Stack Mapper     ─┐
-         ├── Arch Mapper       ├── CODEBASE.md (anchored to commit SHA)
-         ├── Convention Mapper ─┤
-         └── Concern Mapper   ─┘
+         ├── Arch Mapper       ├── .planning/codebase/ (anchored to commit SHA)
+         ├── Convention Mapper ─┤   (tech-stack.md, architecture.md,
+         └── Concern Mapper   ─┘    conventions.md, concerns.md)
                 │
         ┌───────▼──────────┐
         │ /new-project     │  <- Questions focus on what you're ADDING
@@ -240,7 +240,7 @@ git commit                # Single atomic commit
 ### Existing Codebase
 
 ```bash
-/map                      # Analyze what exists -> CODEBASE.md
+/map                      # Analyze what exists -> .planning/codebase/
 /new-project              # Questions focus on what you're ADDING
 # (normal phase workflow from here)
 ```
@@ -321,7 +321,11 @@ For reference, here is what GSD creates in your project:
 
 ```
 .planning/
-├── CODEBASE.md              # Semi-durable — codebase map with commit SHA
+├── codebase/                # Semi-durable — codebase map with commit SHA
+│   ├── tech-stack.md
+│   ├── architecture.md
+│   ├── conventions.md
+│   └── concerns.md
 ├── todos/                   # Semi-durable — parking lot items
 │   └── *.md
 └── project/                 # Ephemeral — current project artifacts
@@ -335,4 +339,4 @@ For reference, here is what GSD creates in your project:
     └── PHASE-{N}-PLAN.md   # Detailed execution plan for phase N
 ```
 
-**Lifecycle:** `todos/` and `CODEBASE.md` persist across projects. `project/` is ephemeral -- `/new-project` wipes it (after confirmation) and starts fresh.
+**Lifecycle:** `codebase/` and `todos/` persist across projects. `project/` is ephemeral -- `/new-project` wipes it (after confirmation) and starts fresh.

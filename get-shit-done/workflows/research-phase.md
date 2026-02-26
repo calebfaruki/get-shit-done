@@ -54,12 +54,12 @@ Collect file paths for researchers to load:
 ```bash
 PROJECT_PLAN_PATH=".planning/project/PROJECT-PLAN.md"
 CONTEXT_PATH=".planning/project/PHASE-${PHASE}-CONTEXT.md"
-CODEBASE_PATH=".planning/CODEBASE.md"
+CODEBASE_DIR=".planning/codebase"
 
 # Check which files exist
 [ -f "$PROJECT_PLAN_PATH" ] && HAS_PROJECT_PLAN=true || HAS_PROJECT_PLAN=false
 [ -f "$CONTEXT_PATH" ] && HAS_CONTEXT=true || HAS_CONTEXT=false
-[ -f "$CODEBASE_PATH" ] && HAS_CODEBASE=true || HAS_CODEBASE=false
+[ -d "$CODEBASE_DIR" ] && HAS_CODEBASE=true || HAS_CODEBASE=false
 ```
 
 ## Step 4: Spawn All 4 Researchers in Parallel
@@ -80,7 +80,10 @@ Answer: "What do I need to know to PLAN and EXECUTE this phase well?"
 <files_to_read>
 ${HAS_PROJECT_PLAN && "- .planning/project/PROJECT-PLAN.md (Project phases)"}
 ${HAS_CONTEXT && "- .planning/project/PHASE-${PHASE}-CONTEXT.md (User decisions from /discuss-phase)"}
-${HAS_CODEBASE && "- .planning/CODEBASE.md (Codebase context)"}
+${HAS_CODEBASE && "- .planning/codebase/architecture.md (codebase architecture)"}
+${HAS_CODEBASE && "- .planning/codebase/conventions.md (codebase conventions)"}
+${HAS_CODEBASE && "- .planning/codebase/tech-stack.md (tech stack)"}
+${HAS_CODEBASE && "- .planning/codebase/concerns.md (known concerns)"}
 </files_to_read>
 
 <additional_context>
@@ -162,7 +165,8 @@ Answer: "What conventions does this codebase follow that are relevant to this ph
 </objective>
 
 <files_to_read>
-${HAS_CODEBASE && "- .planning/CODEBASE.md (Codebase context)"}
+${HAS_CODEBASE && "- .planning/codebase/architecture.md (codebase architecture)"}
+${HAS_CODEBASE && "- .planning/codebase/conventions.md (codebase conventions)"}
 ${HAS_PROJECT_PLAN && "- .planning/project/PROJECT-PLAN.md (Project phases)"}
 </files_to_read>
 
@@ -222,7 +226,8 @@ Answer: "What could go catastrophically wrong during this phase, and how do we p
 </objective>
 
 <files_to_read>
-${HAS_CODEBASE && "- .planning/CODEBASE.md (Codebase context)"}
+${HAS_CODEBASE && "- .planning/codebase/architecture.md (codebase architecture)"}
+${HAS_CODEBASE && "- .planning/codebase/concerns.md (known concerns)"}
 ${HAS_PROJECT_PLAN && "- .planning/project/PROJECT-PLAN.md (Project phases)"}
 </files_to_read>
 

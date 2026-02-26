@@ -12,11 +12,11 @@ allowed-tools:
 ---
 
 <objective>
-Analyze existing codebase using parallel mapper agents to produce a structured codebase document.
+Analyze existing codebase using parallel mapper agents to produce 4 specialized codebase files.
 
-Each mapper agent explores a focus area and writes content. The orchestrator collects findings and produces a single CODEBASE.md file anchored to the current git commit SHA.
+Each mapper agent explores a focus area and writes its file directly to .planning/codebase/. No consolidation step needed.
 
-Output: .planning/CODEBASE.md with commit SHA reference
+Output: .planning/codebase/ directory with 4 topic-specific files (architecture.md, conventions.md, tech-stack.md, concerns.md), each with commit SHA
 </objective>
 
 <execution_context>
@@ -47,16 +47,16 @@ Focus area: $ARGUMENTS (optional - if provided, tells agents to focus on specifi
 </when_to_use>
 
 <process>
-1. Check if .planning/CODEBASE.md already exists (offer to refresh or skip)
-2. Create .planning/ directory if needed
+1. Check if .planning/codebase/ directory exists (offer to refresh or skip)
+2. Create .planning/codebase/ directory if needed
 3. Spawn parallel mapper agents to analyze codebase
-4. Collect findings and write consolidated CODEBASE.md with commit SHA
+4. Each agent writes its own file to .planning/codebase/
 5. Suggest /new-project as next step
 </process>
 
 <success_criteria>
-- [ ] .planning/ directory created
-- [ ] CODEBASE.md written with current commit SHA
+- [ ] .planning/codebase/ directory created
+- [ ] 4 files written in .planning/codebase/, each with commit SHA
 - [ ] Parallel agents completed without errors
 - [ ] User knows next steps
 </success_criteria>

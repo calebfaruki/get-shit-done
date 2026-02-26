@@ -37,7 +37,7 @@ console.log(`  Files to remove:`);
 for (const file of files) {
   console.log(`    ${dim}${file}${reset}`);
 }
-console.log(`\n  ${dim}CODEBASE.md and todos/ are preserved.${reset}\n`);
+console.log(`\n  ${dim}codebase/ and todos/ are preserved.${reset}\n`);
 
 const { resolveState } = require('../hooks/gsd-state-resolver.js');
 const result = resolveState(process.cwd());

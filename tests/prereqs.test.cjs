@@ -231,7 +231,7 @@ describe('gsd-prereqs hook', () => {
   });
 
   describe('soft warnings', () => {
-    it('warns when CODEBASE.md missing for new-project', () => {
+    it('warns when codebase map missing for new-project', () => {
       const result = runHook(PREREQS_HOOK_PATH, { tool_input: { skill: 'gsd:new-project' } }, tmpDir);
       assert.equal(result.exitCode, 0);
       assert.ok(result.stdout.length > 0, 'expected stdout output');
@@ -239,7 +239,7 @@ describe('gsd-prereqs hook', () => {
       assert.ok(output.hookSpecificOutput.additionalContext.includes('No codebase map found'));
     });
 
-    it('warns when CODEBASE.md missing for research-project', () => {
+    it('warns when codebase map missing for research-project', () => {
       const planDir = path.join(tmpDir, '.planning', 'project');
       fs.mkdirSync(planDir, { recursive: true });
       fs.writeFileSync(path.join(planDir, 'PROJECT.md'), '# Project\n');
@@ -251,7 +251,7 @@ describe('gsd-prereqs hook', () => {
       assert.ok(output.hookSpecificOutput.additionalContext.includes('No codebase map found'));
     });
 
-    it('warns when CODEBASE.md missing for plan-project', () => {
+    it('warns when codebase map missing for plan-project', () => {
       const planDir = path.join(tmpDir, '.planning', 'project');
       fs.mkdirSync(planDir, { recursive: true });
       fs.writeFileSync(path.join(planDir, 'PROJECT.md'), '# Project\n');
@@ -262,7 +262,7 @@ describe('gsd-prereqs hook', () => {
       assert.ok(output.hookSpecificOutput.additionalContext.includes('No codebase map found'));
     });
 
-    it('warns when CODEBASE.md missing for discuss-project', () => {
+    it('warns when codebase map missing for discuss-project', () => {
       const planDir = path.join(tmpDir, '.planning', 'project');
       fs.mkdirSync(planDir, { recursive: true });
       fs.writeFileSync(path.join(planDir, 'PROJECT.md'), '# Project\n');
@@ -273,11 +273,11 @@ describe('gsd-prereqs hook', () => {
       assert.ok(output.hookSpecificOutput.additionalContext.includes('No codebase map found'));
     });
 
-    it('no codebase warning when CODEBASE.md exists', () => {
-      const planDir = path.join(tmpDir, '.planning');
-      fs.mkdirSync(planDir, { recursive: true });
-      fs.writeFileSync(path.join(planDir, 'CODEBASE.md'), '# Codebase\n');
-      const projectDir = path.join(planDir, 'project');
+    it('no codebase warning when codebase directory exists', () => {
+      const codebaseDir = path.join(tmpDir, '.planning', 'codebase');
+      fs.mkdirSync(codebaseDir, { recursive: true });
+      fs.writeFileSync(path.join(codebaseDir, 'tech-stack.md'), '# Tech Stack\n');
+      const projectDir = path.join(tmpDir, '.planning', 'project');
       fs.mkdirSync(projectDir, { recursive: true });
       fs.writeFileSync(path.join(projectDir, 'PROJECT.md'), '# Project\n');
 

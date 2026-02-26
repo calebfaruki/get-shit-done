@@ -80,7 +80,7 @@ function getSoftWarnings(skill, phaseNum, cwd) {
   const warnings = [];
 
   if (skill === 'new-project' || skill === 'research-project' || skill === 'discuss-project' || skill === 'plan-project') {
-    if (!fs.existsSync(path.join(cwd, '.planning/CODEBASE.md'))) {
+    if (!fs.existsSync(path.join(cwd, '.planning', 'codebase'))) {
       warnings.push({ message: 'No codebase map found.', fix: '/gsd:map' });
     }
     if (skill !== 'new-project' && !fs.existsSync(path.join(cwd, '.planning/project/PROJECT.md'))) {

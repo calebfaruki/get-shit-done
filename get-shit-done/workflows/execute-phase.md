@@ -52,13 +52,13 @@ PROJECT_PATH=".planning/project/PROJECT.md"
 
 **Optional context files:**
 ```bash
-CODEBASE_PATH=".planning/CODEBASE.md"
+CODEBASE_DIR=".planning/codebase"
 CONTEXT_PATH=".planning/project/PHASE-${PHASE}-CONTEXT.md"
 RESEARCH_PATH=".planning/project/PHASE-${PHASE}-RESEARCH.md"
 CLAUDE_PATH="./CLAUDE.md"
 
 # Check which optional files exist
-[ -f "$CODEBASE_PATH" ] && HAS_CODEBASE=true || HAS_CODEBASE=false
+[ -d "$CODEBASE_DIR" ] && HAS_CODEBASE=true || HAS_CODEBASE=false
 [ -f "$CONTEXT_PATH" ] && HAS_CONTEXT=true || HAS_CONTEXT=false
 [ -f "$RESEARCH_PATH" ] && HAS_RESEARCH=true || HAS_RESEARCH=false
 [ -f "$CLAUDE_PATH" ] && HAS_CLAUDE=true || HAS_CLAUDE=false
@@ -101,7 +101,10 @@ All changes remain unstaged — never run git add, git commit, git checkout, git
 Read these files at execution start using the Read tool:
 - .planning/project/PHASE-${PHASE}-PLAN.md (the plan to execute)
 - .planning/project/PROJECT.md (project context)
-${HAS_CODEBASE ? "- .planning/CODEBASE.md (codebase understanding)" : ""}
+${HAS_CODEBASE ? "- .planning/codebase/architecture.md (codebase architecture)" : ""}
+${HAS_CODEBASE ? "- .planning/codebase/conventions.md (codebase conventions)" : ""}
+${HAS_CODEBASE ? "- .planning/codebase/tech-stack.md (tech stack)" : ""}
+${HAS_CODEBASE ? "- .planning/codebase/concerns.md (known concerns)" : ""}
 ${HAS_CONTEXT ? "- .planning/project/PHASE-${PHASE}-CONTEXT.md (locked decisions from /discuss-phase)" : ""}
 ${HAS_RESEARCH ? "- .planning/project/PHASE-${PHASE}-RESEARCH.md (tactical research)" : ""}
 ${HAS_CLAUDE ? "- ./CLAUDE.md (project-specific instructions and conventions)" : ""}

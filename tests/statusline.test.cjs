@@ -239,7 +239,7 @@ describe('gsd-statusline MAP staleness', () => {
       cleanup(tmpDir);
     });
 
-    it('shows Δ with line count when CODEBASE.md exists with valid SHA', () => {
+    it('shows Δ with line count when tech-stack.md exists with valid SHA', () => {
       execSync('git commit --allow-empty -m "init"', { cwd: tmpDir, stdio: 'pipe' });
       const sha = execSync('git rev-parse HEAD', { cwd: tmpDir, stdio: 'pipe' }).toString().trim();
 
@@ -247,9 +247,9 @@ describe('gsd-statusline MAP staleness', () => {
       fs.writeFileSync(path.join(tmpDir, 'hello.js'), 'line1\nline2\nline3\n');
       execSync('git add . && git commit -m "add file"', { cwd: tmpDir, stdio: 'pipe' });
 
-      const planDir = path.join(tmpDir, '.planning');
-      fs.mkdirSync(planDir, { recursive: true });
-      fs.writeFileSync(path.join(planDir, 'CODEBASE.md'), `---\ncommit_sha: ${sha}\n---\n# Map\n`);
+      const codebaseDir = path.join(tmpDir, '.planning', 'codebase');
+      fs.mkdirSync(codebaseDir, { recursive: true });
+      fs.writeFileSync(path.join(codebaseDir, 'tech-stack.md'), `---\ncommit_sha: ${sha}\n---\n# Map\n`);
 
       const result = runHook(STATUSLINE_HOOK_PATH, STATUSLINE_STDIN(tmpDir), tmpDir);
       assert.equal(result.exitCode, 0);
@@ -261,16 +261,16 @@ describe('gsd-statusline MAP staleness', () => {
       execSync('git commit --allow-empty -m "init"', { cwd: tmpDir, stdio: 'pipe' });
       const sha = execSync('git rev-parse HEAD', { cwd: tmpDir, stdio: 'pipe' }).toString().trim();
 
-      const planDir = path.join(tmpDir, '.planning');
-      fs.mkdirSync(planDir, { recursive: true });
-      fs.writeFileSync(path.join(planDir, 'CODEBASE.md'), `---\ncommit_sha: ${sha}\n---\n# Map\n`);
+      const codebaseDir = path.join(tmpDir, '.planning', 'codebase');
+      fs.mkdirSync(codebaseDir, { recursive: true });
+      fs.writeFileSync(path.join(codebaseDir, 'tech-stack.md'), `---\ncommit_sha: ${sha}\n---\n# Map\n`);
 
       const result = runHook(STATUSLINE_HOOK_PATH, STATUSLINE_STDIN(tmpDir), tmpDir);
       assert.equal(result.exitCode, 0);
       assert.ok(result.stdout.includes('Δ 0 lines'), `expected "Δ 0 lines" in output, got: ${result.stdout}`);
     });
 
-    it('shows red MAP: ✗ warning when .planning/CODEBASE.md is missing', () => {
+    it('shows red MAP: ✗ warning when .planning/codebase/tech-stack.md is missing', () => {
       execSync('git commit --allow-empty -m "init"', { cwd: tmpDir, stdio: 'pipe' });
 
       const result = runHook(STATUSLINE_HOOK_PATH, STATUSLINE_STDIN(tmpDir), tmpDir);
@@ -280,12 +280,12 @@ describe('gsd-statusline MAP staleness', () => {
       assert.ok(result.stdout.includes('\x1b[31m'), `expected red ANSI code in output`);
     });
 
-    it('does not show Δ when CODEBASE.md exists but has no commit_sha', () => {
+    it('does not show Δ when tech-stack.md exists but has no commit_sha', () => {
       execSync('git commit --allow-empty -m "init"', { cwd: tmpDir, stdio: 'pipe' });
 
-      const planDir = path.join(tmpDir, '.planning');
-      fs.mkdirSync(planDir, { recursive: true });
-      fs.writeFileSync(path.join(planDir, 'CODEBASE.md'), '---\ngenerated: 2026-01-01\n---\n# Map\n');
+      const codebaseDir = path.join(tmpDir, '.planning', 'codebase');
+      fs.mkdirSync(codebaseDir, { recursive: true });
+      fs.writeFileSync(path.join(codebaseDir, 'tech-stack.md'), '---\ngenerated: 2026-01-01\n---\n# Map\n');
 
       const result = runHook(STATUSLINE_HOOK_PATH, STATUSLINE_STDIN(tmpDir), tmpDir);
       assert.equal(result.exitCode, 0);
@@ -295,21 +295,21 @@ describe('gsd-statusline MAP staleness', () => {
     it('does not show Δ when commit_sha references non-existent commit', () => {
       execSync('git commit --allow-empty -m "init"', { cwd: tmpDir, stdio: 'pipe' });
 
-      const planDir = path.join(tmpDir, '.planning');
-      fs.mkdirSync(planDir, { recursive: true });
-      fs.writeFileSync(path.join(planDir, 'CODEBASE.md'), '---\ncommit_sha: 0000000000000000000000000000000000000000\n---\n# Map\n');
+      const codebaseDir = path.join(tmpDir, '.planning', 'codebase');
+      fs.mkdirSync(codebaseDir, { recursive: true });
+      fs.writeFileSync(path.join(codebaseDir, 'tech-stack.md'), '---\ncommit_sha: 0000000000000000000000000000000000000000\n---\n# Map\n');
 
       const result = runHook(STATUSLINE_HOOK_PATH, STATUSLINE_STDIN(tmpDir), tmpDir);
       assert.equal(result.exitCode, 0);
       assert.ok(!result.stdout.includes('Δ'), `expected no Δ in output, got: ${result.stdout}`);
     });
 
-    it('does not crash on garbage CODEBASE.md content', () => {
+    it('does not crash on garbage tech-stack.md content', () => {
       execSync('git commit --allow-empty -m "init"', { cwd: tmpDir, stdio: 'pipe' });
 
-      const planDir = path.join(tmpDir, '.planning');
-      fs.mkdirSync(planDir, { recursive: true });
-      fs.writeFileSync(path.join(planDir, 'CODEBASE.md'), '!!!garbage{{{not yaml%%%\x00\x01\x02');
+      const codebaseDir = path.join(tmpDir, '.planning', 'codebase');
+      fs.mkdirSync(codebaseDir, { recursive: true });
+      fs.writeFileSync(path.join(codebaseDir, 'tech-stack.md'), '!!!garbage{{{not yaml%%%\x00\x01\x02');
 
       const result = runHook(STATUSLINE_HOOK_PATH, STATUSLINE_STDIN(tmpDir), tmpDir);
       assert.equal(result.exitCode, 0);

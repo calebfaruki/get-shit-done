@@ -84,7 +84,11 @@ All in `.planning/` (gitignored):
 
 ```
 .planning/
-├── CODEBASE.md              # semi-durable — codebase map with commit SHA anchor
+├── codebase/                # semi-durable — codebase map with commit SHA anchor
+│   ├── tech-stack.md
+│   ├── architecture.md
+│   ├── conventions.md
+│   └── concerns.md
 ├── todos/                   # semi-durable — parking lot items
 │   └── *.md
 └── project/                 # ephemeral — current project only
@@ -99,7 +103,7 @@ All in `.planning/` (gitignored):
 ```
 
 **Lifecycle:**
-- `CODEBASE.md` and `todos/` persist across projects
+- `codebase/` and `todos/` persist across projects
 - `project/` is ephemeral — `/new-project` wipes it (with confirmation)
 - Working tree code is never touched — only `.planning/` files
 

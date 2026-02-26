@@ -55,7 +55,7 @@ This ensures your analysis accounts for both implicit codebase patterns and expl
 <step name="understand_scope">
 Read the phase goal and context from your prompt. Determine which area of the codebase is most relevant.
 
-If CODEBASE.md exists, read it first — it may already document project-wide conventions. Your job is to go deeper into the specific domain area this phase touches.
+If codebase files exist (`.planning/codebase/`), read them first — they may already document project-wide conventions. Your job is to go deeper into the specific domain area this phase touches.
 </step>
 
 <step name="explore_conventions">
@@ -89,7 +89,7 @@ Use Glob and Grep liberally. Read actual files to verify patterns — don't gues
 <step name="return_findings">
 Return your findings as a `<codebase_conventions>` XML block. DO NOT write any files.
 
-If no relevant existing patterns exist for the domain, honestly report that and recommend following project-wide conventions from CODEBASE.md.
+If no relevant existing patterns exist for the domain, honestly report that and recommend following project-wide conventions from the codebase files.
 
 **Format:**
 
