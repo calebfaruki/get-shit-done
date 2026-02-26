@@ -25,13 +25,9 @@ Context budget: Subagent loads fresh 200k context with execution domain knowledg
 </execution_context>
 
 <context>
+!`node ~/.claude/bin/gsd-context.js`
+
 Phase: $ARGUMENTS
-
-**Prerequisites** (soft):
-- `.planning/project/PHASE-{N}-PLAN.md` exists
-- `.planning/project/PROJECT.md` exists
-
-Missing prerequisites produce a warning and offer to help (not hard error).
 
 Context files are resolved inside the workflow. The executor subagent receives explicit `<files_to_read>` with all required context.
 </context>

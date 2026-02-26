@@ -16,6 +16,10 @@ Validate `.planning/` directory integrity and report actionable issues. Checks f
 @~/.claude/get-shit-done/workflows/health.md
 </execution_context>
 
+<context>
+!`node ~/.claude/bin/gsd-context.js`
+</context>
+
 <process>
 Execute the health workflow from @~/.claude/get-shit-done/workflows/health.md end-to-end.
 Parse --repair flag from arguments and pass to workflow.

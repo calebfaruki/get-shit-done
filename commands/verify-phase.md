@@ -23,6 +23,8 @@ Output: `.planning/project/PHASE-N-VERIFICATION.md`
 </execution_context>
 
 <context>
+!`node ~/.claude/bin/gsd-context.js`
+
 This command runs after `/execute-phase N`. The executor leaves changes unstaged; the verifier checks must_haves and stages files on pass. Two views for human: `git diff` (unstaged current phase) and `git diff --cached` (all verified phases).
 
 On failure: Reports diagnostics and stops. No automated fix loop. Human decides next steps (fix manually, re-run phase, adjust plan, accept as-is).
@@ -30,11 +32,9 @@ On failure: Reports diagnostics and stops. No automated fix loop. Human decides 
 
 <process>
 1. Parse phase number from arguments
-2. Check PHASE-N-PLAN.md exists (soft warning if missing)
-3. Check PROJECT-SUMMARY.md exists (execution occurred)
-4. Load verify-phase workflow
-5. Execute workflow (spawns verifier subagent)
-6. Report verification outcome to user
+2. Load verify-phase workflow
+3. Execute workflow (spawns verifier subagent)
+4. Report verification outcome to user
 </process>
 
 <success_criteria>

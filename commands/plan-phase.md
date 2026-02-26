@@ -26,16 +26,15 @@ Produce detailed execution plan for phase N.
 </execution_context>
 
 <context>
-Phase number: $ARGUMENTS (required)
+!`node ~/.claude/bin/gsd-context.js`
 
-Validates phase exists in PROJECT-PLAN.md before proceeding.
+Phase number: $ARGUMENTS (required)
 </context>
 
 <process>
 Execute the plan-phase workflow end-to-end:
 
-1. Validate PROJECT-PLAN.md exists (soft warning if missing)
-2. Parse phase number and validate against PROJECT-PLAN.md
+1. Parse phase number and validate against PROJECT-PLAN.md
 3. Check for existing PHASE-N-PLAN.md (offer update/view/skip if exists)
 4. Load context from:
    - PROJECT-PLAN.md (phase goal and acceptance criteria)

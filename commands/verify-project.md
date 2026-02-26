@@ -24,6 +24,8 @@ Output: .planning/project/PROJECT-VERIFICATION.md
 </execution_context>
 
 <context>
+!`node ~/.claude/bin/gsd-context.js`
+
 **This command runs after all phases complete**, before the human commits.
 
 Verification methodology:
@@ -35,12 +37,10 @@ On failure: Reports diagnostics and stops. No automated fix loop. Human decides 
 </context>
 
 <process>
-1. Check that PROJECT.md exists (soft warning if missing)
-2. Check that PROJECT-SUMMARY.md exists (execution has occurred)
-3. Spawn verifier subagent with project context
-4. Agent performs three-layer verification per criterion
-5. Agent writes PROJECT-VERIFICATION.md with pass/fail results
-6. Report verification outcome to user
+1. Spawn verifier subagent with project context
+2. Agent performs three-layer verification per criterion
+3. Agent writes PROJECT-VERIFICATION.md with pass/fail results
+4. Report verification outcome to user
 </process>
 
 <success_criteria>

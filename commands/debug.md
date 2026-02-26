@@ -18,12 +18,9 @@ Debug issues using scientific method with subagent isolation.
 </objective>
 
 <context>
-User's issue: $ARGUMENTS
+!`node ~/.claude/bin/gsd-context.js`
 
-Check for active sessions:
-```bash
-ls .planning/debug/*.md 2>/dev/null | grep -v resolved | head -5
-```
+User's issue: $ARGUMENTS
 </context>
 
 <process>

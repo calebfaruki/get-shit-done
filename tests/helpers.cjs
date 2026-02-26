@@ -37,4 +37,7 @@ function runHook(hookPath, stdinData, cwd) {
   }
 }
 
-module.exports = { PREREQS_HOOK_PATH, BASH_GUARD_HOOK_PATH, IDLE_DEBUG_HOOK_PATH, STATE_RESOLVER_HOOK_PATH, STATUSLINE_HOOK_PATH, createTempProject, cleanup, runHook };
+const END_PROJECT_BIN_PATH = path.join(__dirname, '..', 'bin', 'end-project.js');
+const GSD_CONTEXT_BIN_PATH = path.join(__dirname, '..', 'bin', 'gsd-context.js');
+
+module.exports = { PREREQS_HOOK_PATH, BASH_GUARD_HOOK_PATH, IDLE_DEBUG_HOOK_PATH, STATE_RESOLVER_HOOK_PATH, STATUSLINE_HOOK_PATH, END_PROJECT_BIN_PATH, GSD_CONTEXT_BIN_PATH, createTempProject, cleanup, runHook };

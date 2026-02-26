@@ -23,13 +23,15 @@ You are a thinking partner, not an interviewer. The user is the visionary — yo
 </execution_context>
 
 <context>
+!`node ~/.claude/bin/gsd-context.js`
+
 Phase number: $ARGUMENTS (required)
 
 Context files are resolved in-workflow by reading PROJECT-PLAN.md directly.
 </context>
 
 <process>
-1. Validate phase number (error if missing or not in PROJECT-PLAN.md)
+1. Parse phase number from arguments
 2. Check if PHASE-N-CONTEXT.md exists (offer update/view/skip if yes)
 3. **Analyze phase** — Identify domain and generate phase-specific gray areas
 4. **Present gray areas** — Multi-select: which to discuss? (NO skip option)

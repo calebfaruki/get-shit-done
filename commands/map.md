@@ -24,6 +24,8 @@ Output: .planning/CODEBASE.md with commit SHA reference
 </execution_context>
 
 <context>
+!`node ~/.claude/bin/gsd-context.js`
+
 Focus area: $ARGUMENTS (optional - if provided, tells agents to focus on specific subsystem)
 
 **This command can run:**

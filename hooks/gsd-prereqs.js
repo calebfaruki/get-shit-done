@@ -2,6 +2,7 @@
 // Prerequisite Checker - PreToolUse hook
 // Validates that required files exist before GSD commands run.
 // Hard failures (exit 2) block the command. Soft warnings inject context.
+// Uses the state resolver as the single source of truth for command validity.
 
 const fs = require('fs');
 const path = require('path');
@@ -11,90 +12,89 @@ const PHASE_COMMANDS = new Set([
   'discuss-phase', 'research-phase', 'plan-phase', 'execute-phase', 'verify-phase'
 ]);
 
-const PREREQS = {
-  'new-project': {
-    soft: [
-      { file: '.planning/CODEBASE.md', message: 'No codebase map found.', fix: '/gsd:map' }
-    ]
-  },
-  'research-project': {
-    soft: [
-      { file: '.planning/CODEBASE.md', message: 'No codebase map found.', fix: '/gsd:map' },
-      { file: '.planning/project/PROJECT.md', message: 'PROJECT.md not found.', fix: '/gsd:new-project' }
-    ]
-  },
-  'discuss-project': {
-    soft: [
-      { file: '.planning/CODEBASE.md', message: 'No codebase map found.', fix: '/gsd:map' },
-      { file: '.planning/project/PROJECT.md', message: 'PROJECT.md not found.', fix: '/gsd:new-project' }
-    ]
-  },
-  'plan-project': {
-    soft: [
-      { file: '.planning/CODEBASE.md', message: 'No codebase map found.', fix: '/gsd:map' },
-      { file: '.planning/project/PROJECT.md', message: 'PROJECT.md not found.', fix: '/gsd:new-project' }
-    ]
-  },
-  'discuss-phase': {
-    hard: [
-      { file: '.planning/project/PROJECT-PLAN.md', message: 'PROJECT-PLAN.md not found.', fix: '/gsd:plan-project' },
-      { type: 'phase-exists', message: 'Phase {N} not found in PROJECT-PLAN.md.', fix: '/gsd:plan-project' }
-    ]
-  },
-  'research-phase': {
-    hard: [
-      { file: '.planning/project/PROJECT-PLAN.md', message: 'PROJECT-PLAN.md not found.', fix: '/gsd:plan-project' },
-      { type: 'phase-exists', message: 'Phase {N} not found in PROJECT-PLAN.md.', fix: '/gsd:plan-project' }
-    ]
-  },
-  'plan-phase': {
-    hard: [
-      { file: '.planning/project/PROJECT-PLAN.md', message: 'PROJECT-PLAN.md not found.', fix: '/gsd:plan-project' },
-      { type: 'phase-exists', message: 'Phase {N} not found in PROJECT-PLAN.md.', fix: '/gsd:plan-project' }
-    ]
-  },
-  'execute-phase': {
-    hard: [
-      { file: '.planning/project/PHASE-{N}-PLAN.md', message: 'PHASE-{N}-PLAN.md not found.', fix: '/gsd:plan-phase {N}' }
-    ],
-    soft: [
-      { file: '.planning/project/PROJECT.md', message: 'PROJECT.md not found. Executor will lack project context.', fix: '/gsd:new-project' }
-    ]
-  },
-  'verify-phase': {
-    hard: [
-      { file: '.planning/project/PHASE-{N}-PLAN.md', message: 'PHASE-{N}-PLAN.md not found.', fix: '/gsd:plan-phase {N}' },
-      { file: '.planning/project/PROJECT-SUMMARY.md', message: 'PROJECT-SUMMARY.md not found. Phase has not been executed.', fix: '/gsd:execute-phase {N}' }
-    ]
-  },
-  'verify-project': {
-    soft: [
-      { file: '.planning/project/PROJECT.md', message: 'PROJECT.md not found.', fix: '/gsd:new-project' },
-      { file: '.planning/project/PROJECT-SUMMARY.md', message: 'No execution history.', fix: 'Execute phases first.' }
-    ]
-  }
-};
+const UTILITY_COMMANDS = new Set(['help', 'health', 'todo', 'map', 'debug']);
 
-function resolveTemplate(str, phaseNum) {
-  return str.replace(/\{N\}/g, phaseNum);
+const KNOWN_COMMANDS = new Set([
+  'new-project', 'discuss-project', 'research-project', 'plan-project',
+  'discuss-phase', 'research-phase', 'plan-phase', 'execute-phase', 'verify-phase',
+  'verify-project', 'end-project'
+]);
+
+function isCommandAllowed(skill, phaseNum, resolved, cwd) {
+  switch (skill) {
+    case 'new-project':
+    case 'verify-project':
+      return { allowed: true };
+
+    case 'discuss-project':
+    case 'research-project':
+    case 'plan-project':
+      if (resolved.state === 'no-project') {
+        return { allowed: false, reason: 'No project defined.', fix: '/gsd:new-project' };
+      }
+      return { allowed: true };
+
+    case 'discuss-phase':
+    case 'research-phase':
+    case 'plan-phase':
+      if (resolved.totalPhases === null) {
+        return { allowed: false, reason: 'No project plan found.', fix: '/gsd:plan-project' };
+      }
+      if (phaseNum > resolved.totalPhases) {
+        return { allowed: false, reason: `Phase ${phaseNum} not found in PROJECT-PLAN.md.`, fix: '/gsd:plan-project' };
+      }
+      return { allowed: true };
+
+    case 'execute-phase': {
+      const planPath = path.join(cwd, '.planning/project/PHASE-' + phaseNum + '-PLAN.md');
+      if (!fs.existsSync(planPath)) {
+        return { allowed: false, reason: `PHASE-${phaseNum}-PLAN.md not found.`, fix: `/gsd:plan-phase ${phaseNum}` };
+      }
+      return { allowed: true };
+    }
+
+    case 'verify-phase': {
+      const phasePlanPath = path.join(cwd, '.planning/project/PHASE-' + phaseNum + '-PLAN.md');
+      const summaryPath = path.join(cwd, '.planning/project/PROJECT-SUMMARY.md');
+      if (!fs.existsSync(phasePlanPath)) {
+        return { allowed: false, reason: `PHASE-${phaseNum}-PLAN.md not found.`, fix: `/gsd:plan-phase ${phaseNum}` };
+      }
+      if (!fs.existsSync(summaryPath)) {
+        return { allowed: false, reason: 'PROJECT-SUMMARY.md not found. Phase has not been executed.', fix: `/gsd:execute-phase ${phaseNum}` };
+      }
+      return { allowed: true };
+    }
+
+    case 'end-project':
+      if (resolved.state === 'no-project') {
+        return { allowed: false, reason: 'No project to end.', fix: '/gsd:new-project' };
+      }
+      return { allowed: true };
+
+    default:
+      return { allowed: true };
+  }
 }
 
-function checkRule(rule, phaseNum) {
-  if (rule.type === 'phase-exists') {
-    const planPath = path.join(process.cwd(), '.planning/project/PROJECT-PLAN.md');
-    if (!fs.existsSync(planPath)) return true; // already caught by file rule
-    const content = fs.readFileSync(planPath, 'utf8');
-    const regex = new RegExp(`^### Phase ${phaseNum}:`, 'm');
-    return !regex.test(content);
-  }
-  const filePath = path.join(process.cwd(), resolveTemplate(rule.file, phaseNum));
-  return !fs.existsSync(filePath);
-}
+function getSoftWarnings(skill, phaseNum, cwd) {
+  const warnings = [];
 
-function formatFailure(rule, phaseNum) {
-  const message = resolveTemplate(rule.message, phaseNum);
-  const fix = resolveTemplate(rule.fix, phaseNum);
-  return { message, fix };
+  if (skill === 'new-project' || skill === 'research-project' || skill === 'discuss-project' || skill === 'plan-project') {
+    if (!fs.existsSync(path.join(cwd, '.planning/CODEBASE.md'))) {
+      warnings.push({ message: 'No codebase map found.', fix: '/gsd:map' });
+    }
+    if (skill !== 'new-project' && !fs.existsSync(path.join(cwd, '.planning/project/PROJECT.md'))) {
+      warnings.push({ message: 'PROJECT.md not found.', fix: '/gsd:new-project' });
+    }
+  }
+
+  if (skill === 'execute-phase') {
+    if (!fs.existsSync(path.join(cwd, '.planning/project/PROJECT.md'))) {
+      warnings.push({ message: 'PROJECT.md not found. Executor will lack project context.', fix: '/gsd:new-project' });
+    }
+  }
+
+  return warnings;
 }
 
 let input = '';
@@ -109,11 +109,11 @@ process.stdin.on('end', () => {
       process.exit(0);
     }
 
-    // Normalize: strip "gsd:" prefix
     const rawSkill = toolInput.skill;
     const skill = rawSkill.startsWith('gsd:') ? rawSkill.slice(4) : rawSkill;
-    const rules = PREREQS[skill];
-    if (!rules) {
+
+    // Utility commands and unknown commands always pass through
+    if (UTILITY_COMMANDS.has(skill) || !KNOWN_COMMANDS.has(skill)) {
       process.exit(0);
     }
 
@@ -134,46 +134,32 @@ process.stdin.on('end', () => {
         );
         process.exit(2);
       }
-      phaseNum = match[1];
+      phaseNum = parseInt(match[1], 10);
     }
 
-    // Check hard rules
-    const hardFailures = [];
-    if (rules.hard) {
-      for (const rule of rules.hard) {
-        if (checkRule(rule, phaseNum)) {
-          hardFailures.push(formatFailure(rule, phaseNum));
-        }
-      }
-    }
+    const cwd = process.cwd();
+    const resolved = resolveState(cwd);
 
-    if (hardFailures.length > 0) {
+    // Check if command is allowed
+    const check = isCommandAllowed(skill, phaseNum, resolved, cwd);
+
+    if (!check.allowed) {
       const label = rawSkill.startsWith('gsd:') ? rawSkill : `gsd:${skill}`;
       const lines = [`---GSD PREREQ---\nCannot run /${label}${phaseNum ? ' ' + phaseNum : ''}.\n`];
-      for (const f of hardFailures) {
-        lines.push(`MISSING: ${f.message}`);
-        lines.push(`FIX: Run ${f.fix} first.\n`);
-      }
+      lines.push(`MISSING: ${check.reason}`);
+      lines.push(`FIX: Run ${check.fix} first.\n`);
       lines.push('Tell the user what is missing and which command to run next.');
       lines.push('---END GSD PREREQ---');
       process.stderr.write(lines.join('\n'));
       process.exit(2);
     }
 
-    // Check soft rules
-    const softWarnings = [];
-    if (rules.soft) {
-      for (const rule of rules.soft) {
-        if (checkRule(rule, phaseNum)) {
-          softWarnings.push(formatFailure(rule, phaseNum));
-        }
-      }
-    }
+    // Soft warnings
+    const softWarnings = getSoftWarnings(skill, phaseNum, cwd);
 
-    // Check out-of-sequence via state resolver
+    // Out-of-sequence detection
     let sequenceWarning = '';
     try {
-      const resolved = resolveState(process.cwd());
       const currentCmd = phaseNum ? `/${skill} ${phaseNum}` : `/${skill}`;
       if (resolved.nextCommand && resolved.nextCommand !== currentCmd) {
         const lines = [

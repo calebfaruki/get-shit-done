@@ -25,6 +25,10 @@ Conduct conversational project intake that sharpens a fuzzy idea into verifiable
 @~/.claude/get-shit-done/knowledge/AGENTS.md
 </execution_context>
 
+<context>
+!`node ~/.claude/bin/gsd-context.js`
+</context>
+
 <process>
 Execute the new-project workflow from the workflow file.
 Follow SPEC.md for all intake flow, scope validation, and PROJECT.md format.

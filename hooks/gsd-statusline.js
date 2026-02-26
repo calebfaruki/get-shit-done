@@ -107,11 +107,23 @@ process.stdin.on('end', () => {
       }
     }
 
+    // Braille lifecycle indicator
+    let braille = '';
+    try {
+      const { resolveState } = require('./gsd-state-resolver.js');
+      const resolved = resolveState(dir);
+      braille = renderBrailleIndicator(resolved.steps, resolved.totalPhases);
+    } catch (e) {
+      // Silent fail — don't break statusline if resolver fails
+    }
+
     // Output
+    const braillePrefix = braille ? `${braille} │ ` : '';
+    const sep = (mapSegment && ctx) ? ' │' : '';
     if (task) {
-      process.stdout.write(`\x1b[2m${model}\x1b[0m │ \x1b[1m${task}\x1b[0m │ ${mapSegment}${ctx}`);
+      process.stdout.write(`${braillePrefix}\x1b[2m${model}\x1b[0m │ \x1b[1m${task}\x1b[0m │ ${mapSegment}${sep}${ctx}`);
     } else {
-      process.stdout.write(`\x1b[2m${model}\x1b[0m │ ${mapSegment}${ctx}`);
+      process.stdout.write(`${braillePrefix}\x1b[2m${model}\x1b[0m │ ${mapSegment}${sep}${ctx}`);
     }
   } catch (e) {
     // Silent fail - don't break statusline on parse errors
@@ -148,4 +160,44 @@ function getMapStalenessColor(lines) {
   return '\x1b[31m';
 }
 
-module.exports = { parseCommitSha, countLinesChanged, getMapStalenessColor };
+function renderBrailleIndicator(steps, totalPhases) {
+  if (!steps || steps.length === 0) return '';
+
+  const CHAR_MAP = {
+    done: '\x1b[32m\u25CF\x1b[0m',
+    active: '\x1b[33m\u25D0\x1b[0m',
+    pending: '\x1b[2m\u25CB\x1b[0m',
+    skipped: '\x1b[31m\u25CF\x1b[0m',
+  };
+
+  const segments = [];
+  let idx = 0;
+
+  // Project segment: 4 steps
+  let seg = '';
+  for (let i = 0; i < 4 && idx < steps.length; i++, idx++) {
+    seg += CHAR_MAP[steps[idx].status] || '';
+  }
+  segments.push(seg);
+
+  // Phase segments: 5 steps each
+  if (totalPhases != null) {
+    for (let p = 0; p < totalPhases; p++) {
+      seg = '';
+      for (let i = 0; i < 5 && idx < steps.length; i++, idx++) {
+        seg += CHAR_MAP[steps[idx].status] || '';
+      }
+      segments.push(seg);
+    }
+
+    // Verify segment: 1 step
+    if (idx < steps.length) {
+      segments.push(CHAR_MAP[steps[idx].status] || '');
+      idx++;
+    }
+  }
+
+  return segments.join(' ');
+}
+
+module.exports = { parseCommitSha, countLinesChanged, getMapStalenessColor, renderBrailleIndicator };

@@ -33,16 +33,15 @@ Research how to implement a phase. Spawns researcher subagent with phase context
 </execution_context>
 
 <context>
-Phase number: $ARGUMENTS (required)
+!`node ~/.claude/bin/gsd-context.js`
 
-Validates phase exists in PROJECT-PLAN.md before proceeding.
+Phase number: $ARGUMENTS (required)
 </context>
 
 <process>
 Execute the research-phase workflow end-to-end:
 
-1. Validate PROJECT-PLAN.md exists (soft warning if missing)
-2. Parse phase number and validate against PROJECT-PLAN.md
+1. Parse phase number and validate against PROJECT-PLAN.md
 3. Check for existing PHASE-N-RESEARCH.md (offer update/view/skip if exists)
 4. Gather phase context from PROJECT-PLAN.md and PHASE-N-CONTEXT.md (if exists)
 5. Spawn researcher subagent with context

@@ -25,6 +25,10 @@ Dig deeper into an existing PROJECT.md through conversational exploration.
 @~/.claude/get-shit-done/knowledge/AGENTS.md
 </execution_context>
 
+<context>
+!`node ~/.claude/bin/gsd-context.js`
+</context>
+
 <process>
 Execute the discuss-project workflow from the workflow file.
 Follow SPEC.md for conversational exploration pattern and plan invalidation warnings.

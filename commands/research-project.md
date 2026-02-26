@@ -26,6 +26,8 @@ Output: .planning/project/PROJECT-RESEARCH.md
 </execution_context>
 
 <context>
+!`node ~/.claude/bin/gsd-context.js`
+
 **This command runs after /new-project**, before planning or discussion.
 
 Use when:
@@ -37,10 +39,9 @@ Research informs discussion — run this before `/discuss-project` so decisions 
 </context>
 
 <process>
-1. Check that PROJECT.md exists (soft warning if missing)
-2. Spawn research subagent with project context
-3. Agent writes PROJECT-RESEARCH.md
-4. Suggest /discuss-project or /plan-project as next steps
+1. Spawn research subagent with project context
+2. Agent writes PROJECT-RESEARCH.md
+3. Suggest /discuss-project or /plan-project as next steps
 </process>
 
 <success_criteria>

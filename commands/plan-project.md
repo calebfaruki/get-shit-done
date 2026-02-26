@@ -24,6 +24,8 @@ Output: .planning/project/PROJECT-PLAN.md
 </execution_context>
 
 <context>
+!`node ~/.claude/bin/gsd-context.js`
+
 **This command runs after /new-project** (and optionally after /research-project and /discuss-project).
 
 PROJECT-PLAN.md is the sole planning artifact — no ROADMAP.md, STATE.md, or MILESTONES.md created.
@@ -32,10 +34,9 @@ The plan identifies phases, their order, and maps acceptance criteria. It does N
 </context>
 
 <process>
-1. Check that PROJECT.md exists (soft warning if missing)
-2. Spawn planning subagent with project context
-3. Agent produces PROJECT-PLAN.md with phase breakdown
-4. Suggest /discuss-phase 1, /research-phase 1, or /plan-phase 1 as next steps
+1. Spawn planning subagent with project context
+2. Agent produces PROJECT-PLAN.md with phase breakdown
+3. Suggest /discuss-phase 1, /research-phase 1, or /plan-phase 1 as next steps
 </process>
 
 <success_criteria>
