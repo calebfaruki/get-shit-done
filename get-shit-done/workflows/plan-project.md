@@ -134,8 +134,13 @@ PROJECT-PLAN.md is the sole planning artifact per SPEC (STATE-02).
 
 ### 8. Handoff
 
-After planning completes:
+Determine next step:
 
+```bash
+node ~/.claude/hooks/gsd-state-resolver.js
+```
+
+Parse the JSON result and present:
 ```
 Planning complete. [N] phases identified.
 
@@ -144,15 +149,15 @@ Phase 2: [Name] — [Goal one-liner]
 
 All [N] acceptance criteria mapped. Coverage verified.
 
-Next steps:
-- /discuss-phase 1 - Clarify implementation decisions for Phase 1
-- /research-phase 1 - Tactical research for Phase 1 implementation
-- /plan-phase 1 - Create detailed execution plan for Phase 1
+Next: [nextCommand from resolver]
+Context: [context from resolver]
 
 The project plan is available at .planning/project/PROJECT-PLAN.md
+
+<sub>`/clear` first -> fresh context window</sub>
 ```
 
-<sub>`/clear` first → fresh context window</sub>
+Present exactly ONE next step from the resolver. Do not list alternatives.
 
 **Never auto-advance.** Human decides which phase-level command to run next.
 

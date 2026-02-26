@@ -245,19 +245,23 @@ Write to `.planning/project/PROJECT.md` using Write tool (NEVER bash heredoc).
 
 ## 11. Handoff
 
-Suggest next steps (SAFE-03):
+Determine next step:
 
+```bash
+node ~/.claude/hooks/gsd-state-resolver.js
 ```
-Project initialized! Next steps:
 
-- `/research-project` — Research domain ecosystem, standard stacks, patterns
-- `/discuss-project` — Dig deeper into gray areas, edge cases, implementation preferences
-- `/plan-project` — Break project into phases
-
-Human decides next step — no auto-advance.
-
-<sub>`/clear` first → fresh context window</sub>
+Parse the JSON result and present:
 ```
+Project initialized!
+
+Next: [nextCommand from resolver]
+Context: [context from resolver]
+
+<sub>`/clear` first -> fresh context window</sub>
+```
+
+Human decides next step -- no auto-advance. Present exactly ONE next step from the resolver. Do not list alternatives.
 
 </process>
 

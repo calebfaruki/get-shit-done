@@ -387,7 +387,7 @@ Write file using Write tool.
 </step>
 
 <step name="confirm_creation">
-Present summary and next steps:
+Present summary and determine next step:
 
 ```
 Created: .planning/project/PHASE-${PHASE}-CONTEXT.md
@@ -403,21 +403,27 @@ Created: .planning/project/PHASE-${PHASE}-CONTEXT.md
 [If deferred ideas exist:]
 ## Noted for Later
 - [Deferred idea] — future enhancement
-
----
-
-## Next Steps
-
-Suggest continuing with:
-- `/research-phase ${PHASE}` — investigate implementation details
-- `/plan-phase ${PHASE}` — create detailed execution plan
-
----
-
-<sub>`/clear` first → fresh context window</sub>
 ```
 
-**Never auto-advance** — user decides next command.
+Determine next step:
+
+```bash
+node ~/.claude/hooks/gsd-state-resolver.js
+```
+
+Parse the JSON result and present:
+```
+Created: .planning/project/PHASE-${PHASE}-CONTEXT.md
+
+[Summary of decisions captured]
+
+Next: [nextCommand from resolver]
+Context: [context from resolver]
+
+<sub>`/clear` first -> fresh context window</sub>
+```
+
+Present exactly ONE next step. Do not list alternatives.
 </step>
 
 

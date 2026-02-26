@@ -269,18 +269,25 @@ After executor returns, read PROJECT-SUMMARY.md to extract phase status and deta
 [List from summary]
 
 ${DEVIATIONS_EXIST ? "### Deviations from plan\n[List from summary]" : ""}
-
----
-
-**Next step:** /verify-phase ${PHASE}
-
-<sub>`/clear` first → fresh context window</sub>
-
-This will check the executor's work against the plan's must_haves.
-On pass, changes are staged. On fail, diagnostics are provided.
 ```
 
 **Never auto-advance to another command.** The user decides when to verify.
+
+Determine next step:
+
+```bash
+node ~/.claude/hooks/gsd-state-resolver.js
+```
+
+Parse the JSON result and present:
+```
+Next: [nextCommand from resolver]
+Context: [context from resolver]
+
+<sub>`/clear` first -> fresh context window</sub>
+```
+
+Present exactly ONE next step from the resolver. Do not list alternatives.
 
 **If status is "Stopped (Rule 4)":**
 
@@ -292,14 +299,17 @@ On pass, changes are staged. On fail, diagnostics are provided.
 
 ### Architectural Concern
 [What was found, why it's architectural]
+```
 
-### Options
-1. Adjust the plan to work within current architecture
-2. Run /discuss-phase ${PHASE} to explore architectural change
-3. Manual implementation for this piece
-
+Present the architectural concern diagnostics above, then run the resolver and present:
+```
 Current work is saved in PROJECT-SUMMARY.md.
 All changes remain unstaged.
+
+Next: [nextCommand from resolver]
+Context: [context from resolver]
+
+<sub>`/clear` first -> fresh context window</sub>
 ```
 
 **If status is "Stopped (Hung Process)":**
@@ -361,7 +371,12 @@ goal: find_and_fix
 )
 ```
 
-Report debugger results to user:
+Report debugger results, then determine next step:
+
+```bash
+node ~/.claude/hooks/gsd-state-resolver.js
+```
+
 ```
 ## Phase ${PHASE} Stopped — Hung Process Investigated
 
@@ -371,11 +386,10 @@ Report debugger results to user:
 ### Debugger Findings
 ${debugger return summary}
 
-### Options
-1. Fix the issue and re-execute: /execute-phase ${PHASE}
-2. Adjust the plan: /plan-phase ${PHASE}
-3. Debug further: /gsd:debug ${description}
-4. Manual investigation
+Next: [nextCommand from resolver]
+Context: [context from resolver]
+
+<sub>`/clear` first -> fresh context window</sub>
 ```
 </step>
 

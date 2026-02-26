@@ -312,10 +312,24 @@ If phase researcher failed:
 - Offer alternatives
 - Do NOT attempt to use supplemental research as a substitute
 
-**Handoff suggestion:** Recommend `/plan-phase ${PHASE}` after successful research.
+Determine next step:
 
-<sub>`/clear` first → fresh context window</sub>
+```bash
+node ~/.claude/hooks/gsd-state-resolver.js
+```
 
-**Never auto-advance** — user decides next command per SPEC (SAFE-03).
+Parse the JSON result and present:
+```
+Research complete for Phase ${PHASE}.
+
+Next: [nextCommand from resolver]
+Context: [context from resolver]
+
+<sub>`/clear` first -> fresh context window</sub>
+```
+
+Present exactly ONE next step from the resolver. Do not list alternatives.
+
+**Never auto-advance** -- user decides next command per SPEC (SAFE-03).
 
 </process>

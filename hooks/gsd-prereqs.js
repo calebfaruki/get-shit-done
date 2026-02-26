@@ -5,6 +5,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { resolveState } = require('./gsd-state-resolver.js');
 
 const PHASE_COMMANDS = new Set([
   'discuss-phase', 'research-phase', 'plan-phase', 'execute-phase', 'verify-phase'
@@ -18,16 +19,19 @@ const PREREQS = {
   },
   'research-project': {
     soft: [
+      { file: '.planning/CODEBASE.md', message: 'No codebase map found.', fix: '/gsd:map' },
       { file: '.planning/project/PROJECT.md', message: 'PROJECT.md not found.', fix: '/gsd:new-project' }
     ]
   },
   'discuss-project': {
     soft: [
+      { file: '.planning/CODEBASE.md', message: 'No codebase map found.', fix: '/gsd:map' },
       { file: '.planning/project/PROJECT.md', message: 'PROJECT.md not found.', fix: '/gsd:new-project' }
     ]
   },
   'plan-project': {
     soft: [
+      { file: '.planning/CODEBASE.md', message: 'No codebase map found.', fix: '/gsd:map' },
       { file: '.planning/project/PROJECT.md', message: 'PROJECT.md not found.', fix: '/gsd:new-project' }
     ]
   },
@@ -166,20 +170,48 @@ process.stdin.on('end', () => {
       }
     }
 
-    if (softWarnings.length > 0) {
-      const label = rawSkill.startsWith('gsd:') ? rawSkill : `gsd:${skill}`;
-      const lines = [`---GSD PREREQ---\n/${label}${phaseNum ? ' ' + phaseNum : ''} — prerequisite warning:\n`];
-      for (const w of softWarnings) {
-        lines.push(`WARNING: ${w.message}`);
-        lines.push(`SUGGESTED: Run ${w.fix}\n`);
+    // Check out-of-sequence via state resolver
+    let sequenceWarning = '';
+    try {
+      const resolved = resolveState(process.cwd());
+      const currentCmd = phaseNum ? `/${skill} ${phaseNum}` : `/${skill}`;
+      if (resolved.nextCommand && resolved.nextCommand !== currentCmd) {
+        const lines = [
+          '---GSD SEQUENCE---',
+          `Out of sequence: running ${currentCmd} but lifecycle suggests ${resolved.nextCommand}.`,
+          `Context: ${resolved.context}`,
+          'This is a warning only — command will proceed.',
+          '---END GSD SEQUENCE---'
+        ];
+        sequenceWarning = lines.join('\n');
       }
-      lines.push('Mention this to the user, then proceed with the command.');
-      lines.push('---END GSD PREREQ---');
+    } catch (e) {
+      // Silent continue on resolver errors
+    }
+
+    if (softWarnings.length > 0 || sequenceWarning) {
+      const label = rawSkill.startsWith('gsd:') ? rawSkill : `gsd:${skill}`;
+      const contextParts = [];
+
+      if (softWarnings.length > 0) {
+        const lines = [`---GSD PREREQ---\n/${label}${phaseNum ? ' ' + phaseNum : ''} — prerequisite warning:\n`];
+        for (const w of softWarnings) {
+          lines.push(`WARNING: ${w.message}`);
+          lines.push(`SUGGESTED: Run ${w.fix}\n`);
+        }
+        lines.push('Mention this to the user, then proceed with the command.');
+        lines.push('---END GSD PREREQ---');
+        contextParts.push(lines.join('\n'));
+      }
+
+      if (sequenceWarning) {
+        contextParts.push(sequenceWarning);
+      }
 
       const output = {
         hookSpecificOutput: {
           hookEventName: "PreToolUse",
-          additionalContext: lines.join('\n')
+          additionalContext: contextParts.join('\n')
         }
       };
       process.stdout.write(JSON.stringify(output));

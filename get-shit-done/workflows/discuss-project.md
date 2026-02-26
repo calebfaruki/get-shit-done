@@ -19,13 +19,15 @@ Check if `.planning/project/PROJECT.md` exists:
 **If missing:**
 
 Soft block (not hard error):
-```
-No PROJECT.md found. You need to run `/new-project` first to create one.
 
-Would you like to run `/new-project` now?
-```
+Use AskUserQuestion:
+- header: "No project"
+- question: "No PROJECT.md found. Run /new-project first?"
+- options:
+  - "Run /new-project" -- Start project intake
+  - "Cancel" -- Stop workflow
 
-If yes: suggest running `/new-project`. If no: stop workflow.
+If "Run /new-project": suggest running `/new-project`. If "Cancel": stop workflow.
 
 ## 2. Load Project Context
 
@@ -117,12 +119,17 @@ Proposed updates to PROJECT.md:
 **Out of Scope:**
 - Update: [item moved in/out of scope]
 
-Apply these changes? (yes / adjust / cancel)
-```
+Use AskUserQuestion:
+- header: "Apply"
+- question: "Apply these changes to PROJECT.md?"
+- options:
+  - "Apply" -- Update PROJECT.md with these changes
+  - "Adjust" -- Revise the proposed changes
+  - "Cancel" -- Discard changes
 
-**If yes:** Continue to update.
-**If adjust:** Get feedback, revise summary, re-ask.
-**If cancel:** Stop workflow, no changes made.
+**If "Apply":** Continue to update.
+**If "Adjust":** Get feedback, revise summary, re-ask.
+**If "Cancel":** Stop workflow, no changes made.
 
 ## 7. Check for Existing Plan
 
@@ -136,17 +143,18 @@ Check if `.planning/project/PROJECT-PLAN.md` exists:
 
 Warn:
 ```
-⚠ Warning: PROJECT-PLAN.md already exists.
-
-Changes to PROJECT.md may invalidate the existing plan.
-
-You may need to re-run `/plan-project` after updating PROJECT.md.
-
-Continue with update? (yes / no)
+PROJECT-PLAN.md already exists. Changes to PROJECT.md may invalidate the existing plan.
 ```
 
-**If no:** Stop workflow, no changes made.
-**If yes:** Continue to update.
+Use AskUserQuestion:
+- header: "Plan exists"
+- question: "PROJECT-PLAN.md exists. Changes may invalidate it. Continue?"
+- options:
+  - "Continue" -- Update PROJECT.md, may need to replan
+  - "Cancel" -- Keep PROJECT.md unchanged
+
+**If "Cancel":** Stop workflow, no changes made.
+**If "Continue":** Continue to update.
 
 ## 8. Update PROJECT.md
 
@@ -174,21 +182,23 @@ Rewrite `.planning/project/PROJECT.md` with updated content using Write tool.
 
 ## 9. Handoff
 
-Suggest next steps:
+Determine next step:
 
+```bash
+node ~/.claude/hooks/gsd-state-resolver.js
+```
+
+Parse the JSON result and present:
 ```
 PROJECT.md updated!
 
-Next steps:
+Next: [nextCommand from resolver]
+Context: [context from resolver]
 
-- `/research-project` — Research domain ecosystem if not done yet
-- `/plan-project` — Create or update project plan
-- `/discuss-project` — Continue exploring (run again)
-
-Human decides next step — no auto-advance.
-
-<sub>`/clear` first → fresh context window</sub>
+<sub>`/clear` first -> fresh context window</sub>
 ```
+
+Present exactly ONE next step from the resolver. Do not list alternatives.
 
 </process>
 

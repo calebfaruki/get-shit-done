@@ -105,21 +105,27 @@ PROJECT-RESEARCH.md structure per SPEC:
 
 ### 4. Handoff
 
-After research completes:
+Determine next step:
 
+```bash
+node ~/.claude/hooks/gsd-state-resolver.js
+```
+
+Parse the JSON result and present:
 ```
 Research complete. Domain: [domain], Confidence: [level]
 
 Primary recommendation: [one-liner from research]
 
-Next steps:
-- /discuss-project - Explore gray areas and implementation preferences
-- /plan-project - Break project into phases using research findings
+Next: [nextCommand from resolver]
+Context: [context from resolver]
 
 The research document is available at .planning/project/PROJECT-RESEARCH.md
+
+<sub>`/clear` first -> fresh context window</sub>
 ```
 
-<sub>`/clear` first → fresh context window</sub>
+Present exactly ONE next step from the resolver. Do not list alternatives.
 
 **Never auto-advance.** Human decides next step.
 

@@ -168,6 +168,13 @@ Task(
 Read PHASE-${PHASE_NUM}-VERIFICATION.md to get results.
 
 If **PASSED**:
+
+Determine next step:
+
+```bash
+node ~/.claude/hooks/gsd-state-resolver.js
+```
+
 ```
 ## Phase ${PHASE_NUM} Verification: PASSED
 
@@ -178,11 +185,22 @@ ${FILE_LIST}
 
 Use \`git diff --cached\` to review staged changes.
 
----
-**Next:** /verify-phase ${PHASE_NUM + 1} or /verify-project
+Next: [nextCommand from resolver]
+Context: [context from resolver]
+
+<sub>`/clear` first -> fresh context window</sub>
 ```
 
+Present exactly ONE next step from the resolver. Do not list alternatives.
+
 If **FAILED**:
+
+Determine next step:
+
+```bash
+node ~/.claude/hooks/gsd-state-resolver.js
+```
+
 ```
 ## Phase ${PHASE_NUM} Verification: FAILED
 
@@ -191,14 +209,15 @@ ${FAILURE_LIST}
 
 Nothing staged. See .planning/project/PHASE-${PHASE_NUM}-VERIFICATION.md for diagnostics.
 
----
-**Next steps (you decide):**
-1. Fix issues manually and re-run /execute-phase ${PHASE_NUM}
-2. Adjust phase plan to match reality
-3. Accept current state as-is
+Verification failed. The resolver suggests re-verifying, but you may want to fix issues first.
+
+Next: [nextCommand from resolver]
+Context: [context from resolver]
+
+<sub>`/clear` first -> fresh context window</sub>
+```
 
 The verifier does not auto-fix. You decide how to proceed.
-```
 
 **Never auto-fix.** Always defer to human decision.
 </step>

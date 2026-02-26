@@ -5,7 +5,9 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const { execSync } = require('child_process');
 
+if (require.main === module) {
 // Read JSON from stdin
 let input = '';
 process.stdin.setEncoding('utf8');
@@ -83,14 +85,67 @@ process.stdin.on('end', () => {
       }
     }
 
-    // Output
-    const dirname = path.basename(dir);
-    if (task) {
-      process.stdout.write(`\x1b[2m${model}\x1b[0m │ \x1b[1m${task}\x1b[0m │ \x1b[2m${dirname}\x1b[0m${ctx}`);
+    // Map staleness indicator (replaces dirname in output)
+    let mapSegment = '';
+    const codebasePath = path.join(dir, '.planning', 'CODEBASE.md');
+    if (!fs.existsSync(codebasePath)) {
+      mapSegment = `\x1b[31mMAP: ✗\x1b[0m`;
     } else {
-      process.stdout.write(`\x1b[2m${model}\x1b[0m │ \x1b[2m${dirname}\x1b[0m${ctx}`);
+      try {
+        const codebaseContent = fs.readFileSync(codebasePath, 'utf8');
+        const sha = parseCommitSha(codebaseContent);
+        if (sha) {
+          const numstat = execSync('git diff --numstat ' + sha + '..HEAD', {
+            cwd: dir, timeout: 1000, stdio: ['pipe', 'pipe', 'pipe']
+          }).toString().trim();
+          const lines = countLinesChanged(numstat);
+          const color = getMapStalenessColor(lines);
+          mapSegment = `${color}Δ ${lines} lines\x1b[0m`;
+        }
+      } catch (e) {
+        // Silent fail if git fails or timeout
+      }
+    }
+
+    // Output
+    if (task) {
+      process.stdout.write(`\x1b[2m${model}\x1b[0m │ \x1b[1m${task}\x1b[0m │ ${mapSegment}${ctx}`);
+    } else {
+      process.stdout.write(`\x1b[2m${model}\x1b[0m │ ${mapSegment}${ctx}`);
     }
   } catch (e) {
     // Silent fail - don't break statusline on parse errors
   }
 });
+} // end require.main === module
+
+function parseCommitSha(content) {
+  if (!content) return null;
+  const match = content.match(/^---\s*\n([\s\S]*?)\n---/);
+  if (!match) return null;
+  const frontmatter = match[1];
+  const shaMatch = frontmatter.match(/^commit_sha:\s*([a-f0-9]{7,40})\s*$/m);
+  return shaMatch ? shaMatch[1] : null;
+}
+
+function countLinesChanged(numstatOutput) {
+  if (!numstatOutput) return 0;
+  let total = 0;
+  for (const line of numstatOutput.split('\n')) {
+    const parts = line.split('\t');
+    const added = parseInt(parts[0], 10);
+    const deleted = parseInt(parts[1], 10);
+    if (!isNaN(added)) total += added;
+    if (!isNaN(deleted)) total += deleted;
+  }
+  return total;
+}
+
+function getMapStalenessColor(lines) {
+  if (lines <= 100) return '\x1b[32m';
+  if (lines <= 500) return '\x1b[33m';
+  if (lines <= 2000) return '\x1b[38;5;208m';
+  return '\x1b[31m';
+}
+
+module.exports = { parseCommitSha, countLinesChanged, getMapStalenessColor };

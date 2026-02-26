@@ -6,6 +6,8 @@ const path = require('path');
 const PREREQS_HOOK_PATH = path.join(__dirname, '..', 'hooks', 'gsd-prereqs.js');
 const BASH_GUARD_HOOK_PATH = path.join(__dirname, '..', 'hooks', 'gsd-bash-guard.js');
 const IDLE_DEBUG_HOOK_PATH = path.join(__dirname, '..', 'hooks', 'gsd-idle-debug.js');
+const STATE_RESOLVER_HOOK_PATH = path.join(__dirname, '..', 'hooks', 'gsd-state-resolver.js');
+const STATUSLINE_HOOK_PATH = path.join(__dirname, '..', 'hooks', 'gsd-statusline.js');
 
 function createTempProject() {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gsd-test-'));
@@ -35,4 +37,4 @@ function runHook(hookPath, stdinData, cwd) {
   }
 }
 
-module.exports = { PREREQS_HOOK_PATH, BASH_GUARD_HOOK_PATH, IDLE_DEBUG_HOOK_PATH, createTempProject, cleanup, runHook };
+module.exports = { PREREQS_HOOK_PATH, BASH_GUARD_HOOK_PATH, IDLE_DEBUG_HOOK_PATH, STATE_RESOLVER_HOOK_PATH, STATUSLINE_HOOK_PATH, createTempProject, cleanup, runHook };

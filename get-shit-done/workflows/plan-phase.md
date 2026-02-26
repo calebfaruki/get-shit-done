@@ -226,23 +226,27 @@ Task(
 
 ## 8. Present Results and Next Steps
 
-Display summary:
+Determine next step:
+
+```bash
+node ~/.claude/hooks/gsd-state-resolver.js
+```
+
+Parse the JSON result and present:
 ```
 Planning complete for Phase ${PHASE}: ${PHASE_NAME}
 
 Created: .planning/project/PHASE-${PHASE}-PLAN.md
 
-## Next Steps
+Next: [nextCommand from resolver]
+Context: [context from resolver]
 
-Suggest continuing with:
-- Review the plan: cat .planning/project/PHASE-${PHASE}-PLAN.md
-- Execute the phase: /execute-phase ${PHASE}
-- Verify after execution: /verify-phase ${PHASE}
+<sub>`/clear` first -> fresh context window</sub>
 ```
 
-<sub>`/clear` first → fresh context window</sub>
+Present exactly ONE next step from the resolver. Do not list alternatives.
 
-**Never auto-advance** — user decides next command per SPEC (SAFE-03).
+**Never auto-advance** -- user decides next command per SPEC (SAFE-03).
 
 Track `iteration_count` (starts at 1 after initial plan + check).
 
