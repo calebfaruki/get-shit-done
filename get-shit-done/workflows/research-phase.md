@@ -314,6 +314,8 @@ If phase researcher failed:
 
 **Handoff suggestion:** Recommend `/plan-phase ${PHASE}` after successful research.
 
+<sub>`/clear` first → fresh context window</sub>
+
 **Never auto-advance** — user decides next command per SPEC (SAFE-03).
 
 </process>

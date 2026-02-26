@@ -255,6 +255,8 @@ Project initialized! Next steps:
 - `/plan-project` — Break project into phases
 
 Human decides next step — no auto-advance.
+
+<sub>`/clear` first → fresh context window</sub>
 ```
 
 </process>

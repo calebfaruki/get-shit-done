@@ -313,7 +313,7 @@ function uninstall(isGlobal) {
   // 4. Remove GSD hooks
   const hooksDir = path.join(targetDir, 'hooks');
   if (fs.existsSync(hooksDir)) {
-    const gsdHooks = ['gsd-statusline.js', 'gsd-check-update.js', 'gsd-check-update.sh', 'gsd-context-monitor.js', 'gsd-prereqs.js', 'gsd-bash-guard.js', 'gsd-idle-timeout.js', 'gsd-idle-debug.js'];
+    const gsdHooks = ['gsd-statusline.js', 'gsd-check-update.js', 'gsd-check-update.sh', 'gsd-context-monitor.js', 'gsd-prereqs.js', 'gsd-bash-guard.js', 'gsd-idle-timeout.js', 'gsd-idle-timeout', 'gsd-idle-debug.js'];
     let hookCount = 0;
     for (const hook of gsdHooks) {
       const hookPath = path.join(hooksDir, hook);
@@ -690,7 +690,7 @@ function install(isGlobal) {
   fs.writeFileSync(pkgJsonDest, '{"type":"commonjs"}\n');
   console.log(`  ${green}✓${reset} Wrote package.json (CommonJS mode)`);
 
-  // Copy hooks (.js files only, skip subdirectories like dist/)
+  // Copy hooks (.js files and executable scripts, skip subdirectories like dist/)
   const hooksSrc = path.join(src, 'hooks');
   if (fs.existsSync(hooksSrc)) {
     const hooksDest = path.join(targetDir, 'hooks');
@@ -698,9 +698,11 @@ function install(isGlobal) {
     const hookEntries = fs.readdirSync(hooksSrc);
     for (const entry of hookEntries) {
       const srcFile = path.join(hooksSrc, entry);
-      if (fs.statSync(srcFile).isFile() && entry.endsWith('.js')) {
+      const stat = fs.statSync(srcFile);
+      if (stat.isFile() && (entry.endsWith('.js') || (stat.mode & 0o111))) {
         const destFile = path.join(hooksDest, entry);
         fs.copyFileSync(srcFile, destFile);
+        if (stat.mode & 0o111) fs.chmodSync(destFile, stat.mode);
       }
     }
     if (verifyInstalled(hooksDest, 'hooks')) {

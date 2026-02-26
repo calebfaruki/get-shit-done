@@ -186,6 +186,8 @@ Next steps:
 - `/discuss-project` — Continue exploring (run again)
 
 Human decides next step — no auto-advance.
+
+<sub>`/clear` first → fresh context window</sub>
 ```
 
 </process>

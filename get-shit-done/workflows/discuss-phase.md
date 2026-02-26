@@ -413,6 +413,8 @@ Suggest continuing with:
 - `/plan-phase ${PHASE}` — create detailed execution plan
 
 ---
+
+<sub>`/clear` first → fresh context window</sub>
 ```
 
 **Never auto-advance** — user decides next command.

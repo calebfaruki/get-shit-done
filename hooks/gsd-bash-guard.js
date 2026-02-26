@@ -30,11 +30,11 @@ process.stdin.on('end', () => {
     }
 
     const idleTimeout = 60;
-    const wrapperPath = path.join(__dirname, 'gsd-idle-timeout.js');
+    const wrapperPath = path.join(__dirname, 'gsd-idle-timeout');
 
     if (fs.existsSync(wrapperPath)) {
       const escapedCmd = toolInput.command.replace(/'/g, "'\\''");
-      const wrappedCmd = `node "${wrapperPath}" ${idleTimeout} -- sh -c '${escapedCmd}'`;
+      const wrappedCmd = `"${wrapperPath}" ${idleTimeout} '${escapedCmd}'`;
       const output = {
         hookSpecificOutput: {
           hookEventName: "PreToolUse",

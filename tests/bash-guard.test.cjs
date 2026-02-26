@@ -60,16 +60,18 @@ describe('gsd-bash-guard hook', () => {
     assert.ok(result.stderr.includes('timeout'));
   });
 
-  it('wraps command with idle timeout', () => {
+  it('wraps command with idle timeout (short form)', () => {
     const result = runHook(BASH_GUARD_HOOK_PATH, {
       tool_input: { command: 'npm test' }
     });
     assert.equal(result.exitCode, 0);
     const output = JSON.parse(result.stdout);
     const cmd = output.hookSpecificOutput.updatedInput.command;
-    assert.ok(cmd.includes('gsd-idle-timeout.js'));
-    assert.ok(cmd.startsWith('node'));
-    assert.ok(cmd.includes("-- sh -c 'npm test'"));
+    assert.ok(cmd.includes('gsd-idle-timeout'));
+    assert.ok(!cmd.includes('gsd-idle-timeout.js'), 'should not have .js extension');
+    assert.ok(!cmd.startsWith('node'), 'should invoke directly, not via node');
+    assert.ok(cmd.includes("'npm test'"), 'command should be single-quoted');
+    assert.ok(!cmd.includes('-- sh -c'), 'should use short form, not legacy -- sh -c');
   });
 
   it('preserves original timeout param in updatedInput', () => {

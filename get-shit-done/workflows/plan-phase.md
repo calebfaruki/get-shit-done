@@ -240,6 +240,8 @@ Suggest continuing with:
 - Verify after execution: /verify-phase ${PHASE}
 ```
 
+<sub>`/clear` first → fresh context window</sub>
+
 **Never auto-advance** — user decides next command per SPEC (SAFE-03).
 
 Track `iteration_count` (starts at 1 after initial plan + check).

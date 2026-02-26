@@ -274,6 +274,8 @@ ${DEVIATIONS_EXIST ? "### Deviations from plan\n[List from summary]" : ""}
 
 **Next step:** /verify-phase ${PHASE}
 
+<sub>`/clear` first → fresh context window</sub>
+
 This will check the executor's work against the plan's must_haves.
 On pass, changes are staged. On fail, diagnostics are provided.
 ```

@@ -152,6 +152,8 @@ Next steps:
 The project plan is available at .planning/project/PROJECT-PLAN.md
 ```
 
+<sub>`/clear` first → fresh context window</sub>
+
 **Never auto-advance.** Human decides which phase-level command to run next.
 
 ## Success Criteria

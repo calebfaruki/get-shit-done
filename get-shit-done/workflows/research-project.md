@@ -119,6 +119,8 @@ Next steps:
 The research document is available at .planning/project/PROJECT-RESEARCH.md
 ```
 
+<sub>`/clear` first → fresh context window</sub>
+
 **Never auto-advance.** Human decides next step.
 
 ## Success Criteria

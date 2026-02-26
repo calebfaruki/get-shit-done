@@ -3,14 +3,25 @@ const { spawn } = require('child_process');
 
 const args = process.argv.slice(2);
 const sep = args.indexOf('--');
-const idleSec = sep > 0 ? parseInt(args[0], 10) : 60;
-const cmdArgs = sep >= 0 ? args.slice(sep + 1) : args;
 
-if (cmdArgs.length === 0) { process.exit(0); }
-
-const child = spawn(cmdArgs[0], cmdArgs.slice(1), {
-  stdio: ['inherit', 'pipe', 'pipe']
-});
+let idleSec, child;
+if (sep >= 0) {
+  // Legacy: <timeout> -- cmd arg1 arg2
+  idleSec = sep > 0 ? parseInt(args[0], 10) : 60;
+  const cmdArgs = args.slice(sep + 1);
+  if (cmdArgs.length === 0) { process.exit(0); }
+  child = spawn(cmdArgs[0], cmdArgs.slice(1), {
+    stdio: ['inherit', 'pipe', 'pipe']
+  });
+} else if (args.length >= 2) {
+  // Short: <timeout> '<command string>'
+  idleSec = parseInt(args[0], 10) || 60;
+  child = spawn('sh', ['-c', args.slice(1).join(' ')], {
+    stdio: ['inherit', 'pipe', 'pipe']
+  });
+} else {
+  process.exit(0);
+}
 
 let timer;
 function resetTimer() {
