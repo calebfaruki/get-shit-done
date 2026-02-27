@@ -51,7 +51,7 @@ Parse body:
 - `<tasks>`: task list with files/action/verify/done fields
 - `<verification>`: overall phase verification steps
 
-**If plan references CONTEXT.md:** Honor locked decisions throughout execution.
+**If plan references DISCUSSION.md:** Honor locked decisions throughout execution.
 </step>
 
 <step name="execute_tasks">

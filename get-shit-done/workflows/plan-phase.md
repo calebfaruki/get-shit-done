@@ -61,7 +61,7 @@ Collect file paths for planner to load:
 
 ```bash
 PROJECT_PLAN_PATH=".planning/project/PROJECT-PLAN.md"
-CONTEXT_PATH=".planning/project/PHASE-${PHASE}-CONTEXT.md"
+CONTEXT_PATH=".planning/project/PHASE-${PHASE}-DISCUSSION.md"
 RESEARCH_PATH=".planning/project/PHASE-${PHASE}-RESEARCH.md"
 CODEBASE_DIR=".planning/codebase"
 
@@ -72,11 +72,11 @@ CODEBASE_DIR=".planning/codebase"
 [ -d "$CODEBASE_DIR" ] && HAS_CODEBASE=true || HAS_CODEBASE=false
 ```
 
-**If no CONTEXT.md exists:**
+**If no DISCUSSION.md exists:**
 
 Display soft warning:
 ```
-Note: No PHASE-${PHASE}-CONTEXT.md found.
+Note: No PHASE-${PHASE}-DISCUSSION.md found.
 Plan will use research and codebase only — user design preferences not included.
 Consider running /discuss-phase ${PHASE} first if you have specific implementation preferences.
 ```
@@ -114,7 +114,7 @@ Create detailed execution plan for Phase ${PHASE}: ${PHASE_NAME}
 
 <files_to_read>
 ${HAS_PROJECT_PLAN && "- .planning/project/PROJECT-PLAN.md (Phase goal and acceptance criteria)"}
-${HAS_CONTEXT && "- .planning/project/PHASE-${PHASE}-CONTEXT.md (User decisions from /discuss-phase)"}
+${HAS_CONTEXT && "- .planning/project/PHASE-${PHASE}-DISCUSSION.md (User decisions from /discuss-phase)"}
 ${HAS_RESEARCH && "- .planning/project/PHASE-${PHASE}-RESEARCH.md (Technical research)"}
 ${HAS_CODEBASE && "- .planning/codebase/architecture.md (codebase architecture)"}
 ${HAS_CODEBASE && "- .planning/codebase/conventions.md (codebase conventions)"}
@@ -155,7 +155,7 @@ must_haves:
 
 <context>
 @.planning/project/PROJECT-PLAN.md
-${HAS_CONTEXT && "@.planning/project/PHASE-${PHASE}-CONTEXT.md"}
+${HAS_CONTEXT && "@.planning/project/PHASE-${PHASE}-DISCUSSION.md"}
 ${HAS_RESEARCH && "@.planning/project/PHASE-${PHASE}-RESEARCH.md"}
 ${HAS_CODEBASE && "@.planning/codebase/architecture.md"}
 ${HAS_CODEBASE && "@.planning/codebase/conventions.md"}
@@ -261,7 +261,7 @@ Track `iteration_count` (starts at 1 after initial plan + check).
 - [ ] PROJECT-PLAN.md validated
 - [ ] Phase validated against PROJECT-PLAN.md
 - [ ] .planning/project/ directory exists
-- [ ] Context files loaded (CONTEXT.md, RESEARCH.md, codebase files if they exist)
+- [ ] Context files loaded (DISCUSSION.md, RESEARCH.md, codebase files if they exist)
 - [ ] Existing plan checked
 - [ ] Planner spawned with proper context
 - [ ] PHASE-N-PLAN.md created with YAML + XML format per SPEC

@@ -180,7 +180,33 @@ Rewrite `.planning/project/PROJECT.md` with updated content using Write tool.
 - [New decisions from discussion]
 ```
 
-## 9. Handoff
+## 9. Write PROJECT-DISCUSSION.md
+
+Write `.planning/project/PROJECT-DISCUSSION.md` using the Write tool.
+
+This file serves as a record of the discussion and as a marker for the state resolver.
+
+```markdown
+# Project Discussion
+
+## Date
+[Current date]
+
+## Areas Explored
+- [Topic 1]: [What was discussed, what was decided]
+- [Topic 2]: [What was discussed, what was decided]
+
+## Decisions Made
+- [Decision from discussion]
+
+## Scope Changes
+- [Any additions or removals from scope]
+
+## Changes Applied to PROJECT.md
+- [Summary of what changed]
+```
+
+## 10. Handoff
 
 Determine next step:
 
@@ -210,9 +236,11 @@ Present exactly ONE next step from the resolver. Do not list alternatives.
 - [ ] Proposed changes summarized and confirmed
 - [ ] Plan invalidation warning shown if PROJECT-PLAN.md exists
 - [ ] PROJECT.md updated only after confirmation
+- [ ] PROJECT-DISCUSSION.md written with discussion summary
 - [ ] Handoff message suggests next steps without auto-advance
 </success_criteria>
 
 <output>
 Updated `.planning/project/PROJECT.md`
+`.planning/project/PROJECT-DISCUSSION.md` — discussion record
 </output>

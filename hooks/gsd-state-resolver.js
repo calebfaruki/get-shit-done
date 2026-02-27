@@ -2,6 +2,21 @@
 const fs = require('fs');
 const path = require('path');
 
+function parseFrontmatter(content) {
+  try {
+    const match = content.match(/^---\n([\s\S]*?)\n---/);
+    if (!match) return {};
+    const fm = {};
+    for (const line of match[1].split('\n')) {
+      const kv = line.match(/^(\w+):\s*(.+)$/);
+      if (kv) fm[kv[1]] = kv[2].trim();
+    }
+    return fm;
+  } catch (e) {
+    return {};
+  }
+}
+
 function resolveState(dir) {
   const projectDir = path.join(dir, '.planning', 'project');
 
@@ -28,7 +43,7 @@ function resolveState(dir) {
       context = 'Project researched. Create a project plan.';
     }
     const legacy = { state: 'project-defined', nextCommand, context };
-    const steps = buildSteps(files, null, '');
+    const steps = buildSteps(files, null, '', projectDir);
     return { ...legacy, ...assignStatuses(steps), totalPhases: null, currentPhase: null };
   }
 
@@ -36,7 +51,7 @@ function resolveState(dir) {
   const phaseMatches = planContent.match(/^#{2,3} Phase (\d+):/gm);
   if (!phaseMatches || phaseMatches.length === 0) {
     const legacy = { state: 'project-defined', nextCommand: '/plan-project', context: 'Project plan has no phases. Create a project plan.' };
-    const steps = buildSteps(files, null, '');
+    const steps = buildSteps(files, null, '', projectDir);
     return { ...legacy, ...assignStatuses(steps), totalPhases: null, currentPhase: null };
   }
 
@@ -83,14 +98,14 @@ function resolveState(dir) {
     }
   }
 
-  const steps = buildSteps(files, totalPhases, summaryContent);
+  const steps = buildSteps(files, totalPhases, summaryContent, projectDir);
   const resolved = assignStatuses(steps);
   const currentPhase = deriveCurrentPhase(resolved.steps);
 
   return { ...legacy, ...resolved, totalPhases, currentPhase };
 }
 
-function buildSteps(files, totalPhases, summaryContent) {
+function buildSteps(files, totalPhases, summaryContent, projectDir) {
   const steps = [];
 
   // Project-level steps (always present)
@@ -115,6 +130,23 @@ function buildSteps(files, totalPhases, summaryContent) {
   for (const step of steps) {
     if (step.file) {
       step.completed = files.has(step.file);
+      // For discuss/research steps, check frontmatter for skip status
+      if (step.completed && (step.id.includes('discussed') || step.id.includes('researched'))) {
+        try {
+          const content = fs.readFileSync(path.join(projectDir, step.file), 'utf8');
+          const fm = parseFrontmatter(content);
+          if ('skipped' in fm) {
+            step.recognized = true;
+            step.skippedByFrontmatter = (fm.skipped === 'true');
+          } else {
+            step.completed = false;
+            step.recognized = false;
+          }
+        } catch (e) {
+          step.completed = false;
+          step.recognized = false;
+        }
+      }
     } else if (step.summaryPhase != null) {
       const regex = new RegExp('^## Phase ' + step.summaryPhase + ':', 'm');
       step.completed = regex.test(summaryContent);
@@ -127,22 +159,9 @@ function buildSteps(files, totalPhases, summaryContent) {
 function assignStatuses(steps) {
   if (steps.length === 0) return { steps: [] };
 
-  // For each incomplete step, determine if a later step is completed (making it skipped).
-  // The active step is the first incomplete step with no later completed step.
-  // Steps after the active step are pending.
-
-  // Build a "has later completed" lookup: for each index, is there any j > i where steps[j].completed?
-  const hasLaterCompleted = new Array(steps.length).fill(false);
-  let seenCompleted = false;
-  for (let i = steps.length - 1; i >= 0; i--) {
-    hasLaterCompleted[i] = seenCompleted;
-    if (steps[i].completed) seenCompleted = true;
-  }
-
-  // Find active index: first incomplete step where no later step is completed
   let activeIndex = -1;
   for (let i = 0; i < steps.length; i++) {
-    if (!steps[i].completed && !hasLaterCompleted[i]) {
+    if (!steps[i].completed) {
       activeIndex = i;
       break;
     }
@@ -151,10 +170,10 @@ function assignStatuses(steps) {
   const result = steps.map((step, i) => {
     let status;
     if (activeIndex === -1) {
-      // All complete or all incomplete-with-later-complete (terminal state)
-      status = step.completed ? 'done' : 'skipped';
+      // All steps completed
+      status = step.skippedByFrontmatter ? 'skipped' : 'done';
     } else if (i < activeIndex) {
-      status = step.completed ? 'done' : 'skipped';
+      status = step.skippedByFrontmatter ? 'skipped' : 'done';
     } else if (i === activeIndex) {
       status = 'active';
     } else {

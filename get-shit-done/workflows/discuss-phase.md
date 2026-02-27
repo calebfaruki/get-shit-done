@@ -5,13 +5,13 @@ You are a thinking partner, not an interviewer. The user is the visionary — yo
 </purpose>
 
 <downstream_awareness>
-**CONTEXT.md feeds into:**
+**DISCUSSION.md feeds into:**
 
-1. **gsd-phase-researcher** — Reads CONTEXT.md to know WHAT to research
+1. **gsd-phase-researcher** — Reads DISCUSSION.md to know WHAT to research
    - "User wants card-based layout" → researcher investigates card component patterns
    - "Infinite scroll decided" → researcher looks into virtualization libraries
 
-2. **gsd-planner** — Reads CONTEXT.md to know WHAT decisions are locked
+2. **gsd-planner** — Reads DISCUSSION.md to know WHAT decisions are locked
    - "Pull-to-refresh on mobile" → planner includes that in task specs
    - "Claude's Discretion: loading skeleton" → planner can decide approach
 
@@ -143,10 +143,10 @@ Exit workflow.
 </step>
 
 <step name="check_existing">
-Check if PHASE-N-CONTEXT.md already exists:
+Check if PHASE-N-DISCUSSION.md already exists:
 
 ```bash
-ls .planning/project/PHASE-${PHASE}-CONTEXT.md 2>/dev/null
+ls .planning/project/PHASE-${PHASE}-DISCUSSION.md 2>/dev/null
 ```
 
 **If exists:**
@@ -159,7 +159,7 @@ Use AskUserQuestion:
   - "Skip" — Use existing context as-is
 
 If "Update": Load existing, continue to analyze_phase
-If "View": Display PHASE-N-CONTEXT.md, then offer update/skip
+If "View": Display PHASE-N-DISCUSSION.md, then offer update/skip
 If "Skip": Exit workflow
 
 **If doesn't exist:**
@@ -328,7 +328,7 @@ Track deferred ideas internally.
 </step>
 
 <step name="write_context">
-Create PHASE-N-CONTEXT.md capturing decisions made.
+Create PHASE-N-DISCUSSION.md capturing decisions made.
 
 **Ensure .planning/project/ directory exists:**
 
@@ -336,7 +336,7 @@ Create PHASE-N-CONTEXT.md capturing decisions made.
 mkdir -p .planning/project
 ```
 
-**File location:** `.planning/project/PHASE-${PHASE}-CONTEXT.md`
+**File location:** `.planning/project/PHASE-${PHASE}-DISCUSSION.md`
 
 **Structure per SPEC — three-category output:**
 
@@ -390,7 +390,7 @@ Write file using Write tool.
 Present summary and determine next step:
 
 ```
-Created: .planning/project/PHASE-${PHASE}-CONTEXT.md
+Created: .planning/project/PHASE-${PHASE}-DISCUSSION.md
 
 ## Decisions Captured
 
@@ -413,7 +413,7 @@ node ~/.claude/hooks/gsd-state-resolver.js
 
 Parse the JSON result and present:
 ```
-Created: .planning/project/PHASE-${PHASE}-CONTEXT.md
+Created: .planning/project/PHASE-${PHASE}-DISCUSSION.md
 
 [Summary of decisions captured]
 
@@ -435,7 +435,7 @@ Present exactly ONE next step. Do not list alternatives.
 - User selected which areas to discuss
 - Each selected area explored until user satisfied
 - Scope creep redirected to deferred ideas
-- CONTEXT.md captures actual decisions, not vague vision
+- DISCUSSION.md captures actual decisions, not vague vision
 - Deferred ideas preserved for future phases
 - User knows next steps
 </success_criteria>

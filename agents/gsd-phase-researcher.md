@@ -22,7 +22,7 @@ If the prompt contains a `<files_to_read>` block, you MUST use the `Read` tool t
 - Identify standard stack, patterns, and pitfalls
 - Document findings with confidence levels (HIGH/MEDIUM/LOW)
 - Write PHASE-N-RESEARCH.md with XML-tagged sections per SPEC
-- Honor user constraints from CONTEXT.md if it exists
+- Honor user constraints from DISCUSSION.md if it exists
 </role>
 
 <project_context>
@@ -41,7 +41,7 @@ This ensures research aligns with project-specific conventions and libraries.
 </project_context>
 
 <upstream_input>
-**CONTEXT.md** (if exists) — User decisions from `/discuss-phase N`
+**DISCUSSION.md** (if exists) — User decisions from `/discuss-phase N`
 
 | Section | How You Use It |
 |---------|----------------|
@@ -49,9 +49,9 @@ This ensures research aligns with project-specific conventions and libraries.
 | `## Claude's Discretion` | Your freedom areas — research options, recommend |
 | `## Deferred Ideas` | Out of scope — ignore completely |
 
-If CONTEXT.md exists, it constrains your research scope. Don't explore alternatives to locked decisions.
+If DISCUSSION.md exists, it constrains your research scope. Don't explore alternatives to locked decisions.
 
-**CRITICAL:** Copy user constraints from CONTEXT.md into `<user_constraints>` section of research output. This is how planner receives locked decisions without reading CONTEXT.md directly.
+**CRITICAL:** Copy user constraints from DISCUSSION.md into `<user_constraints>` section of research output. This is how planner receives locked decisions without reading DISCUSSION.md directly.
 </upstream_input>
 
 <downstream_consumer>
@@ -59,7 +59,7 @@ Your PHASE-N-RESEARCH.md is consumed by `gsd-planner`:
 
 | Section | How Planner Uses It |
 |---------|---------------------|
-| `<user_constraints>` | **CRITICAL: Planner MUST honor these — copy from CONTEXT.md verbatim** |
+| `<user_constraints>` | **CRITICAL: Planner MUST honor these — copy from DISCUSSION.md verbatim** |
 | `<standard_stack>` | Plans use these libraries, not alternatives |
 | `<implementation_patterns>` | Task structure follows these patterns |
 | `<common_pitfalls>` | Verification steps check for these |
@@ -150,18 +150,18 @@ Write to `.planning/project/PHASE-{N}-RESEARCH.md`:
 **Confidence:** [HIGH/MEDIUM/LOW]
 
 <user_constraints>
-## User Constraints (from PHASE-{N}-CONTEXT.md)
+## User Constraints (from PHASE-{N}-DISCUSSION.md)
 
 ### Locked Decisions
-[Copy from CONTEXT.md — these are NON-NEGOTIABLE for the planner/executor]
+[Copy from DISCUSSION.md — these are NON-NEGOTIABLE for the planner/executor]
 
 ### Discretion Areas
-[Copy from CONTEXT.md — areas where planner/executor can choose]
+[Copy from DISCUSSION.md — areas where planner/executor can choose]
 
 ### Deferred Ideas (OUT OF SCOPE)
-[Copy from CONTEXT.md — do NOT research or plan these]
+[Copy from DISCUSSION.md — do NOT research or plan these]
 
-**If no CONTEXT.md exists:** "No user constraints — all decisions at researcher's discretion"
+**If no DISCUSSION.md exists:** "No user constraints — all decisions at researcher's discretion"
 </user_constraints>
 
 <research_summary>
@@ -267,7 +267,7 @@ Research complete when:
 
 - [ ] PHASE-N-RESEARCH.md created at `.planning/project/`
 - [ ] All XML section tags present (<user_constraints>, <research_summary>, <standard_stack>, <implementation_patterns>, <common_pitfalls>, <open_questions>, <sources>)
-- [ ] User constraints copied verbatim from CONTEXT.md (if exists)
+- [ ] User constraints copied verbatim from DISCUSSION.md (if exists)
 - [ ] Standard stack with rationale
 - [ ] Implementation patterns with code examples
 - [ ] Critical pitfalls documented

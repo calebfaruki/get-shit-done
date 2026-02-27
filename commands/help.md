@@ -44,7 +44,7 @@ Implement individual phases within a project:
 | `/execute-phase N` | Execute phase N. Changes remain unstaged |
 | `/verify-phase N` | Verify against must_haves. On pass, stages changes |
 
-**Flow per phase:** `/discuss-phase N` (optional) → `/research-phase N` (optional) → `/plan-phase N` → `/execute-phase N` → `/verify-phase N`
+**Flow per phase:** `/discuss-phase N` (optional — skip with `/skip`) → `/research-phase N` (optional — skip with `/skip`) → `/plan-phase N` → `/execute-phase N` → `/verify-phase N`
 
 ### Utility Commands
 
@@ -56,6 +56,7 @@ Supporting tools for project work:
 | `/todo` | View parking lot items. Lists all todos; optionally filter by area |
 | `/debug` | Systematic debugging with persistent state across context resets |
 | `/health` | Diagnose planning directory health and optionally repair issues |
+| `/skip <step> [N]` | Skip a discussion or research step, writing a minimal skip artifact |
 | `/help` | Show this command reference |
 
 ### Command Order
@@ -97,7 +98,7 @@ All in `.planning/` (gitignored):
     ├── PROJECT-SUMMARY.md
     ├── PROJECT-VERIFICATION.md
     ├── PROJECT-RESEARCH.md
-    ├── PHASE-{N}-CONTEXT.md
+    ├── PHASE-{N}-DISCUSSION.md
     ├── PHASE-{N}-RESEARCH.md
     └── PHASE-{N}-PLAN.md
 ```

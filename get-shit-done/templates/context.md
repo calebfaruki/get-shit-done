@@ -1,6 +1,6 @@
 # Phase Context Template
 
-Template for `.planning/project/PHASE-{N}-CONTEXT.md` - captures implementation decisions for a phase.
+Template for `.planning/project/PHASE-{N}-DISCUSSION.md` - captures implementation decisions for a phase.
 
 **Purpose:** Document decisions that downstream agents need. Researcher uses this to know WHAT to investigate. Planner uses this to know WHAT choices are locked vs flexible.
 
@@ -282,7 +282,7 @@ The output should answer: "What does the researcher need to investigate? What ch
 - "Easy to use"
 
 **After creation:**
-- File lives in project directory: `.planning/project/PHASE-{N}-CONTEXT.md`
+- File lives in project directory: `.planning/project/PHASE-{N}-DISCUSSION.md`
 - `gsd-phase-researcher` uses decisions to focus investigation
 - `gsd-planner` uses decisions + research to create executable tasks
 - Downstream agents should NOT need to ask the user again about captured decisions

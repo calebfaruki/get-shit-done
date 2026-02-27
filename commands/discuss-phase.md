@@ -15,7 +15,7 @@ Extract implementation decisions that downstream agents need. Analyze the phase 
 
 You are a thinking partner, not an interviewer. The user is the visionary — you are the builder. Your job is to capture decisions that will guide research and planning, not to figure out implementation yourself.
 
-**Output:** `PHASE-{N}-CONTEXT.md` in `.planning/project/` — decisions clear enough that downstream agents can act without asking the user again
+**Output:** `PHASE-{N}-DISCUSSION.md` in `.planning/project/` — decisions clear enough that downstream agents can act without asking the user again
 </objective>
 
 <execution_context>
@@ -32,11 +32,11 @@ Context files are resolved in-workflow by reading PROJECT-PLAN.md directly.
 
 <process>
 1. Parse phase number from arguments
-2. Check if PHASE-N-CONTEXT.md exists (offer update/view/skip if yes)
+2. Check if PHASE-N-DISCUSSION.md exists (offer update/view/skip if yes)
 3. **Analyze phase** — Identify domain and generate phase-specific gray areas
 4. **Present gray areas** — Multi-select: which to discuss? (NO skip option)
 5. **Deep-dive each area** — 4 questions per area, then offer more/next
-6. **Write PHASE-N-CONTEXT.md** to `.planning/project/` with three-category structure
+6. **Write PHASE-N-DISCUSSION.md** to `.planning/project/` with three-category structure
 7. Suggest next steps (research or plan)
 
 **CRITICAL: Scope guardrail**
@@ -73,6 +73,6 @@ Generate 3-4 **phase-specific** gray areas, not generic categories.
 - User chose which areas to discuss
 - Each selected area explored until satisfied
 - Scope creep redirected to deferred ideas
-- PHASE-N-CONTEXT.md captures decisions, not vague vision
+- PHASE-N-DISCUSSION.md captures decisions, not vague vision
 - User knows next steps (suggest /research-phase N or /plan-phase N)
 </success_criteria>

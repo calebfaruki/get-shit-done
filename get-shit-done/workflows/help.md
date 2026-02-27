@@ -64,7 +64,7 @@ Repeat steps 3-5 for each phase. When done, review `git diff --cached` and commi
     ├── PROJECT-SUMMARY.md
     ├── PROJECT-VERIFICATION.md
     ├── PROJECT-RESEARCH.md
-    ├── PHASE-{N}-CONTEXT.md
+    ├── PHASE-{N}-DISCUSSION.md
     ├── PHASE-{N}-RESEARCH.md
     └── PHASE-{N}-PLAN.md
 ```

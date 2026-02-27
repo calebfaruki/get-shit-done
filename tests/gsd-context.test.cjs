@@ -81,7 +81,11 @@ describe('gsd-context', () => {
   it('phase 1 planned: shows current phase and total phases', () => {
     setupFiles(tmpDir, {
       'PROJECT.md': '# Project\n',
+      'PROJECT-DISCUSSION.md': '---\nskipped: true\n---\n',
+      'PROJECT-RESEARCH.md': '---\nskipped: true\n---\n',
       'PROJECT-PLAN.md': PLAN_2_PHASES,
+      'PHASE-1-DISCUSSION.md': '---\nskipped: true\n---\n',
+      'PHASE-1-RESEARCH.md': '---\nskipped: true\n---\n',
       'PHASE-1-PLAN.md': '# Phase 1\n',
     });
     const result = runContext(tmpDir);

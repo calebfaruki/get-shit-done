@@ -24,7 +24,7 @@ Template for spawning gsd-planner agent. The agent contains all planning experti
 @.planning/codebase/concerns.md
 
 **Phase Context (if exists):**
-@.planning/project/PHASE-{N}-CONTEXT.md
+@.planning/project/PHASE-{N}-DISCUSSION.md
 
 **Research (if exists):**
 @.planning/project/PHASE-{N}-RESEARCH.md

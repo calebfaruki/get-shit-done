@@ -53,7 +53,7 @@ Collect file paths for researchers to load:
 
 ```bash
 PROJECT_PLAN_PATH=".planning/project/PROJECT-PLAN.md"
-CONTEXT_PATH=".planning/project/PHASE-${PHASE}-CONTEXT.md"
+CONTEXT_PATH=".planning/project/PHASE-${PHASE}-DISCUSSION.md"
 CODEBASE_DIR=".planning/codebase"
 
 # Check which files exist
@@ -79,7 +79,7 @@ Answer: "What do I need to know to PLAN and EXECUTE this phase well?"
 
 <files_to_read>
 ${HAS_PROJECT_PLAN && "- .planning/project/PROJECT-PLAN.md (Project phases)"}
-${HAS_CONTEXT && "- .planning/project/PHASE-${PHASE}-CONTEXT.md (User decisions from /discuss-phase)"}
+${HAS_CONTEXT && "- .planning/project/PHASE-${PHASE}-DISCUSSION.md (User decisions from /discuss-phase)"}
 ${HAS_CODEBASE && "- .planning/codebase/architecture.md (codebase architecture)"}
 ${HAS_CODEBASE && "- .planning/codebase/conventions.md (codebase conventions)"}
 ${HAS_CODEBASE && "- .planning/codebase/tech-stack.md (tech stack)"}
@@ -99,18 +99,18 @@ Write to: .planning/project/PHASE-${PHASE}-RESEARCH.md
 **CRITICAL: Use XML-tagged sections per SPEC:**
 
 <user_constraints>
-## User Constraints (from PHASE-${PHASE}-CONTEXT.md)
+## User Constraints (from PHASE-${PHASE}-DISCUSSION.md)
 
 ### Locked Decisions
-[Copy from CONTEXT.md — these are NON-NEGOTIABLE for the planner/executor]
+[Copy from DISCUSSION.md — these are NON-NEGOTIABLE for the planner/executor]
 
 ### Discretion Areas
-[Copy from CONTEXT.md — areas where planner/executor can choose]
+[Copy from DISCUSSION.md — areas where planner/executor can choose]
 
 ### Deferred Ideas (OUT OF SCOPE)
-[Copy from CONTEXT.md — do NOT research or plan these]
+[Copy from DISCUSSION.md — do NOT research or plan these]
 
-**If no CONTEXT.md exists:** "No user constraints — all decisions at researcher's discretion"
+**If no DISCUSSION.md exists:** "No user constraints — all decisions at researcher's discretion"
 </user_constraints>
 
 <research_summary>
@@ -197,7 +197,7 @@ Answer: "What do experts agree you should always/never do in this domain?"
 
 <files_to_read>
 ${HAS_PROJECT_PLAN && "- .planning/project/PROJECT-PLAN.md (Project phases)"}
-${HAS_CONTEXT && "- .planning/project/PHASE-${PHASE}-CONTEXT.md (User decisions from /discuss-phase)"}
+${HAS_CONTEXT && "- .planning/project/PHASE-${PHASE}-DISCUSSION.md (User decisions from /discuss-phase)"}
 </files_to_read>
 
 <phase_context>

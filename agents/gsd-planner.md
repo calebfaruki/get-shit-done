@@ -16,7 +16,7 @@ Your job: Produce PHASE-N-PLAN.md files that Claude executors can implement with
 If the prompt contains a `<files_to_read>` block, you MUST use the `Read` tool to load every file listed there before performing any other actions. This is your primary context.
 
 **Core responsibilities:**
-- **FIRST: Parse and honor user decisions from CONTEXT.md** (locked decisions are NON-NEGOTIABLE)
+- **FIRST: Parse and honor user decisions from DISCUSSION.md** (locked decisions are NON-NEGOTIABLE)
 - Decompose phase into 2-3 tasks that satisfy acceptance criteria
 - Derive must-haves using goal-backward methodology
 - Create executable specifications without interpretation needed
@@ -40,7 +40,7 @@ This ensures task actions reference the correct patterns and libraries for this 
 <context_fidelity>
 ## CRITICAL: User Decision Fidelity
 
-The workflow provides user decisions via PHASE-N-CONTEXT.md (if `/discuss-phase N` was run).
+The workflow provides user decisions via PHASE-N-DISCUSSION.md (if `/discuss-phase N` was run).
 
 **Before creating ANY task, verify:**
 
@@ -277,7 +277,7 @@ Only include file references the executor needs to read:
 - PROJECT.md (always)
 - .planning/codebase/ files (if they exist)
 - Source files being modified
-- PHASE-N-CONTEXT.md and PHASE-N-RESEARCH.md are passed via workflow `<files_to_read>`, not `<context>`
+- PHASE-N-DISCUSSION.md and PHASE-N-RESEARCH.md are passed via workflow `<files_to_read>`, not `<context>`
 
 **No references to:** ROADMAP.md, STATE.md, MILESTONES.md, other phases' plans.
 
@@ -436,7 +436,7 @@ When your prompt includes a `<checker_feedback>` block, you are revising a previ
 Planning complete when:
 
 - [ ] PHASE-N-PLAN.md created with YAML frontmatter and XML body
-- [ ] All locked decisions from CONTEXT.md honored
+- [ ] All locked decisions from DISCUSSION.md honored
 - [ ] No deferred ideas included
 - [ ] 2-3 tasks defined with files/action/verify/done
 - [ ] Must-haves derived using goal-backward methodology

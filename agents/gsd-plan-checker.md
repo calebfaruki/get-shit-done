@@ -20,7 +20,7 @@ If the prompt contains a `<files_to_read>` block, you MUST use the `Read` tool t
 - Tasks exist but don't actually achieve the criteria
 - Artifacts are planned but wiring between them isn't
 - Scope exceeds verifiability threshold (interaction density too high)
-- **Plans contradict user decisions from CONTEXT.md**
+- **Plans contradict user decisions from DISCUSSION.md**
 
 You are NOT the executor or verifier — you verify plans WILL work before execution burns context.
 </role>
@@ -41,7 +41,7 @@ This ensures verification checks that plans follow project-specific conventions.
 </project_context>
 
 <upstream_input>
-**CONTEXT.md** (if exists) — User decisions from `/discuss-phase N`
+**DISCUSSION.md** (if exists) — User decisions from `/discuss-phase N`
 
 | Section | How You Use It |
 |---------|----------------|
@@ -49,7 +49,7 @@ This ensures verification checks that plans follow project-specific conventions.
 | `## Claude's Discretion` | Freedom areas — planner can choose approach, don't flag. |
 | `## Deferred Ideas` | Out of scope — plan must NOT include these. Flag if present. |
 
-If CONTEXT.md exists, add verification dimension: **Context Compliance**
+If DISCUSSION.md exists, add verification dimension: **Context Compliance**
 - Does plan honor locked decisions?
 - Are deferred ideas excluded?
 - Are discretion areas handled appropriately?
@@ -206,12 +206,12 @@ issue:
   fix_hint: "Break into specific truths: can see messages, can send message, messages persist"
 ```
 
-## Dimension 5: Context Compliance (if CONTEXT.md exists)
+## Dimension 5: Context Compliance (if DISCUSSION.md exists)
 
-**Question:** Does plan honor user decisions from CONTEXT.md?
+**Question:** Does plan honor user decisions from DISCUSSION.md?
 
 **Process:**
-1. Read PHASE-N-CONTEXT.md locked decisions, deferred ideas
+1. Read PHASE-N-DISCUSSION.md locked decisions, deferred ideas
 2. For each locked decision: find task implementing it
 3. For each deferred idea: verify NO task implements it
 4. Flag violations
@@ -240,7 +240,7 @@ issue:
 Use Read tool to load:
 - PROJECT-PLAN.md (phase goal and acceptance criteria for this phase)
 - PHASE-N-PLAN.md (the plan to verify)
-- PHASE-N-CONTEXT.md (if exists — user decisions)
+- PHASE-N-DISCUSSION.md (if exists — user decisions)
 
 Parse plan frontmatter manually:
 - `phase`: phase number
@@ -254,7 +254,7 @@ Parse plan frontmatter manually:
 - Dimension 2: Task Completeness
 - Dimension 3: Scope Verifiability
 - Dimension 4: Must-Haves Derivation
-- Dimension 5: Context Compliance (if CONTEXT.md exists)
+- Dimension 5: Context Compliance (if DISCUSSION.md exists)
 
 **3. Collect issues:**
 Track issues with dimension, severity (blocker/warning), description, fix_hint.

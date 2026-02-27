@@ -88,6 +88,11 @@ const SUMMARY_ALL_3 = [
   '**Status:** Complete',
 ].join('\n');
 
+const DISC_DONE = '---\nskipped: false\n---\n# Discussion\n';
+const DISC_SKIPPED = '---\nskipped: true\n---\n';
+const RESEARCH_DONE = '---\nskipped: false\n---\n# Research\n';
+const RESEARCH_SKIPPED = '---\nskipped: true\n---\n';
+
 describe('gsd-state-resolver', () => {
   let tmpDir;
 
@@ -258,13 +263,13 @@ describe('gsd-state-resolver', () => {
         assert.equal(result.nextCommand, '/discuss-phase 1');
       });
 
-      it('routes to plan when research exists but discussion does not (skip-forward)', () => {
+      it('routes to plan when research exists with frontmatter but discussion does not', () => {
         setupFiles(tmpDir, {
           'PROJECT.md': '# Project\n',
           'PROJECT-PLAN.md': PLAN_2_PHASES,
-          'PROJECT-RESEARCH.md': '# Research\n',
-          'PHASE-1-CONTEXT.md': '# Context\n',
-          'PHASE-1-RESEARCH.md': '# Research\n',
+          'PROJECT-RESEARCH.md': RESEARCH_DONE,
+          'PHASE-1-DISCUSSION.md': DISC_DONE,
+          'PHASE-1-RESEARCH.md': RESEARCH_DONE,
         });
         const result = resolveState(tmpDir);
         assert.equal(result.state, 'phase-1-unplanned');
@@ -321,7 +326,7 @@ describe('gsd-state-resolver', () => {
       it('returns /research-project when discussion exists but no research', () => {
         setupFiles(tmpDir, {
           'PROJECT.md': '# Project\n',
-          'PROJECT-DISCUSSION.md': '# Discussion\n',
+          'PROJECT-DISCUSSION.md': DISC_DONE,
         });
         const result = resolveState(tmpDir);
         assert.equal(result.nextCommand, '/research-project');
@@ -331,8 +336,8 @@ describe('gsd-state-resolver', () => {
       it('returns /plan-project when research exists, no plan', () => {
         setupFiles(tmpDir, {
           'PROJECT.md': '# Project\n',
-          'PROJECT-DISCUSSION.md': '# Discussion\n',
-          'PROJECT-RESEARCH.md': '# Research\n',
+          'PROJECT-DISCUSSION.md': DISC_DONE,
+          'PROJECT-RESEARCH.md': RESEARCH_DONE,
         });
         const result = resolveState(tmpDir);
         assert.equal(result.nextCommand, '/plan-project');
@@ -362,7 +367,7 @@ describe('gsd-state-resolver', () => {
         setupFiles(tmpDir, {
           'PROJECT.md': '# Project\n',
           'PROJECT-PLAN.md': PLAN_2_PHASES,
-          'PHASE-1-DISCUSSION.md': '# Discussion\n',
+          'PHASE-1-DISCUSSION.md': DISC_DONE,
         });
         const result = resolveState(tmpDir);
         assert.equal(result.nextCommand, '/research-phase 1');
@@ -373,8 +378,8 @@ describe('gsd-state-resolver', () => {
         setupFiles(tmpDir, {
           'PROJECT.md': '# Project\n',
           'PROJECT-PLAN.md': PLAN_2_PHASES,
-          'PHASE-1-DISCUSSION.md': '# Discussion\n',
-          'PHASE-1-RESEARCH.md': '# Research\n',
+          'PHASE-1-DISCUSSION.md': DISC_DONE,
+          'PHASE-1-RESEARCH.md': RESEARCH_DONE,
         });
         const result = resolveState(tmpDir);
         assert.equal(result.nextCommand, '/plan-phase 1');
@@ -404,7 +409,7 @@ describe('gsd-state-resolver', () => {
       assert.equal(result.currentPhase, null);
     });
 
-    it('project-defined returns 4 project steps with defined=active, rest pending', () => {
+    it('project-defined returns 4 project steps with defined=done, discussed=active, rest pending', () => {
       setupFiles(tmpDir, { 'PROJECT.md': '# Project\n' });
       const result = resolveState(tmpDir);
       assert.equal(result.steps.length, 4);
@@ -416,10 +421,10 @@ describe('gsd-state-resolver', () => {
       assert.equal(result.steps[3].status, 'pending');
     });
 
-    it('project with discussion returns discussed=done, defined=done', () => {
+    it('project with discussion (frontmatter) returns discussed=done, defined=done', () => {
       setupFiles(tmpDir, {
         'PROJECT.md': '# Project\n',
-        'PROJECT-DISCUSSION.md': '# Discussion\n',
+        'PROJECT-DISCUSSION.md': DISC_DONE,
       });
       const result = resolveState(tmpDir);
       assert.equal(result.steps[0].status, 'done');
@@ -428,13 +433,27 @@ describe('gsd-state-resolver', () => {
       assert.equal(result.steps[3].status, 'pending');
     });
 
-    it('project-defined skips to planned: discussed and researched are skipped', () => {
+    it('project-defined skips to planned: discussed and researched are active/pending without skip artifacts', () => {
       setupFiles(tmpDir, {
         'PROJECT.md': '# Project\n',
         'PROJECT-PLAN.md': PLAN_2_PHASES,
       });
       const result = resolveState(tmpDir);
       assert.equal(result.steps[0].status, 'done');   // defined
+      assert.equal(result.steps[1].status, 'active');  // discussed (no file, first incomplete)
+      assert.equal(result.steps[2].status, 'pending'); // researched
+      assert.equal(result.steps[3].status, 'pending'); // planned
+    });
+
+    it('project-defined with skip artifacts: discussed and researched are skipped', () => {
+      setupFiles(tmpDir, {
+        'PROJECT.md': '# Project\n',
+        'PROJECT-DISCUSSION.md': DISC_SKIPPED,
+        'PROJECT-RESEARCH.md': RESEARCH_SKIPPED,
+        'PROJECT-PLAN.md': PLAN_2_PHASES,
+      });
+      const result = resolveState(tmpDir);
+      assert.equal(result.steps[0].status, 'done');    // defined
       assert.equal(result.steps[1].status, 'skipped'); // discussed
       assert.equal(result.steps[2].status, 'skipped'); // researched
       assert.equal(result.steps[3].status, 'done');    // planned
@@ -442,11 +461,14 @@ describe('gsd-state-resolver', () => {
       assert.equal(result.steps[4].status, 'active');
     });
 
-    it('full sequence with 2 phases, phase 1 midway', () => {
+    it('full sequence with 2 phases, phase 1 midway, with skip artifacts', () => {
       setupFiles(tmpDir, {
         'PROJECT.md': '# Project\n',
-        'PROJECT-DISCUSSION.md': '# Discussion\n',
+        'PROJECT-DISCUSSION.md': DISC_DONE,
+        'PROJECT-RESEARCH.md': RESEARCH_SKIPPED,
         'PROJECT-PLAN.md': PLAN_2_PHASES,
+        'PHASE-1-DISCUSSION.md': DISC_SKIPPED,
+        'PHASE-1-RESEARCH.md': RESEARCH_SKIPPED,
         'PHASE-1-PLAN.md': '# Phase 1\n',
       });
       const result = resolveState(tmpDir);
@@ -468,10 +490,28 @@ describe('gsd-state-resolver', () => {
       assert.equal(result.steps[14].status, 'pending');
     });
 
-    it('skip detection: phase has plan but no discussion or research', () => {
+    it('full sequence with 2 phases, phase 1 midway, without skip artifacts shows active/pending', () => {
       setupFiles(tmpDir, {
         'PROJECT.md': '# Project\n',
+        'PROJECT-DISCUSSION.md': DISC_DONE,
         'PROJECT-PLAN.md': PLAN_2_PHASES,
+        'PHASE-1-PLAN.md': '# Phase 1\n',
+      });
+      const result = resolveState(tmpDir);
+      // Project steps
+      assert.equal(result.steps[0].status, 'done');    // defined
+      assert.equal(result.steps[1].status, 'done');    // discussed
+      assert.equal(result.steps[2].status, 'active');  // researched (no file, first incomplete)
+    });
+
+    it('frontmatter-based skip: phase has plan with skip artifacts for discussion and research', () => {
+      setupFiles(tmpDir, {
+        'PROJECT.md': '# Project\n',
+        'PROJECT-DISCUSSION.md': DISC_SKIPPED,
+        'PROJECT-RESEARCH.md': RESEARCH_SKIPPED,
+        'PROJECT-PLAN.md': PLAN_2_PHASES,
+        'PHASE-1-DISCUSSION.md': DISC_SKIPPED,
+        'PHASE-1-RESEARCH.md': RESEARCH_SKIPPED,
         'PHASE-1-PLAN.md': '# Phase 1\n',
       });
       const result = resolveState(tmpDir);
@@ -508,7 +548,11 @@ describe('gsd-state-resolver', () => {
     it('currentPhase tracks active phase', () => {
       setupFiles(tmpDir, {
         'PROJECT.md': '# Project\n',
+        'PROJECT-DISCUSSION.md': DISC_SKIPPED,
+        'PROJECT-RESEARCH.md': RESEARCH_SKIPPED,
         'PROJECT-PLAN.md': PLAN_2_PHASES,
+        'PHASE-1-DISCUSSION.md': DISC_SKIPPED,
+        'PHASE-1-RESEARCH.md': RESEARCH_SKIPPED,
         'PHASE-1-PLAN.md': '# Phase 1\n',
         'PROJECT-SUMMARY.md': SUMMARY_PHASE_1,
         'PHASE-1-VERIFICATION.md': '# Verified\n',
@@ -521,8 +565,14 @@ describe('gsd-state-resolver', () => {
     it('project-verified: all steps done or skipped, no active step', () => {
       setupFiles(tmpDir, {
         'PROJECT.md': '# Project\n',
+        'PROJECT-DISCUSSION.md': DISC_SKIPPED,
+        'PROJECT-RESEARCH.md': RESEARCH_SKIPPED,
         'PROJECT-PLAN.md': PLAN_2_PHASES,
+        'PHASE-1-DISCUSSION.md': DISC_SKIPPED,
+        'PHASE-1-RESEARCH.md': RESEARCH_SKIPPED,
         'PHASE-1-PLAN.md': '# Phase 1\n',
+        'PHASE-2-DISCUSSION.md': DISC_SKIPPED,
+        'PHASE-2-RESEARCH.md': RESEARCH_SKIPPED,
         'PHASE-2-PLAN.md': '# Phase 2\n',
         'PROJECT-SUMMARY.md': SUMMARY_PHASE_1_AND_2,
         'PHASE-1-VERIFICATION.md': '# Verified\n',
@@ -563,8 +613,14 @@ describe('gsd-state-resolver', () => {
       // project-verified
       setupFiles(tmpDir, {
         'PROJECT.md': '# Project\n',
+        'PROJECT-DISCUSSION.md': DISC_SKIPPED,
+        'PROJECT-RESEARCH.md': RESEARCH_SKIPPED,
         'PROJECT-PLAN.md': PLAN_2_PHASES,
+        'PHASE-1-DISCUSSION.md': DISC_SKIPPED,
+        'PHASE-1-RESEARCH.md': RESEARCH_SKIPPED,
         'PHASE-1-PLAN.md': '# Phase 1\n',
+        'PHASE-2-DISCUSSION.md': DISC_SKIPPED,
+        'PHASE-2-RESEARCH.md': RESEARCH_SKIPPED,
         'PHASE-2-PLAN.md': '# Phase 2\n',
         'PROJECT-SUMMARY.md': SUMMARY_PHASE_1_AND_2,
         'PHASE-1-VERIFICATION.md': '# Verified\n',
@@ -574,6 +630,93 @@ describe('gsd-state-resolver', () => {
       result = resolveState(tmpDir);
       assert.equal(result.state, 'project-verified');
       assert.equal(result.nextCommand, null);
+    });
+  });
+
+  describe('frontmatter-based status detection', () => {
+    function resolveState(dir) {
+      const { resolveState } = require(STATE_RESOLVER_HOOK_PATH);
+      return resolveState(dir);
+    }
+
+    it('file with skipped: true frontmatter reports as skipped', () => {
+      setupFiles(tmpDir, {
+        'PROJECT.md': '# Project\n',
+        'PROJECT-DISCUSSION.md': DISC_SKIPPED,
+        'PROJECT-RESEARCH.md': RESEARCH_SKIPPED,
+        'PROJECT-PLAN.md': PLAN_2_PHASES,
+        'PHASE-1-DISCUSSION.md': DISC_SKIPPED,
+      });
+      const result = resolveState(tmpDir);
+      const p1discussed = result.steps.find(s => s.id === 'phase-1-discussed');
+      assert.equal(p1discussed.status, 'skipped');
+    });
+
+    it('file with skipped: false frontmatter reports as done', () => {
+      setupFiles(tmpDir, {
+        'PROJECT.md': '# Project\n',
+        'PROJECT-DISCUSSION.md': DISC_SKIPPED,
+        'PROJECT-RESEARCH.md': RESEARCH_SKIPPED,
+        'PROJECT-PLAN.md': PLAN_2_PHASES,
+        'PHASE-1-DISCUSSION.md': DISC_DONE,
+      });
+      const result = resolveState(tmpDir);
+      const p1discussed = result.steps.find(s => s.id === 'phase-1-discussed');
+      assert.equal(p1discussed.status, 'done');
+    });
+
+    it('file without frontmatter is treated as pending (not recognized)', () => {
+      setupFiles(tmpDir, {
+        'PROJECT.md': '# Project\n',
+        'PROJECT-DISCUSSION.md': DISC_SKIPPED,
+        'PROJECT-RESEARCH.md': RESEARCH_SKIPPED,
+        'PROJECT-PLAN.md': PLAN_2_PHASES,
+        'PHASE-1-DISCUSSION.md': '# Discussion\n',
+      });
+      const result = resolveState(tmpDir);
+      const p1discussed = result.steps.find(s => s.id === 'phase-1-discussed');
+      assert.equal(p1discussed.status, 'active');
+    });
+
+    it('file with empty frontmatter (no skipped field) is treated as pending', () => {
+      setupFiles(tmpDir, {
+        'PROJECT.md': '# Project\n',
+        'PROJECT-DISCUSSION.md': DISC_SKIPPED,
+        'PROJECT-RESEARCH.md': RESEARCH_SKIPPED,
+        'PROJECT-PLAN.md': PLAN_2_PHASES,
+        'PHASE-1-DISCUSSION.md': '---\n---\n# Content\n',
+      });
+      const result = resolveState(tmpDir);
+      const p1discussed = result.steps.find(s => s.id === 'phase-1-discussed');
+      assert.equal(p1discussed.status, 'active');
+    });
+
+    it('skipped: false with real content reports as done', () => {
+      setupFiles(tmpDir, {
+        'PROJECT.md': '# Project\n',
+        'PROJECT-DISCUSSION.md': DISC_SKIPPED,
+        'PROJECT-RESEARCH.md': RESEARCH_SKIPPED,
+        'PROJECT-PLAN.md': PLAN_2_PHASES,
+        'PHASE-1-DISCUSSION.md': '---\nskipped: false\n---\n# Real discussion content\nLots of details here.\n',
+      });
+      const result = resolveState(tmpDir);
+      const p1discussed = result.steps.find(s => s.id === 'phase-1-discussed');
+      assert.equal(p1discussed.status, 'done');
+    });
+
+    it('plan/execute/verify steps do not require frontmatter', () => {
+      setupFiles(tmpDir, {
+        'PROJECT.md': '# Project\n',
+        'PROJECT-DISCUSSION.md': DISC_SKIPPED,
+        'PROJECT-RESEARCH.md': RESEARCH_SKIPPED,
+        'PROJECT-PLAN.md': PLAN_2_PHASES,
+        'PHASE-1-DISCUSSION.md': DISC_SKIPPED,
+        'PHASE-1-RESEARCH.md': RESEARCH_SKIPPED,
+        'PHASE-1-PLAN.md': '# Phase 1 Plan\n',
+      });
+      const result = resolveState(tmpDir);
+      const p1planned = result.steps.find(s => s.id === 'phase-1-planned');
+      assert.equal(p1planned.status, 'done');
     });
   });
 
@@ -616,10 +759,14 @@ describe('gsd-state-resolver', () => {
       assert.equal(parsed.steps.length, 15);
     });
 
-    it('CLI outputs steps with correct active step', () => {
+    it('CLI outputs steps with correct active step (with skip artifacts)', () => {
       setupFiles(tmpDir, {
         'PROJECT.md': '# Project\n',
+        'PROJECT-DISCUSSION.md': DISC_SKIPPED,
+        'PROJECT-RESEARCH.md': RESEARCH_SKIPPED,
         'PROJECT-PLAN.md': PLAN_2_PHASES,
+        'PHASE-1-DISCUSSION.md': DISC_SKIPPED,
+        'PHASE-1-RESEARCH.md': RESEARCH_SKIPPED,
         'PHASE-1-PLAN.md': '# Phase 1\n',
       });
       const result = runHook(STATE_RESOLVER_HOOK_PATH, '{}', tmpDir);
@@ -634,6 +781,20 @@ describe('gsd-state-resolver', () => {
       assert.equal(p1discussed.status, 'skipped');
       assert.equal(p1researched.status, 'skipped');
       assert.equal(p1planned.status, 'done');
+    });
+
+    it('CLI outputs steps without skip artifacts shows project-discussed as active', () => {
+      setupFiles(tmpDir, {
+        'PROJECT.md': '# Project\n',
+        'PROJECT-PLAN.md': PLAN_2_PHASES,
+        'PHASE-1-PLAN.md': '# Phase 1\n',
+      });
+      const result = runHook(STATE_RESOLVER_HOOK_PATH, '{}', tmpDir);
+      const parsed = JSON.parse(result.stdout);
+      const projDiscussed = parsed.steps.find(s => s.id === 'project-discussed');
+      assert.equal(projDiscussed.status, 'active');
+      const p1discussed = parsed.steps.find(s => s.id === 'phase-1-discussed');
+      assert.equal(p1discussed.status, 'pending');
     });
   });
 });

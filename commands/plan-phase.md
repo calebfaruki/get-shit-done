@@ -16,7 +16,7 @@ Produce detailed execution plan for phase N.
 
 **Default flow:** Plan → Done
 
-**Orchestrator role:** Parse phase number, validate against PROJECT-PLAN.md, gather context (CONTEXT.md, RESEARCH.md, codebase files), spawn planner subagent, present results.
+**Orchestrator role:** Parse phase number, validate against PROJECT-PLAN.md, gather context (DISCUSSION.md, RESEARCH.md, codebase files), spawn planner subagent, present results.
 
 **Output:** PHASE-{N}-PLAN.md in `.planning/project/` — the executor's instruction set with YAML frontmatter + XML body per SPEC.
 </objective>
@@ -38,7 +38,7 @@ Execute the plan-phase workflow end-to-end:
 3. Check for existing PHASE-N-PLAN.md (offer update/view/skip if exists)
 4. Load context from:
    - PROJECT-PLAN.md (phase goal and acceptance criteria)
-   - PHASE-N-CONTEXT.md (if exists — user decisions)
+   - PHASE-N-DISCUSSION.md (if exists — user decisions)
    - PHASE-N-RESEARCH.md (if exists — technical research)
    - .planning/codebase/ files (if they exist — codebase context)
 5. Spawn planner subagent with context
@@ -56,7 +56,7 @@ Execute the plan-phase workflow end-to-end:
 <success_criteria>
 - Phase validated against PROJECT-PLAN.md
 - Existing plan checked
-- Planner spawned with proper context (CONTEXT.md, RESEARCH.md, codebase files)
+- Planner spawned with proper context (DISCUSSION.md, RESEARCH.md, codebase files)
 - PHASE-N-PLAN.md uses YAML + XML format per SPEC
 - No wave/depends_on/parallelization concepts
 - User knows next steps (suggest /execute-phase N)

@@ -16,26 +16,26 @@ Template for `.planning/project/PHASE-{N}-RESEARCH.md` - comprehensive ecosystem
 **Confidence:** [HIGH/MEDIUM/LOW]
 
 <user_constraints>
-## User Constraints (from CONTEXT.md)
+## User Constraints (from DISCUSSION.md)
 
-**CRITICAL:** If CONTEXT.md exists from /discuss-phase, copy locked decisions here verbatim. These MUST be honored by the planner.
+**CRITICAL:** If DISCUSSION.md exists from /discuss-phase, copy locked decisions here verbatim. These MUST be honored by the planner.
 
 ### Locked Decisions
-[Copy from CONTEXT.md `## Decisions` section - these are NON-NEGOTIABLE]
+[Copy from DISCUSSION.md `## Decisions` section - these are NON-NEGOTIABLE]
 - [Decision 1]
 - [Decision 2]
 
 ### Claude's Discretion
-[Copy from CONTEXT.md - areas where researcher/planner can choose]
+[Copy from DISCUSSION.md - areas where researcher/planner can choose]
 - [Area 1]
 - [Area 2]
 
 ### Deferred Ideas (OUT OF SCOPE)
-[Copy from CONTEXT.md - do NOT research or plan these]
+[Copy from DISCUSSION.md - do NOT research or plan these]
 - [Deferred 1]
 - [Deferred 2]
 
-**If no CONTEXT.md exists:** Write "No user constraints - all decisions at Claude's discretion"
+**If no DISCUSSION.md exists:** Write "No user constraints - all decisions at Claude's discretion"
 </user_constraints>
 
 <research_summary>

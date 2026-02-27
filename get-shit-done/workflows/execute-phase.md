@@ -53,7 +53,7 @@ PROJECT_PATH=".planning/project/PROJECT.md"
 **Optional context files:**
 ```bash
 CODEBASE_DIR=".planning/codebase"
-CONTEXT_PATH=".planning/project/PHASE-${PHASE}-CONTEXT.md"
+CONTEXT_PATH=".planning/project/PHASE-${PHASE}-DISCUSSION.md"
 RESEARCH_PATH=".planning/project/PHASE-${PHASE}-RESEARCH.md"
 CLAUDE_PATH="./CLAUDE.md"
 
@@ -105,7 +105,7 @@ ${HAS_CODEBASE ? "- .planning/codebase/architecture.md (codebase architecture)" 
 ${HAS_CODEBASE ? "- .planning/codebase/conventions.md (codebase conventions)" : ""}
 ${HAS_CODEBASE ? "- .planning/codebase/tech-stack.md (tech stack)" : ""}
 ${HAS_CODEBASE ? "- .planning/codebase/concerns.md (known concerns)" : ""}
-${HAS_CONTEXT ? "- .planning/project/PHASE-${PHASE}-CONTEXT.md (locked decisions from /discuss-phase)" : ""}
+${HAS_CONTEXT ? "- .planning/project/PHASE-${PHASE}-DISCUSSION.md (locked decisions from /discuss-phase)" : ""}
 ${HAS_RESEARCH ? "- .planning/project/PHASE-${PHASE}-RESEARCH.md (tactical research)" : ""}
 ${HAS_CLAUDE ? "- ./CLAUDE.md (project-specific instructions and conventions)" : ""}
 - get-shit-done/knowledge/execution-domain.md (deviation rules, TDD flow, tool guidance)

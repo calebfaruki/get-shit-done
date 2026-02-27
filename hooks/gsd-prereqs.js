@@ -12,7 +12,7 @@ const PHASE_COMMANDS = new Set([
   'discuss-phase', 'research-phase', 'plan-phase', 'execute-phase', 'verify-phase'
 ]);
 
-const UTILITY_COMMANDS = new Set(['help', 'health', 'todo', 'map', 'debug']);
+const UTILITY_COMMANDS = new Set(['help', 'health', 'todo', 'map', 'debug', 'skip']);
 
 const KNOWN_COMMANDS = new Set([
   'new-project', 'discuss-project', 'research-project', 'plan-project',
@@ -27,16 +27,48 @@ function isCommandAllowed(skill, phaseNum, resolved, cwd) {
       return { allowed: true };
 
     case 'discuss-project':
-    case 'research-project':
-    case 'plan-project':
       if (resolved.state === 'no-project') {
         return { allowed: false, reason: 'No project defined.', fix: '/gsd:new-project' };
       }
       return { allowed: true };
 
+    case 'research-project':
+      if (resolved.state === 'no-project') {
+        return { allowed: false, reason: 'No project defined.', fix: '/gsd:new-project' };
+      }
+      if (!fs.existsSync(path.join(cwd, '.planning/project/PROJECT-DISCUSSION.md'))) {
+        return {
+          allowed: false,
+          reason: 'PROJECT-DISCUSSION.md not found. Discuss the project first, or skip to proceed.',
+          fix: '/gsd:discuss-project',
+          skipFix: '/gsd:skip discuss-project'
+        };
+      }
+      return { allowed: true };
+
+    case 'plan-project':
+      if (resolved.state === 'no-project') {
+        return { allowed: false, reason: 'No project defined.', fix: '/gsd:new-project' };
+      }
+      if (!fs.existsSync(path.join(cwd, '.planning/project/PROJECT-DISCUSSION.md'))) {
+        return {
+          allowed: false,
+          reason: 'PROJECT-DISCUSSION.md not found. Discuss the project first, or skip to proceed.',
+          fix: '/gsd:discuss-project',
+          skipFix: '/gsd:skip discuss-project'
+        };
+      }
+      if (!fs.existsSync(path.join(cwd, '.planning/project/PROJECT-RESEARCH.md'))) {
+        return {
+          allowed: false,
+          reason: 'PROJECT-RESEARCH.md not found. Research the project first, or skip to proceed.',
+          fix: '/gsd:research-project',
+          skipFix: '/gsd:skip research-project'
+        };
+      }
+      return { allowed: true };
+
     case 'discuss-phase':
-    case 'research-phase':
-    case 'plan-phase':
       if (resolved.totalPhases === null) {
         return { allowed: false, reason: 'No project plan found.', fix: '/gsd:plan-project' };
       }
@@ -44,6 +76,50 @@ function isCommandAllowed(skill, phaseNum, resolved, cwd) {
         return { allowed: false, reason: `Phase ${phaseNum} not found in PROJECT-PLAN.md.`, fix: '/gsd:plan-project' };
       }
       return { allowed: true };
+
+    case 'research-phase': {
+      if (resolved.totalPhases === null) {
+        return { allowed: false, reason: 'No project plan found.', fix: '/gsd:plan-project' };
+      }
+      if (phaseNum > resolved.totalPhases) {
+        return { allowed: false, reason: `Phase ${phaseNum} not found in PROJECT-PLAN.md.`, fix: '/gsd:plan-project' };
+      }
+      if (!fs.existsSync(path.join(cwd, `.planning/project/PHASE-${phaseNum}-DISCUSSION.md`))) {
+        return {
+          allowed: false,
+          reason: `PHASE-${phaseNum}-DISCUSSION.md not found. Discuss the phase first, or skip to proceed.`,
+          fix: `/gsd:discuss-phase ${phaseNum}`,
+          skipFix: `/gsd:skip discuss-phase ${phaseNum}`
+        };
+      }
+      return { allowed: true };
+    }
+
+    case 'plan-phase': {
+      if (resolved.totalPhases === null) {
+        return { allowed: false, reason: 'No project plan found.', fix: '/gsd:plan-project' };
+      }
+      if (phaseNum > resolved.totalPhases) {
+        return { allowed: false, reason: `Phase ${phaseNum} not found in PROJECT-PLAN.md.`, fix: '/gsd:plan-project' };
+      }
+      if (!fs.existsSync(path.join(cwd, `.planning/project/PHASE-${phaseNum}-DISCUSSION.md`))) {
+        return {
+          allowed: false,
+          reason: `PHASE-${phaseNum}-DISCUSSION.md not found. Discuss the phase first, or skip to proceed.`,
+          fix: `/gsd:discuss-phase ${phaseNum}`,
+          skipFix: `/gsd:skip discuss-phase ${phaseNum}`
+        };
+      }
+      if (!fs.existsSync(path.join(cwd, `.planning/project/PHASE-${phaseNum}-RESEARCH.md`))) {
+        return {
+          allowed: false,
+          reason: `PHASE-${phaseNum}-RESEARCH.md not found. Research the phase first, or skip to proceed.`,
+          fix: `/gsd:research-phase ${phaseNum}`,
+          skipFix: `/gsd:skip research-phase ${phaseNum}`
+        };
+      }
+      return { allowed: true };
+    }
 
     case 'execute-phase': {
       const planPath = path.join(cwd, '.planning/project/PHASE-' + phaseNum + '-PLAN.md');
@@ -147,8 +223,13 @@ process.stdin.on('end', () => {
       const label = rawSkill.startsWith('gsd:') ? rawSkill : `gsd:${skill}`;
       const lines = [`---GSD PREREQ---\nCannot run /${label}${phaseNum ? ' ' + phaseNum : ''}.\n`];
       lines.push(`MISSING: ${check.reason}`);
-      lines.push(`FIX: Run ${check.fix} first.\n`);
-      lines.push('Tell the user what is missing and which command to run next.');
+      lines.push(`FIX: Run ${check.fix} first.`);
+      if (check.skipFix) {
+        lines.push(`OR: Run ${check.skipFix} to skip this step.\n`);
+      } else {
+        lines.push('');
+      }
+      lines.push('Tell the user what is missing and which command(s) to run next.');
       lines.push('---END GSD PREREQ---');
       process.stderr.write(lines.join('\n'));
       process.exit(2);

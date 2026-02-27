@@ -43,7 +43,7 @@ Execute the research-phase workflow end-to-end:
 
 1. Parse phase number and validate against PROJECT-PLAN.md
 3. Check for existing PHASE-N-RESEARCH.md (offer update/view/skip if exists)
-4. Gather phase context from PROJECT-PLAN.md and PHASE-N-CONTEXT.md (if exists)
+4. Gather phase context from PROJECT-PLAN.md and PHASE-N-DISCUSSION.md (if exists)
 5. Spawn researcher subagent with context
 6. Handle subagent return (complete/blocked)
 7. Present results and suggest next steps

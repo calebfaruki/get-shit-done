@@ -14,7 +14,7 @@ const PROJECT_FILES = [
 
 const PHASE_FILES = [
   'PHASE-{N}-PLAN.md',
-  'PHASE-{N}-CONTEXT.md',
+  'PHASE-{N}-DISCUSSION.md',
   'PHASE-{N}-RESEARCH.md',
   'PHASE-{N}-VERIFICATION.md',
 ];
