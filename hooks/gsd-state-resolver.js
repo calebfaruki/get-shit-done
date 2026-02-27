@@ -16,7 +16,18 @@ function resolveState(dir) {
   }
 
   if (!files.has('PROJECT-PLAN.md')) {
-    const legacy = { state: 'project-defined', nextCommand: '/plan-project', context: 'Project defined. Create a project plan.' };
+    let nextCommand, context;
+    if (!files.has('PROJECT-RESEARCH.md') && !files.has('PROJECT-DISCUSSION.md')) {
+      nextCommand = '/discuss-project';
+      context = 'Project defined. Discuss implementation decisions. (skip: /plan-project)';
+    } else if (!files.has('PROJECT-RESEARCH.md')) {
+      nextCommand = '/research-project';
+      context = 'Project discussed. Research before planning. (skip: /plan-project)';
+    } else {
+      nextCommand = '/plan-project';
+      context = 'Project researched. Create a project plan.';
+    }
+    const legacy = { state: 'project-defined', nextCommand, context };
     const steps = buildSteps(files, null, '');
     return { ...legacy, ...assignStatuses(steps), totalPhases: null, currentPhase: null };
   }
@@ -42,7 +53,13 @@ function resolveState(dir) {
   let legacy;
   for (let n = 1; n <= totalPhases; n++) {
     if (!files.has(`PHASE-${n}-PLAN.md`)) {
-      legacy = { state: `phase-${n}-unplanned`, nextCommand: `/plan-phase ${n}`, context: `Phase ${n} needs planning.` };
+      if (!files.has(`PHASE-${n}-RESEARCH.md`) && !files.has(`PHASE-${n}-DISCUSSION.md`)) {
+        legacy = { state: `phase-${n}-unplanned`, nextCommand: `/discuss-phase ${n}`, context: `Phase ${n} needs planning. Discuss implementation decisions. (skip: /plan-phase ${n})` };
+      } else if (!files.has(`PHASE-${n}-RESEARCH.md`)) {
+        legacy = { state: `phase-${n}-unplanned`, nextCommand: `/research-phase ${n}`, context: `Phase ${n} discussed. Research before planning. (skip: /plan-phase ${n})` };
+      } else {
+        legacy = { state: `phase-${n}-unplanned`, nextCommand: `/plan-phase ${n}`, context: `Phase ${n} researched. Create a phase plan.` };
+      }
       break;
     }
 

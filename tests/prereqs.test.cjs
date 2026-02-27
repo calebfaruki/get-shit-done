@@ -340,7 +340,7 @@ describe('gsd-prereqs hook', () => {
       fs.writeFileSync(path.join(planDir, 'PROJECT.md'), '# Project\n');
       fs.writeFileSync(path.join(planDir, 'PROJECT-PLAN.md'), PLAN_1_PHASE);
 
-      const result = runHook(PREREQS_HOOK_PATH, { tool_input: { skill: 'plan-phase', args: '1' } }, tmpDir);
+      const result = runHook(PREREQS_HOOK_PATH, { tool_input: { skill: 'discuss-phase', args: '1' } }, tmpDir);
       assert.equal(result.exitCode, 0);
       assert.equal(result.stdout, '');
     });

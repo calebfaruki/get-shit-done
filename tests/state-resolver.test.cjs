@@ -133,8 +133,8 @@ describe('gsd-state-resolver', () => {
         setupFiles(tmpDir, { 'PROJECT.md': '# My Project\n' });
         const result = resolveState(tmpDir);
         assert.equal(result.state, 'project-defined');
-        assert.equal(result.nextCommand, '/plan-project');
-        assert.ok(result.context.length > 0);
+        assert.equal(result.nextCommand, '/discuss-project');
+        assert.ok(result.context.includes('(skip: /plan-project)'));
       });
     });
 
@@ -146,7 +146,7 @@ describe('gsd-state-resolver', () => {
         });
         const result = resolveState(tmpDir);
         assert.equal(result.state, 'phase-1-unplanned');
-        assert.equal(result.nextCommand, '/plan-phase 1');
+        assert.equal(result.nextCommand, '/discuss-phase 1');
       });
 
       it('returns phase-2-unplanned when phase 1 verified but phase 2 plan missing', () => {
@@ -159,7 +159,7 @@ describe('gsd-state-resolver', () => {
         });
         const result = resolveState(tmpDir);
         assert.equal(result.state, 'phase-2-unplanned');
-        assert.equal(result.nextCommand, '/plan-phase 2');
+        assert.equal(result.nextCommand, '/discuss-phase 2');
       });
     });
 
@@ -245,7 +245,7 @@ describe('gsd-state-resolver', () => {
         });
         const result = resolveState(tmpDir);
         assert.equal(result.state, 'phase-1-unplanned');
-        assert.equal(result.nextCommand, '/plan-phase 1');
+        assert.equal(result.nextCommand, '/discuss-phase 1');
       });
 
       it('parses mixed ## and ### phase headers', () => {
@@ -255,10 +255,10 @@ describe('gsd-state-resolver', () => {
         });
         const result = resolveState(tmpDir);
         assert.equal(result.state, 'phase-1-unplanned');
-        assert.equal(result.nextCommand, '/plan-phase 1');
+        assert.equal(result.nextCommand, '/discuss-phase 1');
       });
 
-      it('ignores side-path files (research, context)', () => {
+      it('routes to plan when research exists but discussion does not (skip-forward)', () => {
         setupFiles(tmpDir, {
           'PROJECT.md': '# Project\n',
           'PROJECT-PLAN.md': PLAN_2_PHASES,
@@ -305,6 +305,87 @@ describe('gsd-state-resolver', () => {
         });
         const result = resolveState(tmpDir);
         assert.equal(result.state, 'project-defined');
+        assert.equal(result.nextCommand, '/plan-project');
+      });
+    });
+
+    describe('discuss/research routing', () => {
+      it('returns /discuss-project when PROJECT.md exists, no discussion or research', () => {
+        setupFiles(tmpDir, { 'PROJECT.md': '# Project\n' });
+        const result = resolveState(tmpDir);
+        assert.equal(result.nextCommand, '/discuss-project');
+        assert.ok(result.context.includes('(skip: /plan-project)'));
+        assert.equal(result.state, 'project-defined');
+      });
+
+      it('returns /research-project when discussion exists but no research', () => {
+        setupFiles(tmpDir, {
+          'PROJECT.md': '# Project\n',
+          'PROJECT-DISCUSSION.md': '# Discussion\n',
+        });
+        const result = resolveState(tmpDir);
+        assert.equal(result.nextCommand, '/research-project');
+        assert.ok(result.context.includes('(skip: /plan-project)'));
+      });
+
+      it('returns /plan-project when research exists, no plan', () => {
+        setupFiles(tmpDir, {
+          'PROJECT.md': '# Project\n',
+          'PROJECT-DISCUSSION.md': '# Discussion\n',
+          'PROJECT-RESEARCH.md': '# Research\n',
+        });
+        const result = resolveState(tmpDir);
+        assert.equal(result.nextCommand, '/plan-project');
+        assert.ok(!result.context.includes('(skip:'));
+      });
+
+      it('returns /plan-project when research exists but discussion does not (project-level skip-forward)', () => {
+        setupFiles(tmpDir, {
+          'PROJECT.md': '# Project\n',
+          'PROJECT-RESEARCH.md': '# Research\n',
+        });
+        const result = resolveState(tmpDir);
+        assert.equal(result.nextCommand, '/plan-project');
+      });
+
+      it('returns /discuss-phase 1 when no discussion, research, or plan for phase', () => {
+        setupFiles(tmpDir, {
+          'PROJECT.md': '# Project\n',
+          'PROJECT-PLAN.md': PLAN_2_PHASES,
+        });
+        const result = resolveState(tmpDir);
+        assert.equal(result.nextCommand, '/discuss-phase 1');
+        assert.ok(result.context.includes('(skip: /plan-phase 1)'));
+      });
+
+      it('returns /research-phase 1 when discussion exists but no research', () => {
+        setupFiles(tmpDir, {
+          'PROJECT.md': '# Project\n',
+          'PROJECT-PLAN.md': PLAN_2_PHASES,
+          'PHASE-1-DISCUSSION.md': '# Discussion\n',
+        });
+        const result = resolveState(tmpDir);
+        assert.equal(result.nextCommand, '/research-phase 1');
+        assert.ok(result.context.includes('(skip: /plan-phase 1)'));
+      });
+
+      it('returns /plan-phase 1 when research exists, no plan', () => {
+        setupFiles(tmpDir, {
+          'PROJECT.md': '# Project\n',
+          'PROJECT-PLAN.md': PLAN_2_PHASES,
+          'PHASE-1-DISCUSSION.md': '# Discussion\n',
+          'PHASE-1-RESEARCH.md': '# Research\n',
+        });
+        const result = resolveState(tmpDir);
+        assert.equal(result.nextCommand, '/plan-phase 1');
+      });
+
+      it('plan with no phase headers still routes to /plan-project (no discuss routing)', () => {
+        setupFiles(tmpDir, {
+          'PROJECT.md': '# Project\n',
+          'PROJECT-PLAN.md': '# Plan\nNo phases.\n',
+        });
+        const result = resolveState(tmpDir);
         assert.equal(result.nextCommand, '/plan-project');
       });
     });
@@ -456,7 +537,7 @@ describe('gsd-state-resolver', () => {
       }
     });
 
-    it('backward compat: state, nextCommand, context unchanged', () => {
+    it('state field values unchanged across routing branches', () => {
       // no-project
       let result = resolveState(tmpDir);
       assert.equal(result.state, 'no-project');
@@ -467,7 +548,7 @@ describe('gsd-state-resolver', () => {
       setupFiles(tmpDir, { 'PROJECT.md': '# Project\n' });
       result = resolveState(tmpDir);
       assert.equal(result.state, 'project-defined');
-      assert.equal(result.nextCommand, '/plan-project');
+      assert.equal(result.nextCommand, '/discuss-project');
 
       // phase-1-planned
       setupFiles(tmpDir, {
