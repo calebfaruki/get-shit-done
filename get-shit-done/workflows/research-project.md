@@ -53,6 +53,10 @@ Agent: `gsd-project-researcher` (use `resolve-model` for model selection)
 PROJECT-RESEARCH.md structure per SPEC:
 
 ```markdown
+---
+skipped: false
+---
+
 # Project Research: [Short name]
 
 **Domain:** [primary technology/problem domain]

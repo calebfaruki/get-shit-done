@@ -187,6 +187,10 @@ Write `.planning/project/PROJECT-DISCUSSION.md` using the Write tool.
 This file serves as a record of the discussion and as a marker for the state resolver.
 
 ```markdown
+---
+skipped: false
+---
+
 # Project Discussion
 
 ## Date

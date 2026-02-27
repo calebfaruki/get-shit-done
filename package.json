@@ -1,7 +1,7 @@
 {
   "name": "get-shit-done-cc",
   "version": "1.20.5",
-  "description": "A meta-prompting, context engineering and spec-driven development system for Claude Code by TÂCHES.",
+  "description": "A meta-prompting, context engineering and spec-driven development system for Claude Code by Caleb Faruki.",
   "bin": {
     "get-shit-done-cc": "bin/install.js"
   },
@@ -20,7 +20,7 @@
     "context-engineering",
     "spec-driven-development"
   ],
-  "author": "TÂCHES",
+  "author": "Caleb Faruki",
   "license": "MIT",
   "repository": {
     "type": "git",

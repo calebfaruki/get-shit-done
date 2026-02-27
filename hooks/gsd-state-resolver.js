@@ -139,8 +139,7 @@ function buildSteps(files, totalPhases, summaryContent, projectDir) {
             step.recognized = true;
             step.skippedByFrontmatter = (fm.skipped === 'true');
           } else {
-            step.completed = false;
-            step.recognized = false;
+            step.recognized = true;
           }
         } catch (e) {
           step.completed = false;

@@ -665,7 +665,7 @@ describe('gsd-state-resolver', () => {
       assert.equal(p1discussed.status, 'done');
     });
 
-    it('file without frontmatter is treated as pending (not recognized)', () => {
+    it('file without frontmatter is treated as done', () => {
       setupFiles(tmpDir, {
         'PROJECT.md': '# Project\n',
         'PROJECT-DISCUSSION.md': DISC_SKIPPED,
@@ -675,10 +675,10 @@ describe('gsd-state-resolver', () => {
       });
       const result = resolveState(tmpDir);
       const p1discussed = result.steps.find(s => s.id === 'phase-1-discussed');
-      assert.equal(p1discussed.status, 'active');
+      assert.equal(p1discussed.status, 'done');
     });
 
-    it('file with empty frontmatter (no skipped field) is treated as pending', () => {
+    it('file with empty frontmatter (no skipped field) is treated as done', () => {
       setupFiles(tmpDir, {
         'PROJECT.md': '# Project\n',
         'PROJECT-DISCUSSION.md': DISC_SKIPPED,
@@ -688,7 +688,7 @@ describe('gsd-state-resolver', () => {
       });
       const result = resolveState(tmpDir);
       const p1discussed = result.steps.find(s => s.id === 'phase-1-discussed');
-      assert.equal(p1discussed.status, 'active');
+      assert.equal(p1discussed.status, 'done');
     });
 
     it('skipped: false with real content reports as done', () => {

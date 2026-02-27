@@ -341,6 +341,10 @@ mkdir -p .planning/project
 **Structure per SPEC — three-category output:**
 
 ```markdown
+---
+skipped: false
+---
+
 # Phase ${PHASE}: ${PHASE_NAME} - Context
 
 **Gathered:** $(date +%Y-%m-%d)

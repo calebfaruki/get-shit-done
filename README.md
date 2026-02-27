@@ -488,6 +488,6 @@ MIT License. See [LICENSE](LICENSE) for details.
 
 **Claude Code is powerful. This fork makes it focused.**
 
-Forked from [Get Shit Done](https://github.com/glittercowboy/get-shit-done) with gratitude to TÂCHES and the GSD community.
+Forked from [Get Shit Done](https://github.com/glittercowboy/get-shit-done) with gratitude to Caleb Faruki and the GSD community.
 
 </div>

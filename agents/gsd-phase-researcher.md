@@ -143,6 +143,10 @@ Always include current year. Use multiple query variations. Mark WebSearch-only 
 Write to `.planning/project/PHASE-{N}-RESEARCH.md`:
 
 ```markdown
+---
+skipped: false
+---
+
 # Phase [N]: [Name] — Research
 
 **Domain:** [primary technology/problem area]

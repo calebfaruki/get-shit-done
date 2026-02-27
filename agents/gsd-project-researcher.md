@@ -116,6 +116,10 @@ Always include current year. Use multiple query variations. Mark WebSearch-only 
 Write to `.planning/project/PROJECT-RESEARCH.md`:
 
 ```markdown
+---
+skipped: false
+---
+
 # Project Research: [Short name]
 
 **Domain:** [primary technology/problem domain]
